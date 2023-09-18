@@ -97,3 +97,7 @@ first-person/Content/Geometry/
 first-person/Content/StarterContent/
 first-person/Intermediate/
 first-person/Saved/
+*.vcxproj
+*.filters
+*.user
+big-or-small/BigOrSmall/x64/
