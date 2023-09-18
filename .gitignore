@@ -101,3 +101,13 @@ first-person/Saved/
 *.filters
 *.user
 big-or-small/BigOrSmall/x64/
+battery-collector/Binaries/
+battery-collector/Build/
+battery-collector/Content/DemoRoom/
+battery-collector/Content/Geometry/
+battery-collector/Content/ExampleContent/
+battery-collector/Content/Mannequin/
+battery-collector/Content/StarterContent/
+battery-collector/Intermediate/
+battery-collector/Saved/
+battery-collector/Content/ThirdPerson/Meshes/
