@@ -72,6 +72,7 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
 GUNMAN/Content/FreeAssets/
 GUNMAN/Binaries/
 GUNMAN/DerivedDataCache/Boot.ddc
@@ -87,6 +88,7 @@ GUNMAN/Content/Geometry/
 GUNMAN/Content/Mannequin/
 GUNMAN/Content/StarterContent/
 GUNMAN/Content/ThirdPerson/
+
 first-person/FirstPerson.png
 first-person/Binaries/
 first-person/Build/
@@ -97,10 +99,12 @@ first-person/Content/Geometry/
 first-person/Content/StarterContent/
 first-person/Intermediate/
 first-person/Saved/
+
 *.vcxproj
 *.filters
 *.user
 big-or-small/BigOrSmall/x64/
+
 battery-collector/Binaries/
 battery-collector/Build/
 battery-collector/Content/DemoRoom/
@@ -111,3 +115,22 @@ battery-collector/Content/StarterContent/
 battery-collector/Intermediate/
 battery-collector/Saved/
 battery-collector/Content/ThirdPerson/Meshes/
+
+EndlessRun/Build/
+EndlessRun/Content/__ExternalActors__/
+EndlessRun/Content/__ExternalObjects__/
+EndlessRun/Content/Characters/
+EndlessRun/Content/EndlessRun/Maps/_GENERATED/
+EndlessRun/Content/FantasyOrchestral/
+EndlessRun/Content/LevelPrototyping/
+EndlessRun/Content/MedievalDungeon/
+EndlessRun/Content/StarterContent/
+EndlessRun/Intermediate/
+EndlessRun/Saved/
+EndlessRun/HoloLens/
+EndlessRun/Config/Android
+EndlessRun/Config/TVOS
+EndlessRun/Content/EndlessRun/MS_FieldBGM.uasset
+EndlessRun/Content/EndlessRun/BGM/MS_FieldBGM.uasset
+EndlessRun/Content/EndlessRun/Blueprints/NewBlueprint.uasset
+EndlessRun/Platforms/HoloLens/
