@@ -72,3 +72,18 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+GUNMAN/Content/FreeAssets/
+GUNMAN/Binaries/
+GUNMAN/DerivedDataCache/Boot.ddc
+GUNMAN/Intermediate/AssetRegistryCache/311563bb.bin
+GUNMAN/Intermediate/
+GUNMAN/Saved/
+GUNMAN/Content/AnimStarterPack/
+GUNMAN/Content/Blueprint/FirstPersonCPP/Blueprints/BP_firstpersonProjectProjectile.uasset
+GUNMAN/Content/Enemy/Animation/
+GUNMAN/Content/Enemy/Materials/M_UE4Man_Body_Black.uasset
+GUNMAN/Content/FirstPerson/
+GUNMAN/Content/Geometry/
+GUNMAN/Content/Mannequin/
+GUNMAN/Content/StarterContent/
+GUNMAN/Content/ThirdPerson/
