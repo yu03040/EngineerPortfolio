@@ -28,7 +28,6 @@ AAIEnemy::AAIEnemy()
 	Widget->SetupAttachment(GetMesh());
 
 	AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
-	AIPerception->OnTargetPerceptionUpdated.AddDynamic(this, &AAIEnemy::HandleTargetPerceptionUpdated);
 }
 
 // Called when the game starts or when spawned
@@ -49,41 +48,6 @@ void AAIEnemy::BeginPlay()
 	if (EnemyWidget)
 	{
 		TempWidget = EnemyWidget;
-	}
-}
-
-void AAIEnemy::HandleTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus)
-{
-	// うまくいかなかったのでここの処理はブループリントに記述
-	ReceivedActor = Actor;
-	
-	// 視界に入ったら
-	if (Stimulus.SensingSucceeded && Player == ReceivedActor)
-	{
-		ReceivedActor = Player;
-		UKismetSystemLibrary::K2_ClearAndInvalidateTimerHandle(GetWorld(), TargetLostTime);
-
-		AAIEnemyController* AIEnemyController = CastChecked<AAIEnemyController>(EnemyController);
-		if (AIEnemyController)
-		{
-			AIEnemyController->UpdateTargetActorKey_Implementation(ReceivedActor);
-			AIEnemyController->UpdateHasLineOfSightKey_Implementation(true);
-		}
-	}
-	else
-	{
-		if (Player == ReceivedActor)
-		{
-			FTimerDynamicDelegate _Delegate;
-			_Delegate.BindUFunction(this, "TargetLost");
-			TargetLostTime = UKismetSystemLibrary::K2_SetTimerDelegate(_Delegate, 5.0f, false);
-			
-			AAIEnemyController* AIEnemyController = CastChecked<AAIEnemyController>(EnemyController);
-			if (AIEnemyController)
-			{
-				AIEnemyController->UpdateHasLineOfSightKey_Implementation(false);
-			}
-		}
 	}
 }
 
@@ -142,6 +106,5 @@ void AAIEnemy::Tick(float DeltaTime)
 void AAIEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 

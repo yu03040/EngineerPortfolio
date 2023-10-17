@@ -80,10 +80,6 @@ public:
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	// OnTargetPerceptionUpdated デリゲート
-	UFUNCTION()
-	void HandleTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
-
 	/** Set Timer by Event のイベント */
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
 	void TargetLost();
