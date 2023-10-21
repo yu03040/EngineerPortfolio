@@ -28,6 +28,7 @@ AAIEnemy::AAIEnemy()
 	Widget->SetupAttachment(GetMesh());
 
 	AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
+	AutoPossessAI =  EAutoPossessAI::PlacedInWorldOrSpawned; // スポーンされた敵に対してAIを適用
 }
 
 // Called when the game starts or when spawned
