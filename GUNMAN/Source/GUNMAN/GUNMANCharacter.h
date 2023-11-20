@@ -27,6 +27,14 @@ class AGUNMANCharacter : public ACharacter
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCamera;
 
+	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float BaseTurnRate;
+
+	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
+	float BaseLookUpRate;
+
 	/** Pawn mesh: 1st person view (arms; seen only by self) */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = FirstPerson, meta = (AllowPrivateAccess = "true"))
 	USkeletalMeshComponent* Mesh1P;
@@ -71,74 +79,58 @@ class AGUNMANCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
 	UAnimInstance* TPMeshAnimInstance;
 
+	/** 装備した武器の情報 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
+	FWeaponStructure EquippedWeaponInformation;
+
+	/** 武器を構えているか */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
+	bool IsAiming;
+
+	/** Gun muzzle's offset from the characters location */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	FVector GunOffset;
+
+	/** Sound to play each time we fire */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	USoundBase* FireSound;
+
+	/** AnimMontage to play each time we fire */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	UAnimMontage* FireAnimation;
+
+	/** フリップフロップのための変数 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	bool bIsFlipped = true;
+
+	/** FirstPerson かどうか */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	bool isFP = false;
+
+	/** ジャンプボタンが押されたかどうか */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	bool JumpButtonDown = false;
+
+	/** プレイヤーの体力 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	float Health = 1000.0f;
+
+	/** 倒した敵の数 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	int KillCount = 0;
+
+	/** Projectile class to spawn */
+	UPROPERTY(EditDefaultsOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AfirstpersonProjectProjectile> ProjectileClass;
+
 public:
 	AGUNMANCharacter();
 
 	virtual void Tick(float DeltaTime) override;
 
-	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float BaseTurnRate;
-
-	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera)
-	float BaseLookUpRate;
-
-	/** Gun muzzle's offset from the characters location */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	FVector GunOffset;
-
-	/** Projectile class to spawn */
-	UPROPERTY(EditDefaultsOnly, Category = Projectile)
-	TSubclassOf<class AfirstpersonProjectProjectile> ProjectileClass;
-
-	/** Sound to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	USoundBase* FireSound;
-
-	/** AnimMontage to play each time we fire */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	UAnimMontage* FireAnimation;
-
-	/** Whether to use motion controller location for aiming. */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	uint8 bUsingMotionControllers : 1;
-
-	/** フリップフロップのための変数 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
-	bool isA = true;
-
-	/** FirstPerson かどうか */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
-	bool isFP = false;
-
-	/** ジャンプボタンが押されたかどうか */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
-	bool JumpButtonDown = false;
-
-	/** クラウチ（しゃがむ）ボタンが押されたかどうか */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
-	bool CrouchButtonDown = false;
-
-	/** プレイヤーの体力 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
-	float Health = 1000.0f;
-
-	/** 装備した武器の情報 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = WeaponSettings)
-	FWeaponStructure EquippedWeaponInformation;
-
-	/** 武器を構えているか */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings)
-	bool IsAiming;
-
 	/** UICharacter の リファレンス */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Widget, meta = (AllowPrivateAccess = "true"))
 	UUICharacter* UICharacterRef;
-
-	/** 倒した敵の数 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	int KillCount = 0;
 
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -168,20 +160,11 @@ protected:
 	/** 武器の切り替えと装備 */
 	void SwitchingAndEquippingWeapons();
 
-	/** Resets HMD orientation in VR. */
-	void OnResetVR();
-
 	/** Start to jump. */
 	void StartJump();
 
 	/** Stop to jump. */
 	void StopJump();
-
-	/** Stop to jump. */
-	void StartCrouching();
-
-	/** Stop to jump. */
-	void StopCrouching();
 
 	/** Called for forwards/backward input */
 	void MoveForward(float Value);
@@ -200,16 +183,6 @@ protected:
 	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
 	 */
 	void LookUpAtRate(float Rate);
-
-	/** Handler for when a touch input begins. */
-	void TouchStarted(ETouchIndex::Type FingerIndex, FVector Location);
-
-	/** Handler for when a touch input stops. */
-	void TouchStopped(ETouchIndex::Type FingerIndex, FVector Location);
-
-	void PressFaceButtonRight();
-
-	void ReleaseFaceButtonRight();
 
 	UFUNCTION()
 	void HandleAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);

@@ -176,18 +176,6 @@ void AGUNMANCharacter::BeginPlay()
 	Mesh1P->SetVisibility(false);
 	FP_Gun->SetVisibility(false);
 
-	// Show or hide the two versions of the gun based on whether or not we're using motion controllers.
-	if (bUsingMotionControllers)
-	{
-		//VR_Gun->SetHiddenInGame(false, true);
-		Mesh1P->SetHiddenInGame(true, true);
-	}
-	else
-	{
-		//VR_Gun->SetHiddenInGame(true, true);
-		Mesh1P->SetHiddenInGame(false, true);
-	}
-
 	// AnyDamageデリゲートをバインド
 	OnTakeAnyDamage.AddDynamic(this, &AGUNMANCharacter::HandleAnyDamage);
 }
@@ -207,10 +195,6 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	// Bind run event
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &AGUNMANCharacter::StartTimeline);
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &AGUNMANCharacter::ReverseTimeline);
-
-	// Bind crouch event
-	PlayerInputComponent->BindAction("Crouch", IE_Pressed, this, &AGUNMANCharacter::StartCrouching);
-	PlayerInputComponent->BindAction("Crouch", IE_Released, this, &AGUNMANCharacter::StopCrouching);
 
 	// Bind fire event
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AGUNMANCharacter::OnFire);
@@ -234,17 +218,7 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AGUNMANCharacter::LookUpAtRate);
 
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &AGUNMANCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &AGUNMANCharacter::TouchStopped);
-
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &AGUNMANCharacter::OnResetVR);
-
 	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("FaceButtonRight", EKeys::Gamepad_FaceButton_Right));
-	PlayerInputComponent->BindAction("FaceButtonRight", IE_Pressed, this, &AGUNMANCharacter::PressFaceButtonRight);
-	PlayerInputComponent->BindAction("FaceButtonRight", IE_Released, this, &AGUNMANCharacter::ReleaseFaceButtonRight);
-
 }
 
 void AGUNMANCharacter::TimelineStep(float value)
@@ -417,7 +391,7 @@ void AGUNMANCharacter::OnFire()
 void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 {
 	// フリップフロップ作成
-	if (isA)
+	if (bIsFlipped)
 	{
 		// FirstPerson
 		// FirstPerson のカメラをオン
@@ -447,7 +421,7 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 		// FirstPerson だったら
 		isFP = true;
 
-		isA = false;
+		bIsFlipped = false;
 	}
 	else
 	{
@@ -479,23 +453,12 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 		// ThirdPerson だったら
 		isFP = false;
 
-		isA = true;
+		bIsFlipped = true;
 	}
 }
 
 void AGUNMANCharacter::SwitchingAndEquippingWeapons()
 {
-}
-
-void AGUNMANCharacter::OnResetVR()
-{
-	// If GUNMAN is added to a project via 'Add Feature' in the Unreal Editor the dependency on HeadMountedDisplay in GUNMAN.Build.cs is not automatically propagated
-	// and a linker error will result.
-	// You will need to either:
-	//		Add "HeadMountedDisplay" to [YourProject].Build.cs PublicDependencyModuleNames in order to build successfully (appropriate if supporting VR).
-	// or:
-	//		Comment or delete the call to ResetOrientationAndPosition below (appropriate if not supporting VR)
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
 }
 
 void AGUNMANCharacter::StartJump()
@@ -546,28 +509,6 @@ void AGUNMANCharacter::StopJump()
 		}
 
 	}
-}
-
-void AGUNMANCharacter::StartCrouching()
-{
-	// しゃがむ
-	//CrouchButtonDown = true;
-}
-
-void AGUNMANCharacter::StopCrouching()
-{
-	// 起きる
-	//CrouchButtonDown = false;
-}
-
-void AGUNMANCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
-{
-	Jump();
-}
-
-void AGUNMANCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-	StopJumping();
 }
 
 void AGUNMANCharacter::HandleAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
@@ -657,13 +598,4 @@ void AGUNMANCharacter::MoveRight(float Value)
 		// add movement in that direction
 		AddMovementInput(Direction, Value);
 	}
-}
-
-void AGUNMANCharacter::PressFaceButtonRight()
-{
-	UE_LOG(LogTemp, Log, TEXT("PressFaceButtonRight"));
-}
-void AGUNMANCharacter::ReleaseFaceButtonRight()
-{
-	UE_LOG(LogTemp, Log, TEXT("ReleaseFaceButtonRight"));
 }
