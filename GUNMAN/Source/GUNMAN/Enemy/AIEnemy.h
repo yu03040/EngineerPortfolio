@@ -26,37 +26,36 @@ class GUNMAN_API AAIEnemy : public ACharacter
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = Widget, meta = (AllowPrivateAccess = "true"))
 	UWidgetComponent* Widget;
 
-public:
-	// Sets default values for this character's properties
-	AAIEnemy();
-
 	/** プレイヤーかどうか判断する変数 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	ACharacter* Player;
 
 	/** Enemy のコントローラーを判断する変数 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	AController* EnemyController;
 
 	/** 受け取ったアクターを格納する変数 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	AActor* ReceivedActor;
 
-	/** 敵の体力 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
-	float Health = 30.0f;
-
-	/** 倒した敵の数 */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
-	int KillCount;
-
 	/** 攻撃が当たったときのアニメーション */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	TArray<UAnimMontage*> HitAnimMontage;
 
 	/** Healthバーを表示するための変数 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Widget, meta = (AllowPrivateAccess = "true"))
 	UUIEnemy* TempWidget;
+
+public:
+	// Sets default values for this character's properties
+	AAIEnemy();
+
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
+
+	/** 敵の体力 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
+	float Health = 30.0f;
 
 protected:
 	// Called when the game starts or when spawned
@@ -72,17 +71,6 @@ protected:
 	/** タイマーハンドル */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay)
 	FTimerHandle TargetLostTime;
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	// OnTargetPerceptionUpdated デリゲート
-	UFUNCTION()
-	void HandleTargetPerceptionUpdated(AActor* Actor, FAIStimulus Stimulus);
 
 	/** Set Timer by Event のイベント */
 	UFUNCTION(BlueprintCallable, Category = "Gameplay")
