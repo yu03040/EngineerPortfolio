@@ -100,12 +100,4 @@ void AAIEnemy::TargetLost()
 void AAIEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
-
-// Called to bind functionality to input
-void AAIEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-}
-
