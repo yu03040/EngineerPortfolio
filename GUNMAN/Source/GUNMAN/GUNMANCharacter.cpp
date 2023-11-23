@@ -1,7 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GUNMANCharacter.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -301,7 +300,7 @@ void AGUNMANCharacter::OnFire()
 			);
 
 			// ヒットした敵の情報を使用
-			TWeakObjectPtr<AActor> HitEnemy = HitResult.Actor;
+			TWeakObjectPtr<AActor> HitEnemy = HitResult.GetActor();
 			// アクターが敵だったら
 			AAIEnemy* Enemy = Cast<AAIEnemy>(HitEnemy);
 			if (Enemy)
@@ -365,7 +364,7 @@ void AGUNMANCharacter::OnFire()
 			);
 
 			// ヒットした敵の情報を使用
-			TWeakObjectPtr<AActor> HitEnemy = HitResult.Actor;
+			TWeakObjectPtr<AActor> HitEnemy = HitResult.GetActor();
 			// アクターが敵だったら
 			AAIEnemy* Enemy = Cast<AAIEnemy>(HitEnemy);
 			if (Enemy)
