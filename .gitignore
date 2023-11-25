@@ -134,3 +134,5 @@ EndlessRun/Content/EndlessRun/MS_FieldBGM.uasset
 EndlessRun/Content/EndlessRun/BGM/MS_FieldBGM.uasset
 EndlessRun/Content/EndlessRun/Blueprints/NewBlueprint.uasset
 EndlessRun/Platforms/HoloLens/
+GUNMAN/Build/
+*.vsconfig
