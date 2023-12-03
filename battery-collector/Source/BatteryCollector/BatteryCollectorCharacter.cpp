@@ -3,7 +3,6 @@
 #include "BatteryCollectorCharacter.h"
 #include "Pickup.h"
 #include "BatteryPickup.h"
-#include "HeadMountedDisplayFunctionLibrary.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
@@ -53,7 +52,7 @@ ABatteryCollectorCharacter::ABatteryCollectorCharacter()
 	CollectionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("CollectionSphere"));
 
 	// CollectionSphere をルートの子に設定
-	CollectionSphere->AttachTo(RootComponent);
+	CollectionSphere->SetupAttachment(RootComponent);
 
 	// Sphere の半径を設定
 	CollectionSphere->SetSphereRadius(200.0f);
@@ -88,13 +87,6 @@ void ABatteryCollectorCharacter::SetupPlayerInputComponent(class UInputComponent
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &ABatteryCollectorCharacter::LookUpAtRate);
 
-	// handle touch devices
-	PlayerInputComponent->BindTouch(IE_Pressed, this, &ABatteryCollectorCharacter::TouchStarted);
-	PlayerInputComponent->BindTouch(IE_Released, this, &ABatteryCollectorCharacter::TouchStopped);
-
-	// VR headset functionality
-	PlayerInputComponent->BindAction("ResetVR", IE_Pressed, this, &ABatteryCollectorCharacter::OnResetVR);
-
 	// アイテム収集ボタンのバイディング
 	PlayerInputComponent->BindAction("Collect", IE_Released, this, &ABatteryCollectorCharacter::CollectPickups);
 }
@@ -119,22 +111,6 @@ void ABatteryCollectorCharacter::UpdateCharacterPower(float PowerChange)
 
 	// バッテリー値によって色を変える
 	PowerChangeEffect();
-}
-
-
-void ABatteryCollectorCharacter::OnResetVR()
-{
-	UHeadMountedDisplayFunctionLibrary::ResetOrientationAndPosition();
-}
-
-void ABatteryCollectorCharacter::TouchStarted(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		Jump();
-}
-
-void ABatteryCollectorCharacter::TouchStopped(ETouchIndex::Type FingerIndex, FVector Location)
-{
-		StopJumping();
 }
 
 void ABatteryCollectorCharacter::TurnAtRate(float Rate)
