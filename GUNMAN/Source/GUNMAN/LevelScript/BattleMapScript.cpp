@@ -67,24 +67,7 @@ void ABattleMapScript::UpdateOutputButton()
 		case 2:
 		{
 			UI_PaseMenu->OnClickedCancel_Button();
-			// プレイ中の UI を復活させる
 
-			// プレイヤーコントローラーを取得
-			APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-
-			// アセットパスから UserWidgetClass を生成する
-			HUD_WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*PlayUIpath)).LoadSynchronous();
-			if (IsValid(HUD_WidgetClass))
-			{
-				// ゲーム中の UI を生成
-				UI_Character = Cast<UUICharacter>(CreateWidget(PlayerController, HUD_WidgetClass));
-				// ポーズメニューがあったら
-				if (UI_Character)
-				{
-					// ビューポートに表示する
-					UI_Character->AddToViewport();
-				}
-			}
 			// ボタンの位置を初期化
 			ButtonCounter = 1;
 			break;

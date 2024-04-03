@@ -25,13 +25,6 @@ void AGUNMANController::PressedActionPoseMenu()
 	UWorld* World = GetWorld();
 	if (World)
 	{
-		// プレイ中の UI 削除
-		AGUNMANCharacter* MyCharacter = Cast<AGUNMANCharacter>(UGameplayStatics::GetPlayerCharacter(World, 0));
-		if (MyCharacter)
-		{
-			MyCharacter->UICharacterRef->RemoveFromParent();
-		}
-
 		// レベルがあるか確認後、ポーズメニュー開いたときの最初のボタンの位置を初期化
 		BattleMapRef = Cast<ABattleMapScript>(World->GetLevelScriptActor());
 		if (BattleMapRef)

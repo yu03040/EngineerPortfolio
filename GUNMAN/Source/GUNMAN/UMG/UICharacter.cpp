@@ -12,7 +12,6 @@ void UUICharacter::NativeConstruct()
 	Player = UGameplayStatics::GetPlayerCharacter(this->GetWorld(), 0);
 	// 制限時間は 120 秒
 	TimeLimit = 120.0f;
-	Construct();
 }
 
 void UUICharacter::Construct()
