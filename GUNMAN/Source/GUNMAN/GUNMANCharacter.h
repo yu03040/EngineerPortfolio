@@ -63,6 +63,10 @@ class AGUNMANCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
 	int WeaponNumber;
 
+	/** ThirdPerson の武器の攻撃力 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
+	float WeaponATK;
+
 	/** ThirdPerson の武器のカウント */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
 	int WeaponNumberCounter;

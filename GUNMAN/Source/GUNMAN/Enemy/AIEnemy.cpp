@@ -57,9 +57,7 @@ void AAIEnemy::HandleAnyDamage(AActor* DamagedActor, float Damage, const UDamage
 	// ダメージ分、体力を減らす
 	Health -= Damage;
 
-	// 百分率に直し、ダメージ表示できるようにする
-	Health /= 100.0f;
-	TempWidget->HealthRate = Health;
+	TempWidget->HealthRate = Health / 30.0f;
 
 	if (TempWidget->HealthRate <= 0.0f)
 	{

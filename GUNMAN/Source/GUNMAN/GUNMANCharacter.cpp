@@ -92,6 +92,7 @@ AGUNMANCharacter::AGUNMANCharacter()
 	// Create a thirdperson weapon mesh component
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetMesh());
+	WeaponATK = 6.0;
 
 	// タイムライン初期化
 	RunTimeline = new FTimeline();
@@ -134,7 +135,7 @@ void AGUNMANCharacter::Tick(float DeltaTime)
 	}
 
 	// タイムライン実行処理
-	if (RunTimeline != nullptr && RunTimeline ->IsPlaying())
+	if (RunTimeline != nullptr && RunTimeline->IsPlaying())
 	{
 		RunTimeline->TickTimeline(DeltaTime);
 	}
@@ -310,8 +311,8 @@ void AGUNMANCharacter::OnFire()
 				TSubclassOf<UDamageType> DamageTypeClass = NULL;
 				if (Enemy->Health > 0.0f)
 				{
-					// 10 ダメージを与える
-					UGameplayStatics::ApplyDamage(Enemy, 10.0f, EventInstigator, DamageCauser, DamageTypeClass);
+					// 10 ダメージ(weaponATK分)を与える
+					UGameplayStatics::ApplyDamage(Enemy, WeaponATK, EventInstigator, DamageCauser, DamageTypeClass);
 					if (Enemy->Health <= 0.0f)
 					{
 						KillCount++;
@@ -374,13 +375,25 @@ void AGUNMANCharacter::OnFire()
 				TSubclassOf<UDamageType> DamageTypeClass = NULL;
 				if (Enemy->Health > 0.0f)
 				{
-					// 10 ダメージを与える
-					UGameplayStatics::ApplyDamage(Enemy, 10.0f, EventInstigator, DamageCauser, DamageTypeClass);
+					if (WeaponNumber == 0) //ピストル
+					{
+						WeaponATK = 10;
+					}
+					else if (WeaponNumber == 1) // ライフル
+					{
+						WeaponATK = 5.0;
+					}
+					else // ショットガン
+					{
+						WeaponATK = 15.0;
+					}
+					// 10 ダメージ(WeaponATK分)を与える
+					UGameplayStatics::ApplyDamage(Enemy, WeaponATK, EventInstigator, DamageCauser, DamageTypeClass);
 					if (Enemy->Health <= 0.0f)
 					{
 						KillCount++;
 					}
-				}				
+				}
 			}
 		}
 
@@ -553,7 +566,7 @@ void AGUNMANCharacter::AnimationAtFiring()
 	// 身体の動くアニメーションを出す
 	PlayAnimMontage(EquippedWeaponInformation.FiringMontage, 1.0f);
 	GetWorld()->SpawnActor<ARifleAmmunition>(
-		EquippedWeaponInformation.AmmunitionClass, 
+		EquippedWeaponInformation.AmmunitionClass,
 		FTransform(EquippedWeapon->GetSocketTransform(TEXT("None")))
 	);
 }
