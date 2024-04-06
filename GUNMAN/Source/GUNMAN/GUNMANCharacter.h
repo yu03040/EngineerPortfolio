@@ -127,6 +127,10 @@ class AGUNMANCharacter : public ACharacter
 	UPROPERTY(EditDefaultsOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AfirstpersonProjectProjectile> ProjectileClass;
 
+	/** BattleMapScript のリファレンス */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	class ABattleMapScript* BattleMapRef;
+
 public:
 	AGUNMANCharacter();
 
@@ -163,6 +167,9 @@ protected:
 
 	/** 武器の切り替えと装備 */
 	void SwitchingAndEquippingWeapons();
+
+	/** ポーズメニューを開く */
+	void PressedActionPoseMenu();
 
 	/** Start to jump. */
 	void StartJump();
