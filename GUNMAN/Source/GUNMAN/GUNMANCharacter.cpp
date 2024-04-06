@@ -21,6 +21,8 @@
 #include "ArmedWeapon/Rifle.h"
 #include "Enemy/AIEnemy.h"
 #include "UMG/UICharacter.h"
+#include "LevelScript/BattleMapScript.h"
+
 
 //////////////////////////////////////////////////////////////////////////
 // AGUNMANCharacter
@@ -205,6 +207,8 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	// Bind Switch And Equip Weapons event
 	PlayerInputComponent->BindAction("SwitchAndEquipWeapons", IE_Pressed, this, &AGUNMANCharacter::SwitchingAndEquippingWeapons);
 
+	// ActionMappingsに設定したActionをバインドする
+	PlayerInputComponent->BindAction("PauseMenu", IE_Pressed, this, &AGUNMANCharacter::PressedActionPoseMenu);
 
 	// Bind movement events
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGUNMANCharacter::MoveForward);
@@ -471,6 +475,21 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 
 void AGUNMANCharacter::SwitchingAndEquippingWeapons()
 {
+}
+
+void AGUNMANCharacter::PressedActionPoseMenu()
+{
+	// ワールド情報があるか
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		// レベルがあるか確認後、ポーズメニュー開いたときの最初のボタンの位置を初期化
+		BattleMapRef = Cast<ABattleMapScript>(World->GetLevelScriptActor());
+		if (BattleMapRef)
+		{
+			BattleMapRef->InitializeButtonPosition();
+		}
+	}
 }
 
 void AGUNMANCharacter::StartJump()
