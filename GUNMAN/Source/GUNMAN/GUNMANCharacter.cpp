@@ -314,8 +314,8 @@ void AGUNMANCharacter::OnFire()
 				TSubclassOf<UDamageType> DamageTypeClass = NULL;
 				if (Enemy->Health > 0.0f)
 				{
-					// 10 ダメージ(weaponATK分)を与える
-					WeaponATK = 6.0;
+					// weaponATK分ダメージを与える
+					WeaponATK = 5.0;
 					UGameplayStatics::ApplyDamage(Enemy, WeaponATK, EventInstigator, DamageCauser, DamageTypeClass);
 					if (Enemy->Health <= 0.0f)
 					{
