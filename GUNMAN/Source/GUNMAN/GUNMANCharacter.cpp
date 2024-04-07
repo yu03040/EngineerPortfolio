@@ -94,7 +94,6 @@ AGUNMANCharacter::AGUNMANCharacter()
 	// Create a thirdperson weapon mesh component
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetMesh());
-	WeaponATK = 6.0;
 
 	// タイムライン初期化
 	RunTimeline = new FTimeline();
@@ -316,6 +315,7 @@ void AGUNMANCharacter::OnFire()
 				if (Enemy->Health > 0.0f)
 				{
 					// 10 ダメージ(weaponATK分)を与える
+					WeaponATK = 6.0;
 					UGameplayStatics::ApplyDamage(Enemy, WeaponATK, EventInstigator, DamageCauser, DamageTypeClass);
 					if (Enemy->Health <= 0.0f)
 					{
