@@ -4,30 +4,27 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
-#include "UICharacter.generated.h"
+#include "UITimeLimitWidget.generated.h"
 
 /**
- *
+ * 
  */
 UCLASS()
-class GUNMAN_API UUICharacter : public UUserWidget
+class GUNMAN_API UUITimeLimitWidget : public UUserWidget
 {
 	GENERATED_BODY()
-
+	
 public:
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
 	// コンストラクタ
 	virtual void NativeConstruct() override;
 
-	// Constructメソッド
-	virtual void Construct();
+	bool Initialize() override;
+
+	/** 制限時間の秒数 */
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	float Time;
 
 protected:
-	/** プレイヤーかどうか判断する変数 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
-	ACharacter* Player;
-
 	/** 制限時間のテキスト */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* TimeLimit_TextBlock;
@@ -36,6 +33,7 @@ protected:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
 	class UTextBlock* TimeRemoving_TextBlock;
 
-private:
-
+	/** 制限時間を更新する関数 */
+	UFUNCTION()
+	FText SetTextBlockRemainingTime();
 };
