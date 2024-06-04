@@ -123,23 +123,16 @@ void AGUNMANCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	Timer += DeltaTime;
-
-	// 経過時間をセット
-	UICharacterRef->DeltaTimes = DeltaTime;
-	// 予め決めた制限時間から経過時間を引く
-	UICharacterRef->TimeLimit -= UICharacterRef->DeltaTimes;
-	// 0 秒以下ならゲーム終了（ゲームオーバー）
-	if (UICharacterRef->TimeLimit <= 0.0f)
-	{
-		UGameplayStatics::OpenLevel(this, "GameOverMap");
-	}
-
 	// タイムライン実行処理
 	if (RunTimeline != nullptr && RunTimeline->IsPlaying())
 	{
 		RunTimeline->TickTimeline(DeltaTime);
 	}
+}
+
+int AGUNMANCharacter::GetKillCount()
+{
+	return KillCount;
 }
 
 void AGUNMANCharacter::BeginPlay()
@@ -152,8 +145,6 @@ void AGUNMANCharacter::BeginPlay()
 	// マウスを非表示
 	aPlayerController->bShowMouseCursor = false;
 	aPlayerController->SetInputMode(FInputModeGameOnly());
-
-	Timer = 0.0f;
 
 	// ThirdPerson のアニメーションインスタンスをセット
 	TPMeshAnimInstance = GetMesh()->GetAnimInstance();
@@ -226,7 +217,6 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 
 void AGUNMANCharacter::TimelineStep(float value)
 {
-	UE_LOG(LogTemp, Log, TEXT("Timeline(%.2f) : val = %.2f"), Timer, value);
 	float NewSpeed = FMath::Lerp(StartSpeed, EndSpeed, value);
 	SetMaxWalkSpeed(value);
 }

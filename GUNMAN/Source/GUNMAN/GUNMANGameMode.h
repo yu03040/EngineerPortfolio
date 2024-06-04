@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Enemy/AIEnemy.h"
+#include "GUNMANCharacter.h"
+#include "UMG/UITimeLimitWidget.h"
 #include "GUNMANGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -20,12 +22,19 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void OpenGameClearMap();
+
 private:
 	TSubclassOf<class UUserWidget> TitleWidget;
 
 	UPROPERTY()
 	class UUserWidget* TitleUserWidget = nullptr;
+
+	/** UITimeLimitWidget の リファレンス */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	UUITimeLimitWidget* UITimeLimitRef;
+
+	/** GUNMANCharacter の リファレンス */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	AGUNMANCharacter* PlayerRef;
 };
-
-
-

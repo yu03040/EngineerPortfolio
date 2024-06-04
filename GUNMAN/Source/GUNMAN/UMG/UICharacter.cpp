@@ -7,18 +7,15 @@
 
 void UUICharacter::NativeConstruct()
 {
-	// ユーザー定義の初期化処理を行う
 	// プレイヤーキャラクター（ACharacter）を取得する
 	Player = UGameplayStatics::GetPlayerCharacter(this->GetWorld(), 0);
 	// 制限時間は 120 秒
-	TimeLimit = 120.0f;
+	Time = 120.0f;
 }
 
 void UUICharacter::Construct()
 {
 	Super::Construct();
-
-	// ここでUI要素の初期化や処理を行う
 }
 
 void UUICharacter::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)

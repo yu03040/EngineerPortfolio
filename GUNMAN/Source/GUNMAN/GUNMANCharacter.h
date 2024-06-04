@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "ArmedWeapon/WeaponStructure.h"
 #include "Components/TimelineComponent.h"
-#include "../GUNMAN/UMG/UICharacter.h"
+#include "UMG/UICharacter.h"
 #include "GameFramework/Character.h"
 #include "GUNMANCharacter.generated.h"
 
@@ -138,7 +138,7 @@ public:
 
 	/** UICharacter の リファレンス */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Widget, meta = (AllowPrivateAccess = "true"))
-	UUICharacter* UICharacterRef;
+	UUICharacter* UIRef;
 
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -150,6 +150,9 @@ public:
 
 	/** Returns FirstPersonCamera subobject **/
 	UCameraComponent* GetFirstPersonCamera() const { return FirstPersonCamera; }
+
+	UFUNCTION()
+	int GetKillCount();
 
 protected:
 	virtual void BeginPlay() override;
@@ -229,9 +232,4 @@ protected:
 
 	/** カーブ */
 	class UCurveFloat* RunCurve;
-
-	/** タイマー */
-	float Timer;
-
-
 };
