@@ -30,6 +30,10 @@ private:
 	UPROPERTY()
 	class UUserWidget* TitleUserWidget = nullptr;
 
+	/** ゲームクリアに必要な倒した数 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	int GameClearKillCount;
+
 	/** UITimeLimitWidget の リファレンス */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	UUITimeLimitWidget* UITimeLimitRef;
@@ -37,4 +41,8 @@ private:
 	/** GUNMANCharacter の リファレンス */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	AGUNMANCharacter* PlayerRef;
+
+	/* ブループリントのウィジェットクラス */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> WidgetClass;
 };

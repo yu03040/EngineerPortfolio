@@ -3,20 +3,66 @@
 
 #include "UICharacter.h"
 #include "Kismet/GamePlayStatics.h"
-#include "Components/ProgressBar.h"
+#include "Kismet/KismetTextLibrary.h"
+#include "GUNMAN/GUNMANCharacter.h"
+
 
 void UUICharacter::NativeConstruct()
 {
-	// プレイヤーキャラクター（ACharacter）を取得する
-	Player = UGameplayStatics::GetPlayerCharacter(this->GetWorld(), 0);
+	
 }
 
-void UUICharacter::Construct()
+bool UUICharacter::Initialize()
 {
-	Super::Construct();
+	bool Success = Super::Initialize();
+
+	if (Success == false)
+	{
+		return false;
+	}
+
+	KillCount_TextBlock->TextDelegate.BindUFunction(this, "SetKillCountText");
+	Health_ProgressBar->PercentDelegate.BindUFunction(this, "SetHealthProgressBar");
+
+	return true;
 }
 
-void UUICharacter::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+FText UUICharacter::SetKillCountText()
 {
-	Super::NativeTick(MyGeometry, InDeltaTime);
+	// プレイヤ―の情報をもらう
+	auto Player = UGameplayStatics::GetPlayerCharacter(this->GetWorld(), 0);
+	AGUNMANCharacter* PlayerRef = Cast<AGUNMANCharacter>(Player);
+	if (PlayerRef)
+	{
+		int KillCount = PlayerRef->GetKillCount();
+		if ((KillCount % 5 == 4) && KillCount != 0)
+		{
+			PlayAnimation(MoveKillCount);
+			return UKismetTextLibrary::Conv_IntToText(KillCount);
+		}
+		else
+		{
+			return UKismetTextLibrary::Conv_IntToText(KillCount);
+		}
+	}
+	else
+	{
+		return FText();
+	}
+}
+
+float UUICharacter::SetHealthProgressBar()
+{
+	// プレイヤ―の情報をもらう
+	auto Player = UGameplayStatics::GetPlayerCharacter(this->GetWorld(), 0);
+	AGUNMANCharacter* PlayerRef = Cast<AGUNMANCharacter>(Player);
+	if (PlayerRef)
+	{
+		float Health = PlayerRef->GetHealth();
+		return Health /= 1000.0f;
+	}
+	else
+	{
+		return 0.0f;
+	}
 }
