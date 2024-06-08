@@ -4,6 +4,8 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/ProgressBar.h"
+#include "Components/TextBlock.h"
 #include "UICharacter.generated.h"
 
 /**
@@ -15,27 +17,36 @@ class GUNMAN_API UUICharacter : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
-	// コンストラクタ
-	virtual void NativeConstruct() override;
-
-	// Constructメソッド
-	virtual void Construct();
 
 protected:
-	/** プレイヤーかどうか判断する変数 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
-	ACharacter* Player;
 
-	/** 制限時間のテキスト */
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UTextBlock* TimeLimit_TextBlock;
+	virtual void NativeConstruct() override;
 
-	/** 制限時間の秒数を表示するテキスト */
+	bool Initialize() override;
+
+	/** 体力バー */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UTextBlock* TimeRemoving_TextBlock;
+	class UProgressBar* Health_ProgressBar;
+
+	/** Killのテキスト */
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
+	class UTextBlock* Kill_TextBlock;
+
+	/** 倒した数を表示するテキスト */
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
+	class UTextBlock* KillCount_TextBlock;
+
+	/** 倒した数のアニメーション */
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Transient, meta = (BindWidgetAnim))
+	class UWidgetAnimation* MoveKillCount;
 
 private:
+	// 倒した数を表示する関数
+	UFUNCTION()
+	FText SetKillCountText();
 
+	// 体力を表示する関数
+	UFUNCTION()
+	float SetHealthProgressBar();
 };

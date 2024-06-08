@@ -151,8 +151,9 @@ public:
 	/** Returns FirstPersonCamera subobject **/
 	UCameraComponent* GetFirstPersonCamera() const { return FirstPersonCamera; }
 
-	UFUNCTION()
 	int GetKillCount();
+
+	float GetHealth();
 
 protected:
 	virtual void BeginPlay() override;

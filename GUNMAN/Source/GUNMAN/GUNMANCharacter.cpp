@@ -135,6 +135,11 @@ int AGUNMANCharacter::GetKillCount()
 	return KillCount;
 }
 
+float AGUNMANCharacter::GetHealth()
+{
+	return Health;
+}
+
 void AGUNMANCharacter::BeginPlay()
 {
 	// Call the base class  
