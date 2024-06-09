@@ -139,3 +139,6 @@ GUNMAN/Build/
 *.vsconfig
 
 big-or-small/BigOrSmall/BigOrSmall/x64/Debug/
+GUNMAN/.vscode/
+GUNMAN/GUNMAN.code-workspace
+GUNMAN/.ignore
