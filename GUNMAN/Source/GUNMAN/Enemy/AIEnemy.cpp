@@ -28,7 +28,9 @@ AAIEnemy::AAIEnemy()
 	Widget->SetupAttachment(GetMesh());
 
 	AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
-	AutoPossessAI =  EAutoPossessAI::PlacedInWorldOrSpawned; // スポーンされた敵に対してAIを適用
+
+	// スポーンされた敵に対してもAIを適用
+	AutoPossessAI =  EAutoPossessAI::PlacedInWorldOrSpawned; 
 }
 
 // Called when the game starts or when spawned
@@ -45,11 +47,17 @@ void AAIEnemy::BeginPlay()
 	OnTakeAnyDamage.AddDynamic(this, &AAIEnemy::HandleAnyDamage);
 
 	// ウィジェットをもらう（ダメージ処理で使う）
-	UUIEnemy* EnemyWidget = Cast<UUIEnemy>(Widget->GetUserWidgetObject());
-	if (EnemyWidget)
+	UUIEnemy* WidgetClass = Cast<UUIEnemy>(Widget->GetUserWidgetObject());
+	if (WidgetClass)
 	{
-		TempWidget = EnemyWidget;
+		EnemyWidget = WidgetClass;
 	}
+}
+
+// Called every frame
+void AAIEnemy::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }
 
 void AAIEnemy::HandleAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
@@ -57,9 +65,9 @@ void AAIEnemy::HandleAnyDamage(AActor* DamagedActor, float Damage, const UDamage
 	// ダメージ分、体力を減らす
 	Health -= Damage;
 
-	TempWidget->HealthRate = Health / 30.0f;
+	EnemyWidget->HealthRate = Health / 30.0f;
 
-	if (TempWidget->HealthRate <= 0.0f)
+	if (EnemyWidget->HealthRate <= 0.0f)
 	{
 		// 敵の動きを止める
 		GetCharacterMovement()->DisableMovement();
@@ -94,8 +102,12 @@ void AAIEnemy::TargetLost()
 	}
 }
 
-// Called every frame
-void AAIEnemy::Tick(float DeltaTime)
+float AAIEnemy::GetHealth()
 {
-	Super::Tick(DeltaTime);
+	return Health;
+}
+
+void AAIEnemy::SetHealth(float health)
+{
+	Health = health;
 }
