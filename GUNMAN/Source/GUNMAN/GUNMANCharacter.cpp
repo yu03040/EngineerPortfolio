@@ -307,12 +307,12 @@ void AGUNMANCharacter::OnFire()
 				AController* EventInstigator = NULL;
 				AActor* DamageCauser = NULL;
 				TSubclassOf<UDamageType> DamageTypeClass = NULL;
-				if (Enemy->Health > 0.0f)
+				if (Enemy->GetHealth() > 0.0f)
 				{
 					// weaponATK分ダメージを与える
 					WeaponATK = 5.0;
 					UGameplayStatics::ApplyDamage(Enemy, WeaponATK, EventInstigator, DamageCauser, DamageTypeClass);
-					if (Enemy->Health <= 0.0f)
+					if (Enemy->GetHealth() <= 0.0f)
 					{
 						KillCount++;
 					}
@@ -372,7 +372,7 @@ void AGUNMANCharacter::OnFire()
 				AController* EventInstigator = NULL;
 				AActor* DamageCauser = NULL;
 				TSubclassOf<UDamageType> DamageTypeClass = NULL;
-				if (Enemy->Health > 0.0f)
+				if (Enemy->GetHealth() > 0.0f)
 				{
 					if (WeaponNumber == 0) //ピストル
 					{
@@ -388,7 +388,7 @@ void AGUNMANCharacter::OnFire()
 					}
 					// 10 ダメージ(WeaponATK分)を与える
 					UGameplayStatics::ApplyDamage(Enemy, WeaponATK, EventInstigator, DamageCauser, DamageTypeClass);
-					if (Enemy->Health <= 0.0f)
+					if (Enemy->GetHealth() <= 0.0f)
 					{
 						KillCount++;
 					}
