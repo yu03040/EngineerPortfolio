@@ -15,22 +15,21 @@ class GUNMAN_API UUIEnemy : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
-	// コンストラクタ
 	virtual void NativeConstruct() override;
 
-	// Constructメソッド
-	virtual void Construct();
+	bool Initialize() override;
 
-	/** 敵の体力の割合 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
-		float HealthRate = 1.0f;
+	/* 体力を表示する関数 */
+	UFUNCTION()
+	float SetHealthProgressBar();
+
+	void SetOwningEnemy(TObjectPtr<class AAIEnemy> NewOwner);
 
 protected:
-	/** プレイヤーかどうか判断する変数 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
-		ACharacter* Player;
+	/** 体力バー */
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<class UProgressBar> Health_ProgressBar;
 
-private:
+	UPROPERTY()
+	TObjectPtr<AAIEnemy> OwningEnemy;
 };
