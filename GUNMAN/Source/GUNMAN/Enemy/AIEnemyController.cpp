@@ -8,7 +8,7 @@
 void AAIEnemyController::UpdateTargetActorKey_Implementation(AActor* TargetActor)
 {
 	// BlackboardComponentの取得
-	UBlackboardComponent* BlackboardComp = GetBlackboardComponent();
+    TObjectPtr<UBlackboardComponent> BlackboardComp = GetBlackboardComponent();
 
     if (BlackboardComp)
     {
@@ -23,7 +23,7 @@ void AAIEnemyController::UpdateTargetActorKey_Implementation(AActor* TargetActor
 void AAIEnemyController::UpdateHasLineOfSightKey_Implementation(bool HasLineOfSight)
 {
     // BlackboardComponentの取得
-    UBlackboardComponent* BlackboardComp = GetBlackboardComponent();
+    TObjectPtr<UBlackboardComponent> BlackboardComp = GetBlackboardComponent();
 
     if (BlackboardComp)
     {

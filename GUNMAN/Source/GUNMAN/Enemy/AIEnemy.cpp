@@ -30,7 +30,14 @@ AAIEnemy::AAIEnemy()
 	AIPerception = CreateDefaultSubobject<UAIPerceptionComponent>(TEXT("AIPerception"));
 
 	// スポーンされた敵に対してもAIを適用
-	AutoPossessAI =  EAutoPossessAI::PlacedInWorldOrSpawned; 
+	AutoPossessAI =  EAutoPossessAI::PlacedInWorldOrSpawned;
+
+	IsAlive = true;
+	CurrentHealth = 30.0f;
+	MaxHealth = CurrentHealth;
+	DeadHealth = 0.0f;
+	EnemyATK = 10.0f;
+	InLifeSpan = 2.0f;
 }
 
 // Called when the game starts or when spawned
@@ -47,10 +54,11 @@ void AAIEnemy::BeginPlay()
 	OnTakeAnyDamage.AddDynamic(this, &AAIEnemy::HandleAnyDamage);
 
 	// ウィジェットをもらう（ダメージ処理で使う）
-	UUIEnemy* WidgetClass = Cast<UUIEnemy>(Widget->GetUserWidgetObject());
+	TObjectPtr<UUIEnemy> WidgetClass = Cast<UUIEnemy>(Widget->GetUserWidgetObject());
 	if (WidgetClass)
 	{
 		EnemyWidget = WidgetClass;
+		EnemyWidget->SetOwningEnemy(this);
 	}
 }
 
@@ -63,31 +71,28 @@ void AAIEnemy::Tick(float DeltaTime)
 void AAIEnemy::HandleAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
 	// ダメージ分、体力を減らす
-	Health -= Damage;
+	CurrentHealth -= Damage;
 
-	EnemyWidget->HealthRate = Health / 30.0f;
-
-	if (EnemyWidget->HealthRate <= 0.0f)
+	if (CurrentHealth <= DeadHealth)
 	{
 		// 敵の動きを止める
 		GetCharacterMovement()->DisableMovement();
-		auto EnemyCapsuleComponent = GetCapsuleComponent();
+		TObjectPtr<UCapsuleComponent> EnemyCapsuleComponent = GetCapsuleComponent();
 		if (EnemyCapsuleComponent)
 		{
 			// コリジョンをオフ
 			EnemyCapsuleComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			// 物理シュミレーションをオン
 			GetMesh()->SetSimulatePhysics(true);
-			// 2 秒たったら崩れる
-			SetLifeSpan(2.0f);
-			// 死んだら
+			// 指定された秒数が過ぎると崩れる
+			SetLifeSpan(InLifeSpan);
 			IsAlive = false;
 		}
 	}
 	else
 	{
 		// 攻撃されたらランダムにアニメーションを再生する
-		auto i = UKismetMathLibrary::RandomIntegerInRange(0, 3);
+		int32 i = UKismetMathLibrary::RandomIntegerInRange(0, 3);
 		PlayAnimMontage(HitAnimMontage[i]);
 	}
 }
@@ -95,19 +100,24 @@ void AAIEnemy::HandleAnyDamage(AActor* DamagedActor, float Damage, const UDamage
 
 void AAIEnemy::TargetLost()
 {
-	AAIEnemyController* AIEnemyController = CastChecked<AAIEnemyController>(EnemyController);
+	TObjectPtr<AAIEnemyController> AIEnemyController = CastChecked<AAIEnemyController>(EnemyController);
 	if (AIEnemyController)
 	{
 		AIEnemyController->UpdateTargetActorKey_Implementation(NULL);
 	}
 }
 
-float AAIEnemy::GetHealth()
+float AAIEnemy::GetCurrentHealth()
 {
-	return Health;
+	return CurrentHealth;
 }
 
-void AAIEnemy::SetHealth(float health)
+float AAIEnemy::GetMaxHealth()
 {
-	Health = health;
+	return MaxHealth;
+}
+
+float AAIEnemy::GetHealthPercent()
+{
+	return CurrentHealth / MaxHealth;
 }

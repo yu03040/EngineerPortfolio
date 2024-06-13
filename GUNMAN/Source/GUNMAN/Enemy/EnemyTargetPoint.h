@@ -12,14 +12,13 @@
 #include "EnemyTargetPoint.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class GUNMAN_API AEnemyTargetPoint : public ATargetPoint
 {
 	GENERATED_BODY()
-	
-	/* 出現させる敵カウンター */
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Enemy, meta = (AllowPrivateAccess = "true"))
 	int EnemyCounter;
 
@@ -43,23 +42,19 @@ class GUNMAN_API AEnemyTargetPoint : public ATargetPoint
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Enemy, meta = (AllowPrivateAccess = "true"))
 	float MaxIntervalTime;
 
+	/* 開始ハンドル */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Enemy, meta = (AllowPrivateAccess = "true"))
+	FTimerHandle TimerHandle;
+
 public:
 	AEnemyTargetPoint();
 
-	/* n秒待機する関数 */
-	void StartDelay(float DelayTime, UWorld* World, TSubclassOf<APawn> PawnClass, const FVector& Location, const FRotator& Rotation);
-
-	/* 敵を指定数スポーンする関数 */
-	void SpawnEnemy();
+	virtual void Tick(float DeltaTime) override;
 
 	/* 敵にAIを付けスポーンさせる関数 */
 	UFUNCTION(BlueprintCallable, Category = "EnemyTagetPoint")
-	void SpawnAIClass(UWorld* World, TSubclassOf<APawn> PawnClass, const FVector& Location, const FRotator& Rotation);
+	void GenerateEnemyAI(UWorld* World, TSubclassOf<APawn> PawnClass, const FVector &Location, const FRotator &Rotation);
 
 protected:
 	virtual void BeginPlay() override;
-
-	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
-	
-	FTimerHandle TimerHandle;
 };

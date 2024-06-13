@@ -3,24 +3,40 @@
 
 #include "UIEnemy.h"
 #include "Kismet/GamePlayStatics.h"
+#include "GUNMAN/Enemy/AIEnemy.h"
 #include "Components/ProgressBar.h"
 
 void UUIEnemy::NativeConstruct()
 {
-	// ユーザー定義の初期化処理を行う
-	// プレイヤーキャラクター（ACharacter）を取得する
-	Player = UGameplayStatics::GetPlayerCharacter(this->GetWorld(), 0);
-	Construct();
 }
 
-void UUIEnemy::Construct()
+bool UUIEnemy::Initialize()
 {
-	Super::Construct();
+	bool Success = Super::Initialize();
 
-	// ここでUI要素の初期化や処理を行う
+	if (Success == false)
+	{
+		return false;
+	}
+
+	Health_ProgressBar->PercentDelegate.BindUFunction(this, "SetHealthProgressBar");
+
+	return true;
 }
 
-void UUIEnemy::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
+float UUIEnemy::SetHealthProgressBar()
 {
+	if (OwningEnemy)
+	{
+		return OwningEnemy->GetHealthPercent();
+	}
+	else
+	{
+		return 0.0f;
+	}
+}
 
+void UUIEnemy::SetOwningEnemy(TObjectPtr<class AAIEnemy> NewOwner)
+{
+	OwningEnemy = NewOwner;
 }

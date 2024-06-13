@@ -21,13 +21,9 @@ public:
 
 	void UpdateHasLineOfSightKey_Implementation(bool HasLineOfSight) override;
 
-	// ダメージ処理
-	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = Gameplay)
-	void Damaged();
-
 	/** プレイヤーかどうか判断する変数 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay)
-	ACharacter* Player;
+	TObjectPtr<ACharacter> Player;
 
 protected:
 	// Called when the game starts or when spawned
