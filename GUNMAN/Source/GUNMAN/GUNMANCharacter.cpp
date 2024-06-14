@@ -18,7 +18,7 @@
 #include "Kismet/KismetStringLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "firstpersonProjectProjectile.h"
-#include "ArmedWeapon/Rifle.h"
+#include "ArmedWeapon/Weapon.h"
 #include "Enemy/AIEnemy.h"
 #include "UMG/UICharacter.h"
 #include "LevelScript/BattleMapScript.h"
@@ -417,10 +417,10 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 		MeshComponent->SetVisibility(false);
 		Weapon->SetVisibility(false);
 		TArray<TObjectPtr<AActor>> WeaponList; // レベルから武器を探して取得
-		UGameplayStatics::GetAllActorsOfClass(this, ARifle::StaticClass(), WeaponList);
+		UGameplayStatics::GetAllActorsOfClass(this, AWeapon::StaticClass(), WeaponList);
 		for (TObjectPtr<AActor> SearchActor : WeaponList)
 		{
-			TObjectPtr<ARifle> NewActor = Cast<ARifle>(SearchActor);
+			TObjectPtr<AWeapon> NewActor = Cast<AWeapon>(SearchActor);
 			NewActor->SetActorHiddenInGame(true);
 		}
 
@@ -449,10 +449,10 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 		MeshComponent->SetVisibility(true);
 		Weapon->SetVisibility(false);
 		TArray<TObjectPtr<AActor>> WeaponList; // レベルから武器を探して取得
-		UGameplayStatics::GetAllActorsOfClass(this, ARifle::StaticClass(), WeaponList);
+		UGameplayStatics::GetAllActorsOfClass(this, AWeapon::StaticClass(), WeaponList);
 		for (TObjectPtr<AActor> SearchActor : WeaponList)
 		{
-			TObjectPtr<ARifle> NewActor = Cast<ARifle>(SearchActor);
+			TObjectPtr<AWeapon> NewActor = Cast<AWeapon>(SearchActor);
 			NewActor->SetActorHiddenInGame(false);
 		}
 
