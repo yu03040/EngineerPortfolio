@@ -16,32 +16,28 @@ class GUNMAN_API UUICharacter : public UUserWidget
 {
 	GENERATED_BODY()
 
-public:
+protected:
+	/** 体力バー */
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<class UProgressBar> Health_ProgressBar;
 
+	/** Killのテキスト */
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<class UTextBlock> Kill_TextBlock;
+
+	/** 倒した数を表示するテキスト */
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
+	TObjectPtr<class UTextBlock> KillCount_TextBlock;
+
+	/** 倒した数のアニメーション */
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Transient, meta = (BindWidgetAnim))
+	TObjectPtr<class UWidgetAnimation> MoveKillCount;
 
 protected:
-
 	virtual void NativeConstruct() override;
 
 	bool Initialize() override;
 
-	/** 体力バー */
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UProgressBar* Health_ProgressBar;
-
-	/** Killのテキスト */
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UTextBlock* Kill_TextBlock;
-
-	/** 倒した数を表示するテキスト */
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UTextBlock* KillCount_TextBlock;
-
-	/** 倒した数のアニメーション */
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, Transient, meta = (BindWidgetAnim))
-	class UWidgetAnimation* MoveKillCount;
-
-private:
 	// 倒した数を表示する関数
 	UFUNCTION()
 	FText SetKillCountText();

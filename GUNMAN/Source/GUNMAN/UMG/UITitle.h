@@ -7,7 +7,7 @@
 #include "UITitle.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class GUNMAN_API UUITitle : public UUserWidget
@@ -18,16 +18,16 @@ public:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	UFUNCTION(BlueprintPure, Category = "Button")
-	UButton* GetGameStart_Button() const;
+	UButton* GetGameStart_Button() const { return GameStart_Button; }
 
 	UFUNCTION(BlueprintPure, Category = "Button")
-	UButton* GetGameEnd_Button() const;
+	UButton* GetGameEnd_Button() const { return GameEnd_Button; }
 
 	UFUNCTION(BlueprintPure, Category = "Button")
-	UButton* GetGameStartExplaination_Button() const;
+	UButton* GetGameStartExplaination_Button() const { return GameStartExplaination_Button; }
 
 	UFUNCTION(BlueprintPure, Category = "Button")
-	UButton* GetGameEndExplaination_Button() const;
+	UButton* GetGameEndExplaination_Button() const { return GameEndExplaination_Button; }
 
 	/** ゲームを開始する関数 */
 	UFUNCTION(BlueprintCallable)
@@ -50,29 +50,29 @@ protected:
 
 	/** ゲーム開始ボタン */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UButton* GameStart_Button;
+	TObjectPtr<class UButton> GameStart_Button;
 
 	/** ゲーム開始ボタンのテキスト */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UTextBlock* GameStart_TextBlock;
+	TObjectPtr<class UTextBlock> GameStart_TextBlock;
 
 	/** ゲーム終了ボタン */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UButton* GameEnd_Button;
+	TObjectPtr<class UButton> GameEnd_Button;
 
 	/** ゲーム終了ボタンのテキスト */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UTextBlock* GameEnd_TextBlock;
+	TObjectPtr<class UTextBlock> GameEnd_TextBlock;
 
 	/** 操作説明開始ボタン */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UButton* GameStartExplaination_Button;
+	TObjectPtr<class UButton> GameStartExplaination_Button;
 
 	/** 操作説明終了ボタン */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UButton* GameEndExplaination_Button;
+	TObjectPtr<class UButton> GameEndExplaination_Button;
 
-/** 操作説明のキャンバス*/
+	/** 操作説明のキャンバス*/
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UCanvasPanel* Explaination_CanvasPanel;
+	TObjectPtr<class UCanvasPanel> Explaination_CanvasPanel;
 };

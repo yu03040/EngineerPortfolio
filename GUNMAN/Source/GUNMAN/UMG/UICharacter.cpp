@@ -31,9 +31,10 @@ FText UUICharacter::SetKillCountText()
 {
 	// プレイヤ―の情報をもらう
 	auto Player = UGameplayStatics::GetPlayerCharacter(this->GetWorld(), 0);
-	AGUNMANCharacter* PlayerRef = Cast<AGUNMANCharacter>(Player);
+	TObjectPtr<AGUNMANCharacter> PlayerRef = Cast<AGUNMANCharacter>(Player);
 	if (PlayerRef)
 	{
+		// 敵を5体倒すごとに UI のアニメーションを再生
 		int KillCount = PlayerRef->GetKillCount();
 		if ((KillCount % 5 == 4) && KillCount != 0)
 		{
@@ -55,11 +56,10 @@ float UUICharacter::SetHealthProgressBar()
 {
 	// プレイヤ―の情報をもらう
 	auto Player = UGameplayStatics::GetPlayerCharacter(this->GetWorld(), 0);
-	AGUNMANCharacter* PlayerRef = Cast<AGUNMANCharacter>(Player);
+	TObjectPtr<AGUNMANCharacter> PlayerRef = Cast<AGUNMANCharacter>(Player);
 	if (PlayerRef)
 	{
-		float Health = PlayerRef->GetHealth();
-		return Health /= 1000.0f;
+		return PlayerRef->GetHealthPercent();
 	}
 	else
 	{

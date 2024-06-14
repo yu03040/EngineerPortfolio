@@ -7,7 +7,7 @@
 #include "UI_PaseMenu.generated.h"
 
 /**
- * 
+ *
  */
 UCLASS()
 class GUNMAN_API UUI_PaseMenu : public UUserWidget
@@ -19,43 +19,44 @@ protected:
 
 	/** ポーズメニューのテキスト */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UTextBlock* PoseMenu_TextBlock;
+	TObjectPtr<class UTextBlock> PoseMenu_TextBlock;
 
 	/** タイトルへ戻るボタン */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UButton* BackToTitle_Button;
+	TObjectPtr<class UButton> BackToTitle_Button;
 
 	/** タイトルへ戻るボタンのテキスト */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UTextBlock* BackToTitle_TextBlock;
+	TObjectPtr<class UTextBlock> BackToTitle_TextBlock;
 
 	/** キャンセルボタン */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UButton* Cancel_Button;
+	TObjectPtr<class UButton> Cancel_Button;
 
 	/** キャンセルボタンのテキスト */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UTextBlock* Cancel_TextBlock;
+	TObjectPtr<class UTextBlock> Cancel_TextBlock;
 
 	/** ゲーム終了ボタン */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UButton* GameEnd_Button;
+	TObjectPtr<class UButton> GameEnd_Button;
 
 	/** ゲーム終了ボタンのテキスト */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
-	class UTextBlock* GameEnd_TextBlock;
+	TObjectPtr<class UTextBlock> GameEnd_TextBlock;
 
 public:
 	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	UButton* GetBackToTitle_Button() const;
+	UButton* GetBackToTitle_Button() const { return BackToTitle_Button; }
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	UButton* GetCancel_Button() const;
+	UButton* GetCancel_Button() const { return Cancel_Button; }
 
 	UFUNCTION(BlueprintCallable, Category = "UI")
-	UButton* GetGameEnd_Button() const;
+	UButton* GetGameEnd_Button() const { return GameEnd_Button; }
+
 
 	/** タイトルへ戻る関数 */
 	UFUNCTION()
