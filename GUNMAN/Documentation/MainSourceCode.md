@@ -20,10 +20,6 @@
 
 [GUNMAN Character](/GUNMAN/Source/GUNMAN/GUNMANCharacter.cpp) はプレイヤーキャラクターの動作を定義している。
 
-### GUNMAN Character Constructor
-
-- プレイヤーキャラクターの初期化
-
 ### ゲーム開始処理（BeginPlay）
 
 - アニメーション、メッシュ、カメラの設定

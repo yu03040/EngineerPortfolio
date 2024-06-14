@@ -17,8 +17,8 @@ GUNMMAN のブラッシュアップした箇所について一つずつまとめ
 | ![Rifle_TPS](Images/Weapon_Rifle_TPS.png) | ![Shotgun](Images/Weapon_Shotgun.png) | ![Pistol](Images/Weapon_Pistol.png) | ![Rifle_FPS](Images/Weapon_Rifle_FPS.png) |
 |                5 ダメージ                 |              15 ダメージ              |             10 ダメージ             |                5 ダメージ                 |
 
-[1.ソースコード](https://github.com/yu03040/EngineerPortfolio/commit/a25ed5cfa9cf09bd746817306600bd37743bae54)  
-[2.ソースコード](https://github.com/yu03040/EngineerPortfolio/commit/cc9d280066de0b78531eb7b6b40315164a2811d6)
+[1.ソースコード（TPS）](https://github.com/yu03040/EngineerPortfolio/blob/main/GUNMAN/Source/GUNMAN/GUNMANCharacter.cpp#L378)  
+[2.ソースコード（FPS）](https://github.com/yu03040/EngineerPortfolio/blob/main/GUNMAN/Source/GUNMAN/GUNMANCharacter.cpp#L305)
 
 ## 2.敵の攻撃力を変更
 
@@ -70,7 +70,7 @@ Health を 100 で割っていたので UI 表示がおかしくなっていた�
 
 修正したことで、敵の体力を把握しやすくなり、戦いやすい。
 
-[ソースコード](https://github.com/yu03040/EngineerPortfolio/commit/589b573e639fc8c31585a766fea0eb374b2ffade)
+[UIEnemy クラスのソースコード](../Source/GUNMAN/UMG/UIEnemy.cpp#L31)
 
 ## 7.敵の出現位置が巡回ルート上にない不具合の修正
 
@@ -116,3 +116,63 @@ Health を 100 で割っていたので UI 表示がおかしくなっていた�
 | ![Tutorial_Before](Images/UI_Character_After.png) | ![Tutorial_After](Images/UI_TimeLimit.png) |
 
 プレイヤーの UI は体力と倒した数にし、ゲームモードの UI は制限時間にした。
+
+## 12.生ポインタを TObjectPtr に変更
+
+UPROPERTY 変数の生ポインタ（ \* ）は直接メモリアドレスを扱うが、ガベージコレクションとは互換性がない。
+
+メモリ管理は完全に開発者の責任になる。
+
+従って、TObjectPtr を使用して自動的にメモリ管理を行い、  
+既存の UE ポインタ型よりもシンプルかつ安全に UObject を扱う。
+
+## 13.getter, setter メソッドを使用するように変更
+
+Ugetter および setter メソッドを使用することで
+
+- データカプセル化
+- プロパティの変更監視
+- デバッグの容易化
+- 内部実装の隠蔽
+- Blueprint との統合
+
+など、多くのメリットが得られる。  
+これにより、コードの保守性や安全性が向上し、開発プロセスがより効率的かつ効果的になった。
+
+## 14.敵を無限生成から指定数分生成に変更
+
+同じことを繰り返しても飽きると思ったので、指定数分だけ生成するようにした。
+
+また、敵の攻撃力の変更と敵の射程距離の変更により、難易度が上昇していることもあり、  
+敵を 10 体倒せばクリアにした。
+
+※元々、ブループリント
+
+- BP_EnemyTargetPoint_Path_A
+- BP_EnemyTargetPoint_Path_B
+- BP_EnemyTargetPoint_Random
+
+に書かれていたものだが基底クラス EnemyTargetPoint の方に書いておき、  
+レベルに配置するだけにした。
+
+[EnemyTargetPoint クラスのソースコード](../Source/GUNMAN/Enemy/EnemyTargetPoint.cpp)
+
+## 15.武器と弾薬のクラスのファイル名を変更
+
+最初は武器をライフルだけ実装するつもりだったので、Rifle クラスと RifleAmmunition クラスを作った。  
+しかし、ピストルやショットガンを実装したため、Rifle クラスと RifleAmmunition クラスが基底クラスだと不明瞭だった。
+
+そこで、基底クラスの名前を Weapon に変更し、そこから派生クラスをブループリントで作成した。
+
+- BP_Rifle
+- BP_RifleAmmunition
+- BP_ShotGun
+- BP_ShotGunAmmunition
+- BP_Pistol
+- BP_PistolAmmunition
+
+これで、一貫性を保ちコード全体の整合性を失わずに済んだ。  
+また、可読性も上がり、初めてコードを見る方にも理解しやすくなった。
+
+[Weapon クラスのソースコード](../Source/GUNMAN/ArmedWeapon/Weapon.cpp)  
+[WeaponAmmunition クラスのソースコード](../Source/GUNMAN/ArmedWeapon/WeaponAmmunition.cpp)
