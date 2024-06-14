@@ -18,7 +18,7 @@ void ATitleMapScript::BeginPlay()
 	Super::BeginPlay();
 
 	// プレイヤーコントローラーを取得
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
 	// ウィジェットブループリントのパスをセット
 	FString path = "/Game/UMG/WBP_Title.WBP_Title_C";
@@ -39,7 +39,7 @@ void ATitleMapScript::BeginPlay()
 	PlayerController->SetInputMode(FInputModeGameOnly());
 
 	// 最初 Game Start を選択状態にする
-	UButton* StartButton = UI_Title->GetGameStart_Button();
+	TObjectPtr<UButton> StartButton = UI_Title->GetGameStart_Button();
 	if (StartButton)
 	{
 		StartButton->SetBackgroundColor(SelectedColor);
@@ -49,19 +49,19 @@ void ATitleMapScript::BeginPlay()
 void ATitleMapScript::ChangeButtonColor()
 {
 	// 非選択状態の色をそれぞれ白色に
-	UButton* StartButton = UI_Title->GetGameStart_Button();
+	TObjectPtr<UButton> StartButton = UI_Title->GetGameStart_Button();
 	if (StartButton)
 	{
 		StartButton->SetBackgroundColor(FLinearColor::White);
 	}
 
-	UButton* EndButton = UI_Title->GetGameEnd_Button();
+	TObjectPtr<UButton> EndButton = UI_Title->GetGameEnd_Button();
 	if (EndButton)
 	{
 		EndButton->SetBackgroundColor(FLinearColor::White);
 	}
 
-	UButton* StartTutorialButton = UI_Title->GetGameStartExplaination_Button();
+	TObjectPtr<UButton> StartTutorialButton = UI_Title->GetGameStartExplaination_Button();
 	if (StartTutorialButton)
 	{
 		StartTutorialButton->SetBackgroundColor(FLinearColor::White);
@@ -104,7 +104,7 @@ void ATitleMapScript::UpdateOutputButton()
 			case 3:
 				// 操作説明のキャンバスを閉じるボタンの色を変える
 				UI_Title->OnClickedGameStartExplaination_Button();
-				UButton* EndTutorialButton = UI_Title->GetGameEndExplaination_Button();
+				TObjectPtr<UButton> EndTutorialButton = UI_Title->GetGameEndExplaination_Button();
 				EndTutorialButton->SetBackgroundColor(SelectedColor);
 				HasMovedToInstructions = true;
 				break;

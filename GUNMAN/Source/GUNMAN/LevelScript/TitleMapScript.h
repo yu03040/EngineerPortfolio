@@ -30,5 +30,5 @@ protected:
 private:
 	/* UITitle の Ref */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	class UUITitle* UI_Title;
+	TObjectPtr<class UUITitle> UI_Title;
 };

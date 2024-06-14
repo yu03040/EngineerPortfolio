@@ -19,7 +19,7 @@ void AGameOverMapScript::BeginPlay()
 	Super::BeginPlay();
 
 	// プレイヤーコントローラーを取得
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
 	// ウィジェットブループリントのパスをセット
 	FString path = "/Game/UMG/WBP_GameOver.WBP_GameOver_C";
@@ -40,7 +40,7 @@ void AGameOverMapScript::BeginPlay()
 	PlayerController->SetInputMode(FInputModeGameOnly());
 
 	// 最初 Continue を選択状態にする
-	UButton* ContinueButton = UI_GameOver->GetContinue_Button();
+	TObjectPtr<UButton> ContinueButton = UI_GameOver->GetContinue_Button();
 	if (ContinueButton)
 	{
 		ContinueButton->SetBackgroundColor(SelectedColor);
@@ -50,13 +50,13 @@ void AGameOverMapScript::BeginPlay()
 void AGameOverMapScript::ChangeButtonColor()
 {
 	// 非選択状態の色をそれぞれ白色に
-	UButton* ContinueButton = UI_GameOver->GetContinue_Button();
+	TObjectPtr<UButton> ContinueButton = UI_GameOver->GetContinue_Button();
 	if (ContinueButton)
 	{
 		ContinueButton->SetBackgroundColor(FLinearColor::White);
 	}
 
-	UButton* EndButton = UI_GameOver->GetGameEnd_Button();
+	TObjectPtr<UButton> EndButton = UI_GameOver->GetGameEnd_Button();
 	if (EndButton)
 	{
 		EndButton->SetBackgroundColor(FLinearColor::White);

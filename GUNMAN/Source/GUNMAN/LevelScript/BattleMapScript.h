@@ -36,11 +36,11 @@ protected:
 
 	/* UI_PaseMenu の Ref */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	class UUI_PaseMenu* UI_PaseMenu;
+	TObjectPtr<class UUI_PaseMenu> UI_PaseMenu;
 
 	/* UICharacter の Ref */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	class UUICharacter* UI_Character;
+	TObjectPtr<class UUICharacter> UI_Character;
 
 	/* WBP_UICharacter のパス */ 
 	FString PlayUIpath = "/Game/UMG/WBP_UICharacter.WBP_UICharacter_C";
