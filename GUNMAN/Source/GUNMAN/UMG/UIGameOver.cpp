@@ -11,12 +11,6 @@
 
 void UUIGameOver::NativeConstruct()
 {
-	// プレイヤーコントローラーを取得
-	APlayerController* aPlayerController = UGameplayStatics::GetPlayerController(this, 0);
-	// マウスを表示
-	//aPlayerController->bShowMouseCursor = true;
-	//aPlayerController->SetInputMode(FInputModeUIOnly());
-
 	if (Continue_Button)
 	{
 		Continue_Button->OnClicked.AddDynamic(this, &UUIGameOver::OnClickedContinue_Button);
@@ -44,14 +38,4 @@ void UUIGameOver::OnClickedGameEnd_Button()
 {
 	// ゲーム終了
 	UKismetSystemLibrary::QuitGame(this, NULL, EQuitPreference::Quit, false);
-}
-
-UButton* UUIGameOver::GetContinue_Button() const
-{
-	return Continue_Button;
-}
-
-UButton* UUIGameOver::GetGameEnd_Button() const
-{
-	return GameEnd_Button;
 }

@@ -8,8 +8,6 @@
 
 void UUITimeLimitWidget::NativeConstruct()
 {
-	// 制限時間は 120 秒
-	Time = 120.0f;
 }
 
 bool UUITimeLimitWidget::Initialize()
@@ -21,13 +19,13 @@ bool UUITimeLimitWidget::Initialize()
 		return false;
 	}
 
-	TimeRemoving_TextBlock->TextDelegate.BindUFunction(this, "SetTextBlockRemainingTime");
+	TimeRemoving_TextBlock->TextDelegate.BindUFunction(this, "SetTextBlockUpdateTimeLimit");
 
 	return true;
 }
 
-FText UUITimeLimitWidget::SetTextBlockRemainingTime()
+FText UUITimeLimitWidget::SetTextBlockUpdateTimeLimit()
 {
-	return UKismetTextLibrary::Conv_IntToText(UKismetMathLibrary::Round(Time));
+	return UKismetTextLibrary::Conv_IntToText(UKismetMathLibrary::Round(TimeLimitSeconds));
 }
 

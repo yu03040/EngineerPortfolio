@@ -28,13 +28,3 @@ void UUIGameClear::OnClickedGameEnd_Button()
 	// ゲーム終了
 	UKismetSystemLibrary::QuitGame(this, NULL, EQuitPreference::Quit, false);
 }
-
-UButton* UUIGameClear::GetContinue_Button() const
-{
-	return Continue_Button;
-}
-
-UButton* UUIGameClear::GetGameEnd_Button() const
-{
-	return GameEnd_Button;
-}

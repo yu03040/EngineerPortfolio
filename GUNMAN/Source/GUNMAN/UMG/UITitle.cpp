@@ -40,23 +40,3 @@ void UUITitle::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 
 }
-
-UButton* UUITitle::GetGameStart_Button() const
-{
-	return GameStart_Button;
-}
-
-UButton* UUITitle::GetGameEnd_Button() const
-{
-	return GameEnd_Button;
-}
-
-UButton* UUITitle::GetGameStartExplaination_Button() const
-{
-	return GameStartExplaination_Button;
-}
-
-UButton* UUITitle::GetGameEndExplaination_Button() const
-{
-	return GameEndExplaination_Button;
-}

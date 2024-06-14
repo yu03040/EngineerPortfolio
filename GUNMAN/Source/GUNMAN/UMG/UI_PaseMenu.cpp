@@ -16,7 +16,6 @@ void UUI_PaseMenu::OnClickedBackToTitle_Button()
 {
 	// タイトルへ戻る
 	UGameplayStatics::OpenLevel(this, "TitleMap");
-	//UGameplayStatics::SetGamePaused(GetWorld(), false);
 }
 
 void UUI_PaseMenu::OnClickedCancel_Button()
@@ -33,19 +32,4 @@ void UUI_PaseMenu::OnClickedGameEnd_Button()
 
 void UUI_PaseMenu::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
-}
-
-UButton* UUI_PaseMenu::GetBackToTitle_Button() const
-{
-	return BackToTitle_Button;
-}
-
-UButton* UUI_PaseMenu::GetCancel_Button() const
-{
-	return Cancel_Button;
-}
-
-UButton* UUI_PaseMenu::GetGameEnd_Button() const
-{
-	return GameEnd_Button;
 }
