@@ -16,7 +16,7 @@ class AGUNMANGameMode : public AGameModeBase
 
 public:
 	AGUNMANGameMode();
-	AAIEnemy* Enemy;
+
 	virtual void Tick(float DeltaTime) override;
 
 protected:
@@ -24,23 +24,34 @@ protected:
 
 	void OpenGameClearMap();
 
+	UPROPERTY()
+	TObjectPtr<AAIEnemy> EnemyRef;
+
 private:
 	TSubclassOf<class UUserWidget> TitleWidget;
 
 	UPROPERTY()
-	class UUserWidget* TitleUserWidget = nullptr;
+	TObjectPtr<class UUserWidget> TitleUserWidget = nullptr;
 
 	/** ゲームクリアに必要な倒した数 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
-	int GameClearKillCount;
+	int GameClearKillCount = 10;
+
+	/** ゲームオーバーの時間 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	float GameOverTime = 0.0f;
+
+	/** ゲームクリア後の待機時間 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	float GameClearWaitingTime = 2.0f;
 
 	/** UITimeLimitWidget の リファレンス */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
-	UUITimeLimitWidget* UITimeLimitRef;
+	TObjectPtr<UUITimeLimitWidget> UITimeLimitRef;
 
 	/** GUNMANCharacter の リファレンス */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
-	AGUNMANCharacter* PlayerRef;
+	TObjectPtr<AGUNMANCharacter> PlayerRef;
 
 	/* ブループリントのウィジェットクラス */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))

@@ -19,8 +19,6 @@ AGUNMANGameMode::AGUNMANGameMode() : Super()
 	}
 
 	PlayerControllerClass = AGUNMANController::StaticClass();
-
-	GameClearKillCount = 10;
 }
 
 void AGUNMANGameMode::Tick(float DeltaTime)
@@ -28,9 +26,10 @@ void AGUNMANGameMode::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// 予め決めた制限時間から経過時間を引く
-	UITimeLimitRef->Time -= DeltaTime;
+	UITimeLimitRef->SetTime(UITimeLimitRef->GetTime() - DeltaTime);
+
 	// 0 秒以下ならゲーム終了（ゲームオーバー）
-	if (UITimeLimitRef->Time <= 0.0f)
+	if (UITimeLimitRef->GetTime() <= GameOverTime)
 	{
 		UGameplayStatics::OpenLevel(this, "GameOverMap");
 	}
@@ -39,7 +38,7 @@ void AGUNMANGameMode::Tick(float DeltaTime)
 	if (PlayerRef->GetKillCount() >= GameClearKillCount)
 	{
 		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGUNMANGameMode::OpenGameClearMap, 2.0f);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGUNMANGameMode::OpenGameClearMap, GameClearWaitingTime);
 	}
 }
 
@@ -55,7 +54,7 @@ void AGUNMANGameMode::BeginPlay()
 	}
 
 	// プレイヤーコントローラーを取得
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
 	// ウィジェットブループリントのパスをセット
 	FString path = "/Game/UMG/WBP_TimeLimit.WBP_TimeLimit_C";
