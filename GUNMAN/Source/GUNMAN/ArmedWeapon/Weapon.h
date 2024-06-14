@@ -4,23 +4,23 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Rifle.generated.h"
+#include "Weapon.generated.h"
 
 UCLASS()
-class GUNMAN_API ARifle : public AActor
+class GUNMAN_API AWeapon : public AActor
 {
 	GENERATED_BODY()
 
 		/** Scene Component */
 		UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Rifle, meta = (AllowPrivateAccess = "true"))
-		USceneComponent* DefaultSceneRoot;
+		TObjectPtr<USceneComponent> DefaultSceneRoot;
 
 	/** 武器のメッシュ */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Rifle, meta = (AllowPrivateAccess = "true"))
-		USkeletalMeshComponent* WeaponMesh;
+	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
 public:
 	// Sets default values for this actor's properties
-	ARifle();
+	AWeapon();
 
 protected:
 	// Called when the game starts or when spawned

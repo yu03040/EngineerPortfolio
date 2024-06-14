@@ -4,16 +4,16 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "RifleAmmunition.generated.h"
+#include "WeaponAmmunition.generated.h"
 
 UCLASS()
-class GUNMAN_API ARifleAmmunition : public AActor
+class GUNMAN_API AWeaponAmmunition : public AActor
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	ARifleAmmunition();
+	AWeaponAmmunition();
 
 protected:
 	// Called when the game starts or when spawned
@@ -26,9 +26,9 @@ public:
 private:
 	/** シーンコンポーネント */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	USceneComponent* DefaultSceneRoot;
+	TObjectPtr<USceneComponent> DefaultSceneRoot;
 
 	/** 弾薬のメッシュ */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UStaticMeshComponent* StaticMesh;
+	TObjectPtr<UStaticMeshComponent> StaticMesh;
 };

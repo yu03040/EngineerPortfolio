@@ -1,13 +1,13 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "../ArmedWeapon/RifleAmmunition.h"
+#include "../ArmedWeapon/WeaponAmmunition.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GamePlayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
 // Sets default values
-ARifleAmmunition::ARifleAmmunition()
+AWeaponAmmunition::AWeaponAmmunition()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -21,17 +21,12 @@ ARifleAmmunition::ARifleAmmunition()
 	// StaticMeshComponent を作成する
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 
-	// StaticMesh を Load して StaticMeshComponent の StaticMesh に設定する
-	//FString RifleAmmunitionPath = TEXT("/Game/MilitaryWeapSilver/Weapons/AssaultRifleA_Ammo.AssaultRifleA_Ammo_C");
-	//UStaticMesh* Mesh = LoadObject<UStaticMesh>(NULL, (*RifleAmmunitionPath), NULL, LOAD_None, NULL);
-	//StaticMesh->SetStaticMesh(Mesh);
-
 	// StaticMeshComponentをRootComponentにAttachする
 	StaticMesh->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned
-void ARifleAmmunition::BeginPlay()
+void AWeaponAmmunition::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -52,7 +47,7 @@ void ARifleAmmunition::BeginPlay()
 }
 
 // Called every frame
-void ARifleAmmunition::Tick(float DeltaTime)
+void AWeaponAmmunition::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 

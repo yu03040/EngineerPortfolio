@@ -8,7 +8,7 @@
 #include "Sound/SoundBase.h"
 #include "Particles/ParticleSystem.h"
 #include "Animation/AnimMontage.h"
-#include "RifleAmmunition.h"
+#include "WeaponAmmunition.h"
 #include "WeaponStructure.generated.h"
 
 USTRUCT(BlueprintType)
@@ -50,7 +50,7 @@ struct FWeaponStructure : public FTableRowBase
 
 	/** 弾薬クラス */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Structure")
-	TSubclassOf<ARifleAmmunition> AmmunitionClass = NULL;
+	TSubclassOf<AWeaponAmmunition> AmmunitionClass = NULL;
 
 	/** 銃弾が出る場所 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Structure")
