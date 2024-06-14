@@ -28,5 +28,5 @@ protected:
 
 	/* UIGameClear の Ref */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	class UUIGameOver* UI_GameOver;
+	TObjectPtr<class UUIGameOver> UI_GameOver;
 };

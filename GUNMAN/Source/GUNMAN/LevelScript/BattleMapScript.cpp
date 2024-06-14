@@ -24,19 +24,19 @@ void ABattleMapScript::BeginPlay()
 void ABattleMapScript::ChangeButtonColor()
 {
 	// 非選択状態の色をそれぞれ白色に
-	UButton* BackToTitleButton = UI_PaseMenu->GetBackToTitle_Button();
+	TObjectPtr<UButton> BackToTitleButton = UI_PaseMenu->GetBackToTitle_Button();
 	if (BackToTitleButton)
 	{
 		BackToTitleButton->SetBackgroundColor(FLinearColor::White);
 	}
 
-	UButton* CancelButton = UI_PaseMenu->GetCancel_Button();
+	TObjectPtr<UButton> CancelButton = UI_PaseMenu->GetCancel_Button();
 	if (CancelButton)
 	{
 		CancelButton->SetBackgroundColor(FLinearColor::White);
 	}
 
-	UButton* EndButton = UI_PaseMenu->GetGameEnd_Button();
+	TObjectPtr<UButton> EndButton = UI_PaseMenu->GetGameEnd_Button();
 	if (EndButton)
 	{
 		EndButton->SetBackgroundColor(FLinearColor::White);
@@ -104,7 +104,7 @@ void ABattleMapScript::InitializeButtonPosition()
 	}
 
 	// 最初 Back to Title を選択状態にする
-	UButton* BackToTitleButton = UI_PaseMenu->GetBackToTitle_Button();
+	TObjectPtr<UButton> BackToTitleButton = UI_PaseMenu->GetBackToTitle_Button();
 	if (BackToTitleButton)
 	{
 		BackToTitleButton->SetBackgroundColor(SelectedColor);
