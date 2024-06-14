@@ -4,21 +4,24 @@
 
 ## AI Enemy Class
 
-[AI Enemy](/GUNMAN/Source/GUNMAN/Enemy/AIEnemy.cpp) は敵キャラクターの動作を定義している。  
-このクラスから巡回ルートごとに敵を派生(BP_PathAAIEnemy, BP_PathBAIEnemy, BP_RandomAIEnemy)
-
-### GUNMAN Character Constructor
-
-- 敵キャラクターの初期化
-
-### ゲーム開始処理（BeginPlay）
+[AI Enemy](/GUNMAN/Source/GUNMAN/Enemy/AIEnemy.cpp) は敵キャラクターの動作を定義している。
 
 - 敵からダメージを受けたときダメージ処理
 - 敵の頭上に HP バーを表示
+- 敵を見失ったときの AI の動き
 
-### その他
+このクラスから巡回ルートごとに敵を派生
 
-- HP(Health) の getter, setter
+- BP_EnemyAI_Path_A
+- BP_EnemyAI_Path_B
+- BP_EnemyAI_Random
+
+それぞれの処理は…
+
+- 武器のアタッチ
+- プレイヤ―を追いかけるときは走り、巡回するときは歩く
+- プレイヤ―を見つけたときと見失ったときブラックボードを更新
+- 攻撃処理
 
 ## AI Enemy Controller Class
 
