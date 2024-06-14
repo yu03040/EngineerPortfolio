@@ -578,7 +578,7 @@ void AGUNMANCharacter::AnimationAtFiring()
 	UGameplayStatics::SpawnEmitterAttached(EquippedWeaponInformation.MuzzleFire, EquippedWeapon, EquippedWeaponInformation.MuzzleFireSoketName);
 	// 身体の動くアニメーションを出す
 	PlayAnimMontage(EquippedWeaponInformation.FiringMontage, 1.0f);
-	GetWorld()->SpawnActor<ARifleAmmunition>(
+	GetWorld()->SpawnActor<AWeaponAmmunition>(
 		EquippedWeaponInformation.AmmunitionClass,
 		FTransform(EquippedWeapon->GetSocketTransform(TEXT("None")))
 	);
