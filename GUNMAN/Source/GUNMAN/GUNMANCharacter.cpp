@@ -29,45 +29,47 @@
 
 AGUNMANCharacter::AGUNMANCharacter()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// フレームごとに Tick() を呼び出すように、このアクタを設定する
+	// 必要なければ、これをオフにしてパフォーマンスを向上させることもできる。
 	PrimaryActorTick.bCanEverTick = true;
 
-	// Set size for collision capsule
+	// collision capsule のサイズを設定する
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
-	// set our turn rates for input
+	// turn rates を設定する
 	BaseTurnRate = 45.f;
 	BaseLookUpRate = 45.f;
 
-	// Don't rotate when the controller rotates. Let that just affect the camera.
+	// コントローラーが回転しても回転させない
+	// カメラに影響を与えるだけにする
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
 	bUseControllerRotationRoll = false;
 
-	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...at this rotation rate
+	// キャラクターの動きを設定する
+	GetCharacterMovement()->bOrientRotationToMovement = true; // 入力された方向にキャラクターが動く...	
+	GetCharacterMovement()->RotationRate = FRotator(0.0f, 540.0f, 0.0f); // ...この回転率で
 	GetCharacterMovement()->JumpZVelocity = 600.f;
 	GetCharacterMovement()->AirControl = 0.2f;
 
-	// Create a camera boom (pulls in towards the player if there is a collision)
+	// カメラブームの作成（衝突した場合、プレーヤーに引き寄せられる）
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 300.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
-	// Create a follow camera
+	// 三人称カメラコンポーネントの作成
 	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
 	ThirdPersonCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	ThirdPersonCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
-	// Create a CameraComponent	
+	// 一人称カメラコンポーネントの作成
 	FirstPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCamera->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCamera->SetRelativeLocation(FVector(-39.56f, 1.75f, 64.f)); // Position the camera
 	FirstPersonCamera->bUsePawnControlRotation = true;
 
-	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
+	// 1人称視点から見たときに使用されるメッシュコンポーネントを作成する。(このポーンをコントロールするとき)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(true);
 	Mesh1P->SetupAttachment(FirstPersonCamera);
@@ -76,22 +78,21 @@ AGUNMANCharacter::AGUNMANCharacter()
 	Mesh1P->SetRelativeRotation(FRotator(1.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-0.5f, -4.4f, -155.7f));
 
-	// Create a firstperson gun mesh component
+	// 一人称視点の銃メッシュコンポーネントを作成する
 	FP_Gun = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("FP_Gun"));
-	FP_Gun->SetOnlyOwnerSee(false);			// otherwise won't be visible in the multiplayer
+	FP_Gun->SetOnlyOwnerSee(false);
 	FP_Gun->bCastDynamicShadow = false;
 	FP_Gun->CastShadow = false;
-	// FP_Gun->SetupAttachment(Mesh1P, TEXT("GripPoint"));
 	FP_Gun->SetupAttachment(RootComponent);
 
 	FP_MuzzleLocation = CreateDefaultSubobject<USceneComponent>(TEXT("MuzzleLocation"));
 	FP_MuzzleLocation->SetupAttachment(FP_Gun);
 	FP_MuzzleLocation->SetRelativeLocation(FVector(0.2f, 48.4f, -10.6f));
 
-	// Default offset from the character location for projectiles to spawn
+	// 投射物がスポーンするキャラクタの位置からのデフォルトオフセット
 	GunOffset = FVector(100.0f, 0.0f, 10.0f);
 
-	// Create a thirdperson weapon mesh component
+	// 三人称視点の武器メッシュコンポーネントを作成
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetMesh());
 
@@ -113,10 +114,6 @@ AGUNMANCharacter::AGUNMANCharacter()
 	FOnTimelineFloat TimelineProgress;
 	TimelineProgress.BindUFunction(this, TEXT("TimelineStep"));
 	RunTimeline->AddInterpFloat(RunCurve, TimelineProgress);
-
-	// 線形補間する値をセット
-	StartSpeed = 300.0f;
-	EndSpeed = 600.0f;
 }
 
 void AGUNMANCharacter::Tick(float DeltaTime)
@@ -130,32 +127,19 @@ void AGUNMANCharacter::Tick(float DeltaTime)
 	}
 }
 
-int AGUNMANCharacter::GetKillCount()
-{
-	return KillCount;
-}
-
-float AGUNMANCharacter::GetHealth()
-{
-	return Health;
-}
-
 void AGUNMANCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
 
 	// プレイヤーコントローラーを取得
-	APlayerController* aPlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	TObjectPtr<APlayerController> PlayerControllerRef = UGameplayStatics::GetPlayerController(this, 0);
 	// マウスを非表示
-	aPlayerController->bShowMouseCursor = false;
-	aPlayerController->SetInputMode(FInputModeGameOnly());
+	PlayerControllerRef->bShowMouseCursor = false;
+	PlayerControllerRef->SetInputMode(FInputModeGameOnly());
 
 	// ThirdPerson のアニメーションインスタンスをセット
 	TPMeshAnimInstance = GetMesh()->GetAnimInstance();
-
-	//Attach gun mesh component to Skeleton, doing it here because the skeleton is not yet created in the constructor
-	//FP_Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), TEXT("GripPoint"));
 
 	// 最初はThirdPerson のカメラをオン
 	ThirdPersonCamera->SetActive(true, false);
@@ -164,7 +148,7 @@ void AGUNMANCharacter::BeginPlay()
 	bUseControllerRotationYaw = false;
 
 	// Character クラスの Mesh(ThirdPersonのメッシュ) を取得
-	USkeletalMeshComponent* MeshComponent = GetMesh();
+	TObjectPtr<USkeletalMeshComponent> MeshComponent = GetMesh();
 
 	// ThirdPerson のメッシュを表示
 	MeshComponent->SetVisibility(true);
@@ -185,39 +169,37 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	check(PlayerInputComponent);
 
-	// Bind jump event
+	// ジャンプのバインド
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGUNMANCharacter::StartJump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AGUNMANCharacter::StopJump);
 
-	// Bind run event
+	// 走る操作へのバインド
 	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &AGUNMANCharacter::StartTimeline);
 	PlayerInputComponent->BindAction("Run", IE_Released, this, &AGUNMANCharacter::ReverseTimeline);
 
-	// Bind fire event
+	// 攻撃のバインド
 	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AGUNMANCharacter::OnFire);
 
-	// Bind Toggle event
+	// TPS/FPS 視点切り替えのバインド
 	PlayerInputComponent->BindAction("Toggle", IE_Pressed, this, &AGUNMANCharacter::ToggleBetweenTPSAndFPS);
 
-	// Bind Switch And Equip Weapons event
+	// 武器装備切り替えのバインド
 	PlayerInputComponent->BindAction("SwitchAndEquipWeapons", IE_Pressed, this, &AGUNMANCharacter::SwitchingAndEquippingWeapons);
 
-	// ActionMappingsに設定したActionをバインドする
+	// ポーズメニューのバインド
 	PlayerInputComponent->BindAction("PauseMenu", IE_Pressed, this, &AGUNMANCharacter::PressedActionPoseMenu);
 
-	// Bind movement events
+	// 移動操作のバインド
 	PlayerInputComponent->BindAxis("MoveForward", this, &AGUNMANCharacter::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGUNMANCharacter::MoveRight);
 
-	// We have 2 versions of the rotation bindings to handle different kinds of devices differently
-	// "turn" handles devices that provide an absolute delta, such as a mouse.
-	// "turnrate" is for devices that we choose to treat as a rate of change, such as an analog joystick
+	// 回転バインディングには2つのバージョンがあり、異なる種類のデバイスに対応できるようになっている
+	// turn はマウスのような絶対差分を提供するデバイスを扱う
+	// turnrate はアナログジョイスティックのような、変化率として扱うことを選択したデバイスのためのもの
 	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
 	PlayerInputComponent->BindAxis("TurnRate", this, &AGUNMANCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("LookUpRate", this, &AGUNMANCharacter::LookUpAtRate);
-
-	UPlayerInput::AddEngineDefinedActionMapping(FInputActionKeyMapping("FaceButtonRight", EKeys::Gamepad_FaceButton_Right));
 }
 
 void AGUNMANCharacter::TimelineStep(float value)
@@ -232,7 +214,7 @@ void AGUNMANCharacter::OnFire()
 	if (isFP)
 	{
 		// 腕のメッシュのアニメーションオブジェクトを取得
-		UAnimInstance* AnimInstance = Mesh1P->GetAnimInstance();
+		TObjectPtr<UAnimInstance> AnimInstance = Mesh1P->GetAnimInstance();
 
 		if (AnimInstance != nullptr)
 		{
@@ -249,7 +231,7 @@ void AGUNMANCharacter::OnFire()
 		// 玉を発射
 		if (ProjectileClass != nullptr)
 		{
-			UWorld* const World = GetWorld();
+			TObjectPtr<UWorld> const World = GetWorld();
 			if (World != nullptr)
 			{
 				const FRotator SpawnRotation = GetControlRotation();
@@ -268,20 +250,31 @@ void AGUNMANCharacter::OnFire()
 			}
 		}
 
+		// ヒット結果を格納する構造体
 		FHitResult HitResult;
+
+		// ライントレースの開始位置
 		FVector StartLocation = ThirdPersonCamera->GetComponentLocation();
+
+		// ライントレースの終了位置（ここでは、開始位置から前方に 10000cm 進んだ位置を指定）
 		FVector EndLocation = StartLocation + ThirdPersonCamera->GetForwardVector() * 10000.0f;
+
+		// 衝突クエリに関するパラメータを設定するための構造体
 		FCollisionQueryParams TraceParams(FName(TEXT("LineTraceByChannel")), true, this);
+
 		TraceParams.bTraceComplex = false; // 詳細な衝突判定を行うか
 		TraceParams.AddIgnoredActor(this); // このアクターを無視する
 
+		// コリジョンチャンネル：オブジェクトが衝突やトレースに対してどのように反応するかを設定するためのカテゴリ
+		// ECC_Visibility：視覚的なトレースやレイキャストに使用されるチャンネル
+
 		// ライントレースを実行
 		bool bHit = GetWorld()->LineTraceSingleByChannel(
-			HitResult,		// ヒット結果を格納する変数
-			StartLocation,	// ラインの始点
-			EndLocation,	// ラインの終点（前方向に1000cm移動）
-			ECC_Visibility,	// 可視性チャンネル
-			TraceParams		// ライントレースのパラメータ設定
+			HitResult,
+			StartLocation,
+			EndLocation,
+			ECC_Visibility,
+			TraceParams
 		);
 
 		if (bHit)
@@ -290,29 +283,27 @@ void AGUNMANCharacter::OnFire()
 			FVector HitLocation = HitResult.Location;
 			UGameplayStatics::SpawnEmitterAtLocation(
 				this,					// エミッターを生成するアクター（GUNMANCharacter自身）
-				WeaponEmitter,				// エミッターテンプレート
+				WeaponEmitter,			// エミッターテンプレート
 				HitLocation,			// エミッターの生成位置
 				FRotator::ZeroRotator,	// エミッターの初期回転
-				true,					// 自動でエミッターをアタッチするか
-				EPSCPoolMethod::None,	// エミッタープールの方法
-				true					// エミッターをワールドスペースで生成するか
+				true,					// 再生完了後、自動でエミッターを破棄する
+				EPSCPoolMethod::None,	// エミッターを再利用しない
+				true					// スポーン時にアクティブ
 			);
 
 			// ヒットした敵の情報を使用
-			TWeakObjectPtr<AActor> HitEnemy = HitResult.GetActor();
+			TObjectPtr<AActor> HitEnemy = HitResult.GetActor();
 			// アクターが敵だったら
-			AAIEnemy* Enemy = Cast<AAIEnemy>(HitEnemy);
+			TObjectPtr<AAIEnemy> Enemy = Cast<AAIEnemy>(HitEnemy);
 			if (Enemy)
 			{
-				AController* EventInstigator = NULL;
-				AActor* DamageCauser = NULL;
+				TObjectPtr<AController> EventInstigator = NULL;
+				TObjectPtr<AActor> DamageCauser = NULL;
 				TSubclassOf<UDamageType> DamageTypeClass = NULL;
-				if (Enemy->GetHealth() > 0.0f)
+				if (Enemy->GetCurrentHealth() > 0.0f)
 				{
-					// weaponATK分ダメージを与える
-					WeaponATK = 5.0;
-					UGameplayStatics::ApplyDamage(Enemy, WeaponATK, EventInstigator, DamageCauser, DamageTypeClass);
-					if (Enemy->GetHealth() <= 0.0f)
+					UGameplayStatics::ApplyDamage(Enemy, FP_WeaponATK, EventInstigator, DamageCauser, DamageTypeClass);
+					if (Enemy->GetCurrentHealth() <= 0.0f)
 					{
 						KillCount++;
 					}
@@ -324,26 +315,34 @@ void AGUNMANCharacter::OnFire()
 	{
 		// ThirdPersonだったら
 
+		// ヒット結果を格納する構造体
 		FHitResult HitResult;
+
+		// ライントレースの開始位置
 		FVector StartLocation = ThirdPersonCamera->GetComponentLocation();
+
+		// ライントレースの終了位置（ここでは、開始位置から前方に 10000cm 進んだ位置を指定）
 		FVector EndLocation = StartLocation + ThirdPersonCamera->GetForwardVector() * 10000.0f;
+
+		// 衝突クエリに関するパラメータを設定するための構造体
 		FCollisionQueryParams TraceParams(FName(TEXT("LineTraceByChannel")), true, this);
+
 		TraceParams.bTraceComplex = false; // 詳細な衝突判定を行うか
 		TraceParams.AddIgnoredActor(this); // このアクターを無視する
 
+		// コリジョンチャンネル：オブジェクトが衝突やトレースに対してどのように反応するかを設定するためのカテゴリ
+		// ECC_Visibility：視覚的なトレースやレイキャストに使用されるチャンネル
+
 		// ライントレースを実行
 		bool bHit = GetWorld()->LineTraceSingleByChannel(
-			HitResult,		// ヒット結果を格納する変数
-			StartLocation,	// ラインの始点
-			EndLocation,	// ラインの終点（前方向に10000cm移動）
-			ECC_Visibility,	// 可視性チャンネル
-			TraceParams		// ライントレースのパラメータ設定
+			HitResult,
+			StartLocation,
+			EndLocation,
+			ECC_Visibility,
+			TraceParams
 		);
 
-		// 色を付ける（ライントレースだけだと色が出なかった）
-		//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 0.3f);
-
-		// 指定された場合、サウンドを再生
+		// サウンドを再生
 		if (FireSound != nullptr)
 		{
 			UGameplayStatics::PlaySoundAtLocation(this, FireSound, GetActorLocation());
@@ -358,37 +357,37 @@ void AGUNMANCharacter::OnFire()
 				WeaponEmitter,				// エミッターテンプレート
 				HitLocation,			// エミッターの生成位置
 				FRotator::ZeroRotator,	// エミッターの初期回転
-				true,					// 自動でエミッターをアタッチするか
-				EPSCPoolMethod::None,	// エミッタープールの方法
-				true					// エミッターをワールドスペースで生成するか
+				true,					// 再生完了後、自動でエミッターを破棄する
+				EPSCPoolMethod::None,	// エミッターを再利用しない
+				true					// スポーン時にアクティブ
 			);
 
 			// ヒットした敵の情報を使用
-			TWeakObjectPtr<AActor> HitEnemy = HitResult.GetActor();
+			TObjectPtr<AActor> HitEnemy = HitResult.GetActor();
 			// アクターが敵だったら
-			AAIEnemy* Enemy = Cast<AAIEnemy>(HitEnemy);
+			TObjectPtr<AAIEnemy> Enemy = Cast<AAIEnemy>(HitEnemy);
 			if (Enemy)
 			{
-				AController* EventInstigator = NULL;
+				TObjectPtr<AController> EventInstigator = NULL;
 				AActor* DamageCauser = NULL;
 				TSubclassOf<UDamageType> DamageTypeClass = NULL;
-				if (Enemy->GetHealth() > 0.0f)
+				if (Enemy->GetCurrentHealth() > 0.0f)
 				{
 					if (WeaponNumber == 0) //ピストル
 					{
-						WeaponATK = 10;
+						TP_WeaponATK = TP_PistolATK;
 					}
 					else if (WeaponNumber == 1) // ライフル
 					{
-						WeaponATK = 5.0;
+						TP_WeaponATK = TP_RifleATK;
 					}
 					else // ショットガン
 					{
-						WeaponATK = 15.0;
+						TP_WeaponATK = TP_ShotgunATK;
 					}
 					// 10 ダメージ(WeaponATK分)を与える
-					UGameplayStatics::ApplyDamage(Enemy, WeaponATK, EventInstigator, DamageCauser, DamageTypeClass);
-					if (Enemy->GetHealth() <= 0.0f)
+					UGameplayStatics::ApplyDamage(Enemy, TP_WeaponATK, EventInstigator, DamageCauser, DamageTypeClass);
+					if (Enemy->GetCurrentHealth() <= 0.0f)
 					{
 						KillCount++;
 					}
@@ -417,11 +416,11 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 		// ThirdPerson のメッシュを非表示
 		MeshComponent->SetVisibility(false);
 		Weapon->SetVisibility(false);
-		TArray<AActor*> WeaponList; // レベルから武器を探して取得
+		TArray<TObjectPtr<AActor>> WeaponList; // レベルから武器を探して取得
 		UGameplayStatics::GetAllActorsOfClass(this, ARifle::StaticClass(), WeaponList);
-		for (AActor* SearchActor : WeaponList)
+		for (TObjectPtr<AActor> SearchActor : WeaponList)
 		{
-			ARifle* NewActor = Cast<ARifle>(SearchActor);
+			TObjectPtr<ARifle> NewActor = Cast<ARifle>(SearchActor);
 			NewActor->SetActorHiddenInGame(true);
 		}
 
@@ -444,16 +443,16 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 		bUseControllerRotationYaw = false;
 
 		// Character クラスの Mesh(ThirdPersonのメッシュ) を取得
-		USkeletalMeshComponent* MeshComponent = GetMesh();
+		TObjectPtr<USkeletalMeshComponent> MeshComponent = GetMesh();
 
 		// ThirdPerson のメッシュを表示
 		MeshComponent->SetVisibility(true);
 		Weapon->SetVisibility(false);
-		TArray<AActor*> WeaponList; // レベルから武器を探して取得
+		TArray<TObjectPtr<AActor>> WeaponList; // レベルから武器を探して取得
 		UGameplayStatics::GetAllActorsOfClass(this, ARifle::StaticClass(), WeaponList);
-		for (AActor* SearchActor : WeaponList)
+		for (TObjectPtr<AActor> SearchActor : WeaponList)
 		{
-			ARifle* NewActor = Cast<ARifle>(SearchActor);
+			TObjectPtr<ARifle> NewActor = Cast<ARifle>(SearchActor);
 			NewActor->SetActorHiddenInGame(false);
 		}
 
@@ -475,7 +474,7 @@ void AGUNMANCharacter::SwitchingAndEquippingWeapons()
 void AGUNMANCharacter::PressedActionPoseMenu()
 {
 	// ワールド情報があるか
-	UWorld* World = GetWorld();
+	TObjectPtr<UWorld> World = GetWorld();
 	if (World)
 	{
 		// レベルがあるか確認後、ポーズメニュー開いたときの最初のボタンの位置を初期化
@@ -496,7 +495,7 @@ void AGUNMANCharacter::StartJump()
 	JumpButtonDown = CanJump();
 
 	// MovementComponent が CharacterMovementComponent だったら
-	UCharacterMovementComponent* MovementComponent = Cast<UCharacterMovementComponent>(GetMovementComponent());
+	TObjectPtr<UCharacterMovementComponent> MovementComponent = Cast<UCharacterMovementComponent>(GetMovementComponent());
 	if (MovementComponent)
 	{
 		// ベクトルの長さが0以上か
@@ -540,9 +539,9 @@ void AGUNMANCharacter::StopJump()
 void AGUNMANCharacter::HandleAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
 	// ダメージ分、体力を減らす
-	Health -= Damage;
+	CurrentHealth -= Damage;
 	// 体力がなくなったら
-	if (Health <= 0.0f)
+	if (CurrentHealth <= DeadHealth)
 	{
 		UGameplayStatics::OpenLevel(this, "GameOverMap");
 	}
@@ -567,8 +566,8 @@ void AGUNMANCharacter::ReverseTimeline()
 }
 
 void AGUNMANCharacter::SetMaxWalkSpeed(float NewSpeed)
-{
-	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
+{ 
+	GetCharacterMovement()->MaxWalkSpeed = NewSpeed; 
 }
 
 void AGUNMANCharacter::AnimationAtFiring()
@@ -601,12 +600,13 @@ void AGUNMANCharacter::MoveForward(float Value)
 {
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
-		// find out which way is forward
+		// どちらが前方向か調べる
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		// get forward vector
+		// 前方向ベクトルの取得
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		// その方向に移動する
 		AddMovementInput(Direction, Value);
 	}
 }
@@ -615,13 +615,13 @@ void AGUNMANCharacter::MoveRight(float Value)
 {
 	if ((Controller != nullptr) && (Value != 0.0f))
 	{
-		// find out which way is right
+		// どちらが右方向か調べる
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		// get right vector 
+		// 右方向ベクトルの取得 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		// add movement in that direction
+		// その方向に移動する
 		AddMovementInput(Direction, Value);
 	}
 }

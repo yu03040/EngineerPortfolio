@@ -15,189 +15,225 @@ class AGUNMANCharacter : public ACharacter
 {
 	GENERATED_BODY()
 
-	/** Camera boom positioning the camera behind the character */
+	/* カメラをキャラクターの背後に配置するカメラブーム */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class USpringArmComponent* CameraBoom;
+	TObjectPtr<class USpringArmComponent> CameraBoom;
 
-	/** Follow camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	class UCameraComponent* ThirdPersonCamera;
+	TObjectPtr<class UCameraComponent> ThirdPersonCamera;
 
-	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
-	UCameraComponent* FirstPersonCamera;
+	TObjectPtr<UCameraComponent> FirstPersonCamera;
 
-	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
+	/* 左右視点移動の割合（単位：deg/sec）、その他のスケーリングが最終的なレートに影響する場合もある。 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float BaseTurnRate;
 
-	/** Base look up/down rate, in deg/sec. Other scaling may affect final rate. */
+	/* 上下視点移動の割合（単位：deg/sec）、その他のスケーリングが最終的なレートに影響する場合もある。 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	float BaseLookUpRate;
 
-	/** Pawn mesh: 1st person view (arms; seen only by self) */
+	/* ポーンメッシュ：1人称視点（腕） */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = FirstPerson, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* Mesh1P;
+	TObjectPtr<USkeletalMeshComponent> Mesh1P;
 
-	/** Gun mesh: 1st person view (seen only by self) */
+	/* 銃メッシュ：1人称視点（自分しか見えない） */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = FirstPerson, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* FP_Gun;
+	TObjectPtr<USkeletalMeshComponent> FP_Gun;
 
-	/** Location on gun mesh where projectiles should spawn. */
+	/* 銃のメッシュ上で弾がスポーンする場所 */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = FirstPerson, meta = (AllowPrivateAccess = "true"))
-	USceneComponent* FP_MuzzleLocation;
+	TObjectPtr<USceneComponent> FP_MuzzleLocation;
 
-	/** ThirdPerson の武器 */
+	/* ThirdPerson の武器 */
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* Weapon;
+	TObjectPtr<USkeletalMeshComponent> Weapon;
 
-	/** 玉が着弾したときのエフェクト */
+	/* 玉が着弾したときのエフェクト */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Effect, meta = (AllowPrivateAccess = "true"))
-	UParticleSystem* WeaponEmitter;
+	TObjectPtr<UParticleSystem> WeaponEmitter;
 
-	/** ThirdPerson の武器の配列 */
+	/* ThirdPerson の武器の配列 */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
-	TArray<USkeletalMeshComponent*> WeaponMeshes;
+	TArray<TObjectPtr<USkeletalMeshComponent>> WeaponMeshes;
 
-	/** ThirdPerson の武器の index */
+	/* ThirdPerson の武器の index */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
 	int WeaponNumber;
 
-	/** ThirdPerson の武器の攻撃力 */
+	/* FirstPerson の武器の攻撃力 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
-	float WeaponATK;
+	float FP_WeaponATK = 5.0f;
 
-	/** ThirdPerson の武器のカウント */
+	/* ThirdPerson の武器の攻撃力 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
+	float TP_WeaponATK;
+
+	/* ThirdPerson のライフルの攻撃力 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
+	float TP_RifleATK = 5.0f;
+
+	/* ThirdPerson のショットガンの攻撃力 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
+	float TP_ShotgunATK = 15.0f;
+
+	/* ThirdPerson のピストルの攻撃力 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
+	float TP_PistolATK = 10.0f;
+
+	/* ThirdPerson の武器のカウント */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
 	int WeaponNumberCounter;
 
-	/** 武器を持っているか */
+	/* 武器を持っているか */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
 	bool HasWeapon;
 
-	/** 装備している武器のメッシュ */
+	/* 装備している武器のメッシュ */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
-	USkeletalMeshComponent* EquippedWeapon;
+	TObjectPtr<USkeletalMeshComponent> EquippedWeapon;
 
-	/** ThirdPerson のアニメーションインスタンスをセットする */
+	/* ThirdPerson のアニメーションインスタンスをセットする */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
-	UAnimInstance* TPMeshAnimInstance;
+	TObjectPtr<UAnimInstance> TPMeshAnimInstance;
 
-	/** 装備した武器の情報 */
+	/* 装備した武器の情報 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
 	FWeaponStructure EquippedWeaponInformation;
 
-	/** 武器を構えているか */
+	/* 武器を構えているか */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = WeaponSettings, meta = (AllowPrivateAccess = "true"))
 	bool IsAiming;
 
-	/** Gun muzzle's offset from the characters location */
+	/* 銃口とキャラクターの位置のオフセット */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	FVector GunOffset;
 
-	/** Sound to play each time we fire */
+	/* 発射サウンドエフェクト */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
-	USoundBase* FireSound;
+	TObjectPtr<USoundBase> FireSound;
 
-	/** AnimMontage to play each time we fire */
+	/* 発射アニメーション */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
-	UAnimMontage* FireAnimation;
+	TObjectPtr<UAnimMontage> FireAnimation;
 
-	/** フリップフロップのための変数 */
+	/* フリップフロップのための変数 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	bool bIsFlipped = true;
 
-	/** FirstPerson かどうか */
+	/* FirstPerson かどうか */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	bool isFP = false;
 
-	/** ジャンプボタンが押されたかどうか */
+	/* ジャンプボタンが押されたかどうか */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	bool JumpButtonDown = false;
 
-	/** プレイヤーの体力 */
+	/* プレイヤーの体力 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
-	float Health = 1000.0f;
+	float MaxHealth = 1000.0f;
 
-	/** 倒した敵の数 */
+	/* 現在のプレイヤ―の体力 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	float CurrentHealth = MaxHealth;
+
+	/* 死んだプレイヤ―の体力 */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
+	float DeadHealth = 0.0f;
+
+	/* 倒した敵の数 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	int KillCount = 0;
 
-	/** Projectile class to spawn */
+	/* FirstPerson の武器がスポーンする銃弾 */
 	UPROPERTY(EditDefaultsOnly, Category = Projectile, meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<class AfirstpersonProjectProjectile> ProjectileClass;
 
-	/** BattleMapScript のリファレンス */
+	/* BattleMapScript の参照 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
-	class ABattleMapScript* BattleMapRef;
+	TObjectPtr<class ABattleMapScript> BattleMapRef;
+
+	/* プレイヤ―の速さの最小値 */
+	UPROPERTY()
+	float StartSpeed = 300.0f;
+
+	/* プレイヤ―の速さの最大値 */
+	UPROPERTY()
+	float EndSpeed = 600.0f;
+
+	/* UICharacter の参照 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Widget, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UUICharacter> UIRef;
 
 public:
 	AGUNMANCharacter();
 
 	virtual void Tick(float DeltaTime) override;
 
-	/** UICharacter の リファレンス */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Widget, meta = (AllowPrivateAccess = "true"))
-	UUICharacter* UIRef;
+	/** CameraBoom の getter **/
+	FORCEINLINE TObjectPtr<class USpringArmComponent> GetCameraBoom() const { return CameraBoom; }
+	/** ThirdPersonCamera の getter **/
+	FORCEINLINE TObjectPtr<class UCameraComponent> GetThirdPersonCamera() const { return ThirdPersonCamera; }
 
-	/** Returns CameraBoom subobject **/
-	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
-	/** Returns ThirdPersonCamera subobject **/
-	FORCEINLINE class UCameraComponent* GetThirdPersonCamera() const { return ThirdPersonCamera; }
+	/** Mesh1P の getter **/
+	TObjectPtr<USkeletalMeshComponent> GetMesh1P() const { return Mesh1P; }
 
-	/** Returns Mesh1P subobject **/
-	USkeletalMeshComponent* GetMesh1P() const { return Mesh1P; }
+	/** FirstPersonCamera の getter **/
+	TObjectPtr<UCameraComponent> GetFirstPersonCamera() const { return FirstPersonCamera; }
 
-	/** Returns FirstPersonCamera subobject **/
-	UCameraComponent* GetFirstPersonCamera() const { return FirstPersonCamera; }
+	int GetKillCount() const { return KillCount; }
 
-	int GetKillCount();
+	float GetMaxHealth() const { return MaxHealth; }
 
-	float GetHealth();
+	float GetCurrentHealth() const { return CurrentHealth; }
+
+	float GetHealthPercent() const { return CurrentHealth / MaxHealth; }
+
+	/** MaxWalkSpeed の Setter */
+	void SetMaxWalkSpeed(float NewSpeed);
 
 protected:
 	virtual void BeginPlay() override;
 
-	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-	// End of APawn interface
 
-	/** 弾丸を発射する */
-	UFUNCTION(BlueprintCallable)
-	void OnFire();
-
-	/** TPS と FPS の視点を切り替える */
+	/* TPS と FPS の視点を切り替える */
 	void ToggleBetweenTPSAndFPS();
 
-	/** 武器の切り替えと装備 */
+	/* 武器の切り替えと装備 */
 	void SwitchingAndEquippingWeapons();
 
-	/** ポーズメニューを開く */
+	/* ポーズメニューを開く */
 	void PressedActionPoseMenu();
 
-	/** Start to jump. */
+	/* ジャンプ開始 */
 	void StartJump();
 
-	/** Stop to jump. */
+	/* ジャンプ停止 */
 	void StopJump();
 
-	/** Called for forwards/backward input */
+	/* 前進/後進 */
 	void MoveForward(float Value);
 
-	/** Called for side to side input */
+	/* 右移動/左移動 */
 	void MoveRight(float Value);
 
 	/**
-	 * Called via input to turn at a given rate.
-	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
+	 * 左右の視点移動
+	 * @param Rate	正規化された割合、すなわち、 1.0 は希望する回転率の 100％
 	 */
 	void TurnAtRate(float Rate);
 
 	/**
-	 * Called via input to turn look up/down at a given rate.
-	 * @param Rate	This is a normalized rate, i.e. 1.0 means 100% of desired turn rate
+	 * 上下の視点移動
+	 * @param Rate	正規化された割合、すなわち、 1.0 は希望する回転率の 100％
 	 */
 	void LookUpAtRate(float Rate);
+
+protected:
+	/** 弾丸を発射する */
+	UFUNCTION(BlueprintCallable)
+	void OnFire();
 
 	UFUNCTION()
 	void HandleAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
@@ -214,23 +250,14 @@ protected:
 	UFUNCTION()
 	void TimelineStep(float value);
 
-	/** MaxWalkSpeed の Setter */
-	UFUNCTION(BlueprintCallable, Category = Movement)
-	void SetMaxWalkSpeed(float NewSpeed);
-
 	/** 発砲時のアニメーションを出す関数 */
 	UFUNCTION(BlueprintCallable, Category = WeaponSettings)
 	void AnimationAtFiring();
 
-	UPROPERTY()
-	float StartSpeed;
-
-	UPROPERTY()
-	float EndSpeed;
-
+protected:
 	/** タイムライン */
 	FTimeline* RunTimeline;
 
 	/** カーブ */
-	class UCurveFloat* RunCurve;
+	TObjectPtr<class UCurveFloat> RunCurve;
 };
