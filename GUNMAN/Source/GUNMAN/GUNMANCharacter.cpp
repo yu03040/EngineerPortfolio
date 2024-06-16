@@ -6,6 +6,10 @@
 #include "Components/InputComponent.h"
 #include "Components/SceneComponent.h"
 #include "Components/TimelineComponent.h"
+#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
+#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
+#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputMappingContext.h"
+#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputAction.h"
 #include "Math/Vector.h"
 #include "Engine/DataTable.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -96,6 +100,55 @@ AGUNMANCharacter::AGUNMANCharacter()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetMesh());
 
+	// Enhanced Input のアセットをロード
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IMC_Default.IMC_Default"));
+	if (MappingContextFinder.Succeeded())
+	{
+		DefaultMappingContext = MappingContextFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Jump.IA_Jump"));
+	if (JumpActionFinder.Succeeded())
+	{
+		JumpAction = JumpActionFinder.Object;
+	}
+
+	/*static ConstructorHelpers::FObjectFinder<UInputAction> FireActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Fire.IA_Fire"));
+	if (FireActionFinder.Succeeded())
+	{
+		FireAction = FireActionFinder.Object;
+	}*/
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> ToggleActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Toggle.IA_Toggle"));
+	if (ToggleActionFinder.Succeeded())
+	{
+		ToggleAction = ToggleActionFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> RunActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Run.IA_Run"));
+	if (RunActionFinder.Succeeded())
+	{
+		RunAction = RunActionFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> PauseMenuActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_PauseMenu.IA_PauseMenu"));
+	if (PauseMenuActionFinder.Succeeded())
+	{
+		PauseMenuAction = PauseMenuActionFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> MoveForwardActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_MoveForward.IA_MoveForward"));
+	if (MoveForwardActionFinder.Succeeded())
+	{
+		MoveForwardAction = MoveForwardActionFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> MoveRightActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_MoveRight.IA_MoveRight"));
+	if (MoveRightActionFinder.Succeeded())
+	{
+		MoveRightAction = MoveRightActionFinder.Object;
+	}
+
 	// タイムライン初期化
 	RunTimeline = new FTimeline();
 
@@ -116,17 +169,6 @@ AGUNMANCharacter::AGUNMANCharacter()
 	RunTimeline->AddInterpFloat(RunCurve, TimelineProgress);
 }
 
-void AGUNMANCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	// タイムライン実行処理
-	if (RunTimeline != nullptr && RunTimeline->IsPlaying())
-	{
-		RunTimeline->TickTimeline(DeltaTime);
-	}
-}
-
 void AGUNMANCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -134,6 +176,16 @@ void AGUNMANCharacter::BeginPlay()
 
 	// プレイヤーコントローラーを取得
 	TObjectPtr<APlayerController> PlayerControllerRef = UGameplayStatics::GetPlayerController(this, 0);
+
+	// Enhanced Input サブシステムにマッピングコンテキストを追加
+	if (PlayerControllerRef)
+	{
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerControllerRef->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 1);
+		}
+	}
+
 	// マウスを非表示
 	PlayerControllerRef->bShowMouseCursor = false;
 	PlayerControllerRef->SetInputMode(FInputModeGameOnly());
@@ -161,6 +213,17 @@ void AGUNMANCharacter::BeginPlay()
 	OnTakeAnyDamage.AddDynamic(this, &AGUNMANCharacter::HandleAnyDamage);
 }
 
+void AGUNMANCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	// タイムライン実行処理
+	if (RunTimeline != nullptr && RunTimeline->IsPlaying())
+	{
+		RunTimeline->TickTimeline(DeltaTime);
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -169,29 +232,34 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 	check(PlayerInputComponent);
 
-	// ジャンプのバインド
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGUNMANCharacter::StartJump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &AGUNMANCharacter::StopJump);
+	if (TObjectPtr<UEnhancedInputComponent> EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		// ジャンプのバインド
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartJump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AGUNMANCharacter::StopJump);
 
-	// 走る操作へのバインド
-	PlayerInputComponent->BindAction("Run", IE_Pressed, this, &AGUNMANCharacter::StartTimeline);
-	PlayerInputComponent->BindAction("Run", IE_Released, this, &AGUNMANCharacter::ReverseTimeline);
+		// 攻撃のバインド
+		//EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::OnFire);
 
-	// 攻撃のバインド
-	PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AGUNMANCharacter::OnFire);
+		// TPS/FPS 視点切り替えのバインド
+		EnhancedInputComponent->BindAction(ToggleAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::ToggleBetweenTPSAndFPS);
 
-	// TPS/FPS 視点切り替えのバインド
-	PlayerInputComponent->BindAction("Toggle", IE_Pressed, this, &AGUNMANCharacter::ToggleBetweenTPSAndFPS);
+		// 走る操作へのバインド
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartTimeline);
+		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AGUNMANCharacter::ReverseTimeline);
+
+		// ポーズメニューのバインド
+		EnhancedInputComponent->BindAction(PauseMenuAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::PressedActionPoseMenu);
+
+		// 移動操作のバインド
+		EnhancedInputComponent->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::MoveForward);
+		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::MoveRight);
+	}
+
+	//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AGUNMANCharacter::OnFire);
 
 	// 武器装備切り替えのバインド
-	PlayerInputComponent->BindAction("SwitchAndEquipWeapons", IE_Pressed, this, &AGUNMANCharacter::SwitchingAndEquippingWeapons);
-
-	// ポーズメニューのバインド
-	PlayerInputComponent->BindAction("PauseMenu", IE_Pressed, this, &AGUNMANCharacter::PressedActionPoseMenu);
-
-	// 移動操作のバインド
-	PlayerInputComponent->BindAxis("MoveForward", this, &AGUNMANCharacter::MoveForward);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AGUNMANCharacter::MoveRight);
+	//PlayerInputComponent->BindAction("SwitchAndEquipWeapons", IE_Pressed, this, &AGUNMANCharacter::SwitchingAndEquippingWeapons);
 
 	// 回転バインディングには2つのバージョンがあり、異なる種類のデバイスに対応できるようになっている
 	// turn はマウスのような絶対差分を提供するデバイスを扱う
@@ -566,8 +634,8 @@ void AGUNMANCharacter::ReverseTimeline()
 }
 
 void AGUNMANCharacter::SetMaxWalkSpeed(float NewSpeed)
-{ 
-	GetCharacterMovement()->MaxWalkSpeed = NewSpeed; 
+{
+	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 }
 
 void AGUNMANCharacter::AnimationAtFiring()
@@ -596,9 +664,9 @@ void AGUNMANCharacter::LookUpAtRate(float Rate)
 	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
 }
 
-void AGUNMANCharacter::MoveForward(float Value)
+void AGUNMANCharacter::MoveForward(const FInputActionValue& Value)
 {
-	if ((Controller != nullptr) && (Value != 0.0f))
+	if ((Controller != nullptr) && (Value.Get<float>() != 0.0f))
 	{
 		// どちらが前方向か調べる
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -607,13 +675,13 @@ void AGUNMANCharacter::MoveForward(float Value)
 		// 前方向ベクトルの取得
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		// その方向に移動する
-		AddMovementInput(Direction, Value);
+		AddMovementInput(Direction, Value.Get<float>());
 	}
 }
 
-void AGUNMANCharacter::MoveRight(float Value)
+void AGUNMANCharacter::MoveRight(const FInputActionValue& Value)
 {
-	if ((Controller != nullptr) && (Value != 0.0f))
+	if ((Controller != nullptr) && (Value.Get<float>() != 0.0f))
 	{
 		// どちらが右方向か調べる
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -622,6 +690,6 @@ void AGUNMANCharacter::MoveRight(float Value)
 		// 右方向ベクトルの取得 
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// その方向に移動する
-		AddMovementInput(Direction, Value);
+		AddMovementInput(Direction, Value.Get<float>());
 	}
 }
