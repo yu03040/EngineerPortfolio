@@ -189,6 +189,10 @@ class AGUNMANCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> MoveRightAction;
 
+	/* Turn Input */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> LookAction;
+
 	/* プレイヤ―の速さの最小値 */
 	UPROPERTY()
 	float StartSpeed = 300.0f;
@@ -250,17 +254,8 @@ protected:
 	/* 右移動/左移動 */
 	void MoveRight(const FInputActionValue& Value);
 
-	/**
-	 * 左右の視点移動
-	 * @param Rate	正規化された割合、すなわち、 1.0 は希望する回転率の 100％
-	 */
-	void TurnAtRate(float Rate);
-
-	/**
-	 * 上下の視点移動
-	 * @param Rate	正規化された割合、すなわち、 1.0 は希望する回転率の 100％
-	 */
-	void LookUpAtRate(float Rate);
+	/* 視点移動 */
+	void Look(const FInputActionValue& Value);
 
 protected:
 	/** 弾丸を発射する */

@@ -149,6 +149,12 @@ AGUNMANCharacter::AGUNMANCharacter()
 		MoveRightAction = MoveRightActionFinder.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> LookActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Look.IA_Look"));
+	if (LookActionFinder.Succeeded())
+	{
+		LookAction = LookActionFinder.Object;
+	}
+
 	// タイムライン初期化
 	RunTimeline = new FTimeline();
 
@@ -248,26 +254,21 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartTimeline);
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AGUNMANCharacter::ReverseTimeline);
 
-		// ポーズメニューのバインド
+		//// ポーズメニューのバインド
 		EnhancedInputComponent->BindAction(PauseMenuAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::PressedActionPoseMenu);
 
 		// 移動操作のバインド
 		EnhancedInputComponent->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::MoveForward);
 		EnhancedInputComponent->BindAction(MoveRightAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::MoveRight);
+
+		// 視点移動のバインド
+		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::Look);
 	}
 
 	//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AGUNMANCharacter::OnFire);
 
 	// 武器装備切り替えのバインド
 	//PlayerInputComponent->BindAction("SwitchAndEquipWeapons", IE_Pressed, this, &AGUNMANCharacter::SwitchingAndEquippingWeapons);
-
-	// 回転バインディングには2つのバージョンがあり、異なる種類のデバイスに対応できるようになっている
-	// turn はマウスのような絶対差分を提供するデバイスを扱う
-	// turnrate はアナログジョイスティックのような、変化率として扱うことを選択したデバイスのためのもの
-	PlayerInputComponent->BindAxis("Turn", this, &APawn::AddControllerYawInput);
-	PlayerInputComponent->BindAxis("TurnRate", this, &AGUNMANCharacter::TurnAtRate);
-	PlayerInputComponent->BindAxis("LookUp", this, &APawn::AddControllerPitchInput);
-	PlayerInputComponent->BindAxis("LookUpRate", this, &AGUNMANCharacter::LookUpAtRate);
 }
 
 void AGUNMANCharacter::TimelineStep(float value)
@@ -652,18 +653,6 @@ void AGUNMANCharacter::AnimationAtFiring()
 	);
 }
 
-void AGUNMANCharacter::TurnAtRate(float Rate)
-{
-	// calculate delta for this frame from the rate information
-	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
-}
-
-void AGUNMANCharacter::LookUpAtRate(float Rate)
-{
-	// calculate delta for this frame from the rate information
-	AddControllerPitchInput(Rate * BaseLookUpRate * GetWorld()->GetDeltaSeconds());
-}
-
 void AGUNMANCharacter::MoveForward(const FInputActionValue& Value)
 {
 	if ((Controller != nullptr) && (Value.Get<float>() != 0.0f))
@@ -691,5 +680,17 @@ void AGUNMANCharacter::MoveRight(const FInputActionValue& Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 		// その方向に移動する
 		AddMovementInput(Direction, Value.Get<float>());
+	}
+}
+
+void AGUNMANCharacter::Look(const FInputActionValue& Value)
+{
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
+	{
+		// コントローラにヨーとピッチの入力を追加
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
