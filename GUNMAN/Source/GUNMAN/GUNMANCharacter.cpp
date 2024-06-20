@@ -20,11 +20,11 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
 #include "firstpersonProjectProjectile.h"
 #include "ArmedWeapon/Weapon.h"
 #include "Enemy/AIEnemy.h"
-#include "UMG/UICharacter.h"
 #include "LevelScript/BattleMapScript.h"
 
 
@@ -113,16 +113,22 @@ AGUNMANCharacter::AGUNMANCharacter()
 		JumpAction = JumpActionFinder.Object;
 	}
 
-	/*static ConstructorHelpers::FObjectFinder<UInputAction> FireActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Fire.IA_Fire"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> FireActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Fire.IA_Fire"));
 	if (FireActionFinder.Succeeded())
 	{
 		FireAction = FireActionFinder.Object;
-	}*/
+	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction> ToggleActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Toggle.IA_Toggle"));
 	if (ToggleActionFinder.Succeeded())
 	{
 		ToggleAction = ToggleActionFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> ReadyGunActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_ReadyGun.IA_ReadyGun"));
+	if (ReadyGunActionFinder.Succeeded())
+	{
+		ReadyGunAction = ReadyGunActionFinder.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UInputAction> RunActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Run.IA_Run"));
@@ -181,20 +187,20 @@ void AGUNMANCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// プレイヤーコントローラーを取得
-	TObjectPtr<APlayerController> PlayerControllerRef = UGameplayStatics::GetPlayerController(this, 0);
+	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
 	// Enhanced Input サブシステムにマッピングコンテキストを追加
-	if (PlayerControllerRef)
+	if (PlayerController)
 	{
-		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerControllerRef->GetLocalPlayer()))
+		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
-			Subsystem->AddMappingContext(DefaultMappingContext, 1);
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
 
 	// マウスを非表示
-	PlayerControllerRef->bShowMouseCursor = false;
-	PlayerControllerRef->SetInputMode(FInputModeGameOnly());
+	PlayerController->bShowMouseCursor = false;
+	PlayerController->SetInputMode(FInputModeGameOnly());
 
 	// ThirdPerson のアニメーションインスタンスをセット
 	TPMeshAnimInstance = GetMesh()->GetAnimInstance();
@@ -217,6 +223,35 @@ void AGUNMANCharacter::BeginPlay()
 
 	// AnyDamageデリゲートをバインド
 	OnTakeAnyDamage.AddDynamic(this, &AGUNMANCharacter::HandleAnyDamage);
+
+	// WBP のパスをセット
+	CharacterWidgetPath = "/Game/UMG/WBP_UICharacter.WBP_UICharacter_C";
+
+	// パスからウィジェットを生成する
+	CharacterWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*CharacterWidgetPath)).LoadSynchronous();
+
+	// ウィジェットを表示する
+	if (IsValid(CharacterWidgetClass))
+	{
+		UICharacterRef = Cast<UUICharacter>(CreateWidget(PlayerController, CharacterWidgetClass));
+
+		if (UICharacterRef)
+		{
+			UICharacterRef->AddToViewport();
+		}
+	}
+
+	// WBP のパスをセット
+	GunSightWidgetPath = "/Game/UMG/WBP_UIGunSight.WBP_UIGunSight_C";
+
+	// パスからウィジェットを生成する
+	GunSightWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*GunSightWidgetPath)).LoadSynchronous();
+
+	// ウィジェットを表示する
+	if (IsValid(GunSightWidgetClass))
+	{
+		UIGunSightRef = Cast<UUIGunSight>(CreateWidget(PlayerController, GunSightWidgetClass));
+	}
 }
 
 void AGUNMANCharacter::Tick(float DeltaTime)
@@ -245,10 +280,15 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AGUNMANCharacter::StopJump);
 
 		// 攻撃のバインド
-		//EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::OnFire);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartFire);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AGUNMANCharacter::StopFire);
 
 		// TPS/FPS 視点切り替えのバインド
 		EnhancedInputComponent->BindAction(ToggleAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::ToggleBetweenTPSAndFPS);
+
+		// 武器を構えるバインド
+		EnhancedInputComponent->BindAction(ReadyGunAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartReadyGun);
+		EnhancedInputComponent->BindAction(ReadyGunAction, ETriggerEvent::Completed, this, &AGUNMANCharacter::StopReadyGun);
 
 		// 走る操作へのバインド
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartTimeline);
@@ -264,11 +304,63 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 		// 視点移動のバインド
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::Look);
 	}
+}
 
-	//PlayerInputComponent->BindAction("Fire", IE_Pressed, this, &AGUNMANCharacter::OnFire);
+void AGUNMANCharacter::StartFire()
+{
+	FTimerManager& FireTimerManager = GetWorldTimerManager();
+	FireTimerManager.SetTimer
+	(
+		FireTimerHandle,
+		this,
+		&AGUNMANCharacter::FiringEvent,
+		FiringInterval,
+		true
+	);
+}
 
-	// 武器装備切り替えのバインド
-	//PlayerInputComponent->BindAction("SwitchAndEquipWeapons", IE_Pressed, this, &AGUNMANCharacter::SwitchingAndEquippingWeapons);
+void AGUNMANCharacter::FiringEvent()
+{
+	if ((HasWeapon && IsAiming && CanAttack) || isFP)
+	{
+		if (isFP == false)
+		{
+			// 発砲炎アニメーション再生(Third Person)
+			AnimationAtFiring();
+			OnFire();
+		}
+		else
+		{
+			OnFire();
+		}
+	}
+}
+
+void AGUNMANCharacter::StopFire()
+{
+	FTimerManager& FireTimerManager = GetWorldTimerManager();
+
+	// タイマーがアクティブであるかチェックしてからキャンセル
+	if (FireTimerManager.IsTimerActive(FireTimerHandle))
+	{
+		// タイマーをクリア
+		FireTimerManager.ClearTimer(FireTimerHandle);
+
+		// タイマーハンドルを無効化
+		FireTimerHandle.Invalidate();
+	}
+}
+
+void AGUNMANCharacter::FireState_Implementation(bool CanATK)
+{
+	CanAttack = CanATK;
+}
+
+void AGUNMANCharacter::AttachWeapon_Implementation(USkeletalMeshComponent* WeaponMesh, FName AttachSoketName)
+{
+	// 武器をアタッチ
+	WeaponMeshes.Add(WeaponMesh);
+	WeaponMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), AttachSoketName);
 }
 
 void AGUNMANCharacter::TimelineStep(float value)
@@ -536,8 +628,47 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 	}
 }
 
-void AGUNMANCharacter::SwitchingAndEquippingWeapons()
+void AGUNMANCharacter::StartReadyGun()
 {
+	if (HasWeapon == true)
+	{
+		GunPreparationProcess(true, 150.0f, false, true, FVector(0.0f, 98.0f, 102.0f), FRotator(0.0f, 32.0f, 41.0f));
+		if (UIGunSightRef)
+		{
+			UIGunSightRef->AddToViewport();
+		}
+	}
+}
+
+void AGUNMANCharacter::GunPreparationProcess(bool bIsAiming, float ArmLength, bool bOrientRotationToMovement, bool bYawRotation, FVector CameraBoomLocation, FRotator CameraBoomRotation)
+{
+	// エイムのフラグを設定
+	IsAiming = bIsAiming;
+
+	// エイムの状態をアニメーション（ThirdPerson）に反映
+	IAnimationInterface* AnimInterface = Cast<IAnimationInterface>(TPMeshAnimInstance);
+	AnimInterface->AimingState_Implementation(IsAiming);
+
+	// カメラアームの長さを設定
+	SetTargetArmLength(ArmLength);
+
+	// カメラの向きの設定
+	SetOrientRotationToMovement(bOrientRotationToMovement);
+
+	// 歩く向きの設定
+	SetUseControllerRotationYaw(bYawRotation);
+
+	// カメラブームの位置と角度を設定
+	CameraBoom->SetRelativeLocationAndRotation(CameraBoomLocation, CameraBoomRotation, false, false);
+}
+
+void AGUNMANCharacter::StopReadyGun()
+{
+	GunPreparationProcess(false, 300.0f, true, false, FVector(0.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
+	if (UIGunSightRef)
+	{
+		UIGunSightRef->RemoveFromParent();
+	}
 }
 
 void AGUNMANCharacter::PressedActionPoseMenu()
@@ -550,6 +681,15 @@ void AGUNMANCharacter::PressedActionPoseMenu()
 		BattleMapRef = Cast<ABattleMapScript>(World->GetLevelScriptActor());
 		if (BattleMapRef)
 		{
+			// プレイヤーコントローラーを取得
+			TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+			if (TObjectPtr<UEnhancedInputLocalPlayerSubsystem> Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+			{
+				Subsystem->RemoveMappingContext(DefaultMappingContext);
+				Subsystem->AddMappingContext(BattleMapRef->PauseMenuMappingContext, 0);
+			}
+
 			BattleMapRef->InitializeButtonPosition();
 		}
 	}
@@ -639,6 +779,21 @@ void AGUNMANCharacter::SetMaxWalkSpeed(float NewSpeed)
 	GetCharacterMovement()->MaxWalkSpeed = NewSpeed;
 }
 
+void AGUNMANCharacter::SetTargetArmLength(float Length)
+{
+	CameraBoom->TargetArmLength = Length;
+}
+
+void AGUNMANCharacter::SetOrientRotationToMovement(bool bOrientRotationToMovement)
+{
+	GetCharacterMovement()->bOrientRotationToMovement = bOrientRotationToMovement;
+}
+
+void AGUNMANCharacter::SetUseControllerRotationYaw(bool bYawRotation)
+{
+	bUseControllerRotationYaw = bYawRotation;
+}
+
 void AGUNMANCharacter::AnimationAtFiring()
 {
 	// 発砲音を出す
@@ -651,6 +806,55 @@ void AGUNMANCharacter::AnimationAtFiring()
 		EquippedWeaponInformation.AmmunitionClass,
 		FTransform(EquippedWeapon->GetSocketTransform(TEXT("None")))
 	);
+}
+
+USkeletalMeshComponent* AGUNMANCharacter::RemoveWeapon(TArray<USkeletalMeshComponent*> Arms, int Number)
+{
+	int AllWeaponNumber = Arms.Num() - 1;
+	int CurrentWeaponNumber = Number - 1;
+	bool bPickAllWeaponNumber = false;
+
+	if (CurrentWeaponNumber < 0)
+	{
+		bPickAllWeaponNumber = true;
+	}
+	else
+	{
+		bPickAllWeaponNumber = false;
+	}
+
+	int PickIndex = UKismetMathLibrary::SelectInt(AllWeaponNumber, CurrentWeaponNumber, bPickAllWeaponNumber);
+
+	return Arms[PickIndex];
+}
+
+void AGUNMANCharacter::CountWeapon(TArray<USkeletalMeshComponent*> Arms, int Number)
+{
+	int AllWeaponNumber = Arms.Num();
+	int NextWeaponNumber = Number + 1;
+	bool bPickNextWeaponNumber = false;
+
+	if (NextWeaponNumber < AllWeaponNumber)
+	{
+		bPickNextWeaponNumber = true;
+	}
+	else
+	{
+		bPickNextWeaponNumber = false;
+	}
+
+	int FirstWeaponIndex = 0;
+	WeaponNumberCounter = UKismetMathLibrary::SelectInt(NextWeaponNumber, FirstWeaponIndex, bPickNextWeaponNumber);
+}
+
+void AGUNMANCharacter::EquipWeapon(bool bHasWeapon, bool bHasPistol, FName SoketName)
+{
+	EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), SoketName);
+
+	HasWeapon = bHasWeapon;
+
+	IAnimationInterface* AnimInterface = Cast<IAnimationInterface>(TPMeshAnimInstance);
+	AnimInterface->EquippedState_Implementation(HasWeapon, bHasPistol);
 }
 
 void AGUNMANCharacter::MoveForward(const FInputActionValue& Value)
