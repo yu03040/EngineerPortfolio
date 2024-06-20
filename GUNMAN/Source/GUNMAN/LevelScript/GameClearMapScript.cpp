@@ -5,12 +5,41 @@
 #include "GUNMAN/UMG/UIGameClear.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/Button.h"
+#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
+#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
+#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputMappingContext.h"
+#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputAction.h"
 
 AGameClearMapScript::AGameClearMapScript()
 {
 	UI_GameClear = NULL;
 	MaxButtonCounter = 2;
 	InvalidButtonIndex = 3;
+
+	// Enhanced Input のアセットをロード
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IMC_Map.IMC_Map"));
+	if (MappingContextFinder.Succeeded())
+	{
+		DefaultMappingContext = MappingContextFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> EnterActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Enter.IA_Enter"));
+	if (EnterActionFinder.Succeeded())
+	{
+		EnterAction = EnterActionFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> DownArrowKeyActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_DownArrowKey.IA_DownArrowKey"));
+	if (DownArrowKeyActionFinder.Succeeded())
+	{
+		DownArrowKeyAction = DownArrowKeyActionFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> UpArrowKeyActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_UpArrowKey.IA_UpArrowKey"));
+	if (UpArrowKeyActionFinder.Succeeded())
+	{
+		UpArrowKeyAction = UpArrowKeyActionFinder.Object;
+	}
 }
 
 void AGameClearMapScript::BeginPlay()
@@ -19,6 +48,17 @@ void AGameClearMapScript::BeginPlay()
 
 	// プレイヤーコントローラーを取得
 	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	// Enhanced Input サブシステムにマッピングコンテキストを追加
+	if (PlayerController)
+	{
+		if (TObjectPtr<UEnhancedInputLocalPlayerSubsystem> Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->AddMappingContext(DefaultMappingContext, 0);
+		}
+	}
+
+	SetupInput(PlayerController->InputComponent);
 
 	// ウィジェットブループリントのパスをセット
 	FString path = "/Game/UMG/WBP_GameClear.WBP_GameClear_C";
@@ -43,6 +83,16 @@ void AGameClearMapScript::BeginPlay()
 	if (ContinueButton)
 	{
 		ContinueButton->SetBackgroundColor(SelectedColor);
+	}
+}
+
+void AGameClearMapScript::SetupInput(TObjectPtr<UInputComponent> PlayerInputComponent)
+{
+	if (TObjectPtr<UEnhancedInputComponent> EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(PlayerInputComponent))
+	{
+		EnhancedInputComponent->BindAction(EnterAction, ETriggerEvent::Triggered, this, &AGameClearMapScript::UpdateOutputButton);
+		EnhancedInputComponent->BindAction(DownArrowKeyAction, ETriggerEvent::Triggered, this, &AGameClearMapScript::UI_DownwardMovement);
+		EnhancedInputComponent->BindAction(UpArrowKeyAction, ETriggerEvent::Triggered, this, &AGameClearMapScript::UI_UpwardMovement);
 	}
 }
 

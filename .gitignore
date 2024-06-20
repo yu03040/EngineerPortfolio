@@ -143,3 +143,5 @@ GUNMAN/.vscode/
 GUNMAN/GUNMAN.code-workspace
 GUNMAN/.ignore
 GUNMAN/Content/Test/
+GUNMAN/.editorconfig
+GUNMAN/shadertoolsconfig.json

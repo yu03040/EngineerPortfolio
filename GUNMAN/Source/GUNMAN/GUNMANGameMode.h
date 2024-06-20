@@ -24,14 +24,7 @@ protected:
 
 	void OpenGameClearMap();
 
-	UPROPERTY()
-	TObjectPtr<AAIEnemy> EnemyRef;
-
 private:
-	TSubclassOf<class UUserWidget> TitleWidget;
-
-	UPROPERTY()
-	TObjectPtr<class UUserWidget> TitleUserWidget = nullptr;
 
 	/** ゲームクリアに必要な倒した数 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
