@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GUNMAN/LevelScript/BaseMapScript.h"
+#include "BaseMapScript.h"
 #include "GameOverMapScript.generated.h"
 
 /**

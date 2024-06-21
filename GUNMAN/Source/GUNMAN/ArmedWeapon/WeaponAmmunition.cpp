@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "../ArmedWeapon/WeaponAmmunition.h"
+#include "WeaponAmmunition.h"
 #include "GameFramework/Character.h"
 #include "Kismet/GamePlayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
