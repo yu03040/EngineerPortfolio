@@ -10,7 +10,7 @@
 UINTERFACE(MinimalAPI, Blueprintable)
 class UWeaponInterface : public UInterface
 {
-	GENERATED_BODY()
+	GENERATED_UINTERFACE_BODY()
 };
 
 /**
@@ -18,7 +18,7 @@ class UWeaponInterface : public UInterface
  */
 class GUNMAN_API IWeaponInterface
 {
-	GENERATED_BODY()
+	GENERATED_IINTERFACE_BODY()
 
 		// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
@@ -26,6 +26,4 @@ public:
 	//	武器を装備する関数
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "WeapInterface")
 		void AttachWeapon(USkeletalMeshComponent* WeaponMesh, FName AttachSoketName);
-
-
 };

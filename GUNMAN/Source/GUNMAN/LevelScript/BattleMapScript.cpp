@@ -7,6 +7,10 @@
 #include "GUNMAN/GUNMANCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/Button.h"
+#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
+#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
+#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputMappingContext.h"
+#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputAction.h"
 
 ABattleMapScript::ABattleMapScript()
 {
@@ -14,11 +18,65 @@ ABattleMapScript::ABattleMapScript()
 	UI_Character = NULL;
 	MaxButtonCounter = 3;
 	InvalidButtonIndex = 4;
+
+	// Enhanced Input のアセットをロード
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IMC_Map.IMC_Map"));
+	if (MappingContextFinder.Succeeded())
+	{
+		PauseMenuMappingContext = MappingContextFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> UpActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_UpArrowKey.IA_UpArrowKey"));
+	if (UpActionFinder.Succeeded())
+	{
+		UpAction = UpActionFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> DownActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_DownArrowKey.IA_DownArrowKey"));
+	if (DownActionFinder.Succeeded())
+	{
+		DownAction = DownActionFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> DecisionActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Enter.IA_Enter"));
+	if (DecisionActionFinder.Succeeded())
+	{
+		DecisionAction = DecisionActionFinder.Object;
+	}
 }
 
 void ABattleMapScript::BeginPlay()
 {
 	Super::BeginPlay();
+
+	// プレイヤーコントローラーを取得
+	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	// Enhanced Input サブシステムにマッピングコンテキストを追加
+	if (PlayerController)
+	{
+		if (TObjectPtr<UEnhancedInputComponent> EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerController->InputComponent))
+		{
+			EnhancedInputComponent->BindAction(UpAction, ETriggerEvent::Triggered, this, &ABattleMapScript::UI_UpwardMovement);
+			EnhancedInputComponent->BindAction(DownAction, ETriggerEvent::Triggered, this, &ABattleMapScript::UI_DownwardMovement);
+			EnhancedInputComponent->BindAction(DecisionAction, ETriggerEvent::Triggered, this, &ABattleMapScript::UpdateOutputButton);
+		}
+	}
+}
+
+void ABattleMapScript::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	// プレイヤーコントローラーを取得
+	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	// Enhanced Input サブシステムにマッピングコンテキストを追加
+	if (PlayerController)
+	{
+		if (TObjectPtr<UEnhancedInputLocalPlayerSubsystem> Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+		{
+			Subsystem->RemoveMappingContext(PauseMenuMappingContext);
+		}
+	}
 }
 
 void ABattleMapScript::ChangeButtonColor()
@@ -67,7 +125,15 @@ void ABattleMapScript::UpdateOutputButton()
 		case 2:
 		{
 			UI_PaseMenu->OnClickedCancel_Button();
+			// プレイヤーコントローラーを取得
+			TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
+			if (TObjectPtr<UEnhancedInputLocalPlayerSubsystem> Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
+			{
+				Subsystem->RemoveMappingContext(PauseMenuMappingContext);
+				TObjectPtr<AGUNMANCharacter> GunmanCharacter = Cast<AGUNMANCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+				Subsystem->AddMappingContext(GunmanCharacter->DefaultMappingContext, 0);
+			}
 			// ボタンの位置を初期化
 			ButtonCounter = 1;
 			break;
@@ -82,7 +148,7 @@ void ABattleMapScript::UpdateOutputButton()
 void ABattleMapScript::InitializeButtonPosition()
 {
 	// プレイヤーコントローラーを取得
-	APlayerController* PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
 	// ウィジェットブループリントのパスをセット
 	FString path = "/Game/UMG/WBP_PaseMenu.WBP_PaseMenu_C";

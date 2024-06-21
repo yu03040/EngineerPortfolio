@@ -15,6 +15,18 @@ class GUNMAN_API ABattleMapScript : public ABaseMapScript
 {
 	GENERATED_BODY()
 
+	/* Up Input */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> UpAction;
+
+	/* Down Input */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> DownAction;
+
+	/* Decision Input */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> DecisionAction;
+
 public:
 	ABattleMapScript();
 
@@ -24,11 +36,17 @@ public:
 	/* 選択されたボタンによって出力を変える関数 */
 	virtual void UpdateOutputButton() override;
 
-	/** ボタンの位置を初期化する関数 */
+	/* ボタンの位置を初期化する関数 */
 	void InitializeButtonPosition();
+
+public:
+	/* MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+	TObjectPtr<class UInputMappingContext> PauseMenuMappingContext;
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 	/* ブループリントのプレイ中のウィジェット */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))

@@ -26,9 +26,26 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+	virtual void SetupInput(TObjectPtr<UInputComponent> PlayerInputComponent);
 
 private:
 	/* UITitle の Ref */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UUITitle> UI_Title;
+
+	/* MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
+
+	/* Enter Input */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> EnterAction;
+
+	/* Down Arrow Key Input */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> DownArrowKeyAction;
+
+	/* Up Arrow Key Input */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> UpArrowKeyAction;
 };
