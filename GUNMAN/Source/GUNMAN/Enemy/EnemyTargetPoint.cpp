@@ -1,6 +1,6 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "GUNMAN/Enemy/EnemyTargetPoint.h"
+#include "EnemyTargetPoint.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "EnemyTargetPoint.h"

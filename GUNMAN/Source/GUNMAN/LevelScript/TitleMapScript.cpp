@@ -1,14 +1,14 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GUNMAN/LevelScript/TitleMapScript.h"
+#include "TitleMapScript.h"
 #include "GUNMAN/UMG/UITitle.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/Button.h"
-#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputComponent.h"
-#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/EnhancedInputSubsystems.h"
-#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputMappingContext.h"
-#include "../Plugins/EnhancedInput/Source/EnhancedInput/Public/InputAction.h"
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "InputMappingContext.h"
+#include "InputAction.h"
 
 ATitleMapScript::ATitleMapScript()
 {

@@ -7,7 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "Kismet/GameplayStatics.h"
 #include "GUNMAN/Enemy/AIEnemyController.h"
-#include "Runtime/Engine/Public/TimerManager.h"
+#include "TimerManager.h"
 #include "Engine/World.h"
 #include "EnemyTargetPoint.generated.h"
 

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "ArmedWeapon/WeaponStructure.h"
 #include "Components/TimelineComponent.h"
-#include "../../../../../../../Program Files/Epic Games/UE_5.3/Engine/Plugins/EnhancedInput/Source/EnhancedInput/Public/InputActionValue.h"
+#include "InputActionValue.h"
 #include "GameFramework/Character.h"
 #include "UMG/UICharacter.h"
 #include "UMG/UIGunSight.h"
