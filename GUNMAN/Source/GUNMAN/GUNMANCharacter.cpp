@@ -276,7 +276,7 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 	if (TObjectPtr<UEnhancedInputComponent> EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
 		// ジャンプのバインド
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartJump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AGUNMANCharacter::StartJump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AGUNMANCharacter::StopJump);
 
 		// 攻撃のバインド
