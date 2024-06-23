@@ -8,7 +8,7 @@ public class GUNMAN : ModuleRules
     {
         PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 
-        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "AIModule", "EnhancedInput" });
+        PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "HeadMountedDisplay", "AIModule", "EnhancedInput", "AnimGraphRuntime" });
         PrivateDependencyModuleNames.AddRange(new string[] { "Slate", "SlateCore" });
     }
 }
