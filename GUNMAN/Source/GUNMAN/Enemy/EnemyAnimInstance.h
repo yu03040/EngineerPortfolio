@@ -5,33 +5,21 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Animation/AnimInstance.h"
-#include "ArmedWeapon/AnimationInterface.h"
-#include "GUNMANAnimInstance.generated.h"
+#include "EnemyAnimInstance.generated.h"
 
 /**
  *
  */
 UCLASS()
-class GUNMAN_API UGUNMANAnimInstance : public UAnimInstance, public IAnimationInterface
+class GUNMAN_API UEnemyAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
 protected:
-	/* 武器を構えているか？ */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	bool IsAiming = false;
-
-	/* 武器を持っているか？ */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	bool HasWeapon = false;
-
-	/* ピストルを持っているか？ */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	bool HasPistol = false;
 
 	/* プレイヤーの参照 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<ACharacter> PlayerCharacterRef;
+	TObjectPtr<ACharacter> EnemyCharacterRef;
 
 	/* 毎フレーム */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
@@ -59,13 +47,9 @@ protected:
 
 public:
 
-	UGUNMANAnimInstance();
+	UEnemyAnimInstance();
 
 	virtual void NativeBeginPlay() override;
 
 	virtual void NativeUpdateAnimation(float DeltaTime) override;
-
-	void AimingState_Implementation(bool bIsAiming) override;
-
-	void EquippedState_Implementation(bool bHasWeapon, bool bHasPistol) override;
 };

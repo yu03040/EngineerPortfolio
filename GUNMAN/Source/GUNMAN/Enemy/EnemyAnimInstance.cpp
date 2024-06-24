@@ -1,49 +1,49 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "GUNMANAnimInstance.h"
+#include "EnemyAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "KismetAnimationLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
-UGUNMANAnimInstance::UGUNMANAnimInstance()
+UEnemyAnimInstance::UEnemyAnimInstance()
 {
 }
 
-void UGUNMANAnimInstance::NativeBeginPlay()
+void UEnemyAnimInstance::NativeBeginPlay()
 {
 	//Superの呼び出し
 	Super::NativeBeginPlay();
-	PlayerCharacterRef = Cast<ACharacter>(TryGetPawnOwner());
+	EnemyCharacterRef = Cast<ACharacter>(TryGetPawnOwner());
 }
 
-void UGUNMANAnimInstance::NativeUpdateAnimation(float DeltaTime)
+void UEnemyAnimInstance::NativeUpdateAnimation(float DeltaTime)
 {
 	//Superの呼び出し
 	Super::NativeUpdateAnimation(DeltaTime);
 
 	DeltaTimeX = DeltaTime;
 
-	if (IsValid(PlayerCharacterRef) == true)
+	if (IsValid(EnemyCharacterRef) == true)
 	{
 		// 接地の設定（ステートマシンで使用される）
-		bIsInAir = PlayerCharacterRef->GetMovementComponent()->IsFalling();
+		bIsInAir = EnemyCharacterRef->GetMovementComponent()->IsFalling();
 
 		// スピードの設定（1Dブレンドスペースで使用）
-		Speed = PlayerCharacterRef->GetVelocity().Size();
+		Speed = EnemyCharacterRef->GetVelocity().Size();
 
 		// 方向の設定
-		FVector Velocity = PlayerCharacterRef->GetVelocity();
-		FRotator BaseRotation = PlayerCharacterRef->GetActorRotation();
+		FVector Velocity = EnemyCharacterRef->GetVelocity();
+		FRotator BaseRotation = EnemyCharacterRef->GetActorRotation();
 		Direction = UKismetAnimationLibrary::CalculateDirection(Velocity, BaseRotation);
 
 		// 武器を構えているかの設定
 		FRotator CurrentRotation = UKismetMathLibrary::MakeRotator(0.0f, AimPitch, AimYaw);
 
-		FRotator ControlRotation = PlayerCharacterRef->GetControlRotation();
-		FRotator ActorRotation = PlayerCharacterRef->GetActorRotation();
+		FRotator ControlRotation = EnemyCharacterRef->GetControlRotation();
+		FRotator ActorRotation = EnemyCharacterRef->GetActorRotation();
 		FRotator TargetRotation = UKismetMathLibrary::NormalizedDeltaRotator(ControlRotation, ActorRotation);
 
 		float InterpSpeed = 5.0f;
@@ -56,17 +56,4 @@ void UGUNMANAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		AimPitch = UKismetMathLibrary::ClampAngle(PitchAngleDegree, MinAngleDegree, MaxAngleDegree);
 		AimYaw = UKismetMathLibrary::ClampAngle(YawAngleDegree, MinAngleDegree, MaxAngleDegree);
 	}
-}
-
-void UGUNMANAnimInstance::AimingState_Implementation(bool bIsAiming)
-{
-	// 構えているか受け取る
-	IsAiming = bIsAiming;
-}
-
-void UGUNMANAnimInstance::EquippedState_Implementation(bool bHasWeapon, bool bHasPistol)
-{
-	// 武器とピストルの状態を受け取る
-	HasWeapon = bHasWeapon;
-	HasPistol = bHasPistol;
 }
