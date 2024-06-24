@@ -176,3 +176,46 @@ Ugetter および setter メソッドを使用することで
 
 [Weapon クラスのソースコード](../Source/GUNMAN/ArmedWeapon/Weapon.cpp)  
 [WeaponAmmunition クラスのソースコード](../Source/GUNMAN/ArmedWeapon/WeaponAmmunition.cpp)
+
+## 16.入力を Input Event から Enhanced Input に変更
+
+Unreal Engine 4 から開発を始めため Input Event のままになっていた。  
+しかし、Enhanced Input は従来よりも柔軟に入力を管理できるので変更した。
+
+### Input MappingContext(IMC)
+
+バトル中の入力と UI 操作の入力を分けグループ化
+
+- IMC_Default（バトル中の入力）
+- IMC_Map（UI 操作の入力）
+
+### Input Action(IA)
+
+各種の入力を定義
+
+- IMC_Default には以下の入力を設定
+
+  - IA_Jump（ジャンプ）
+  - IA_MoveForward, IA_MoveRight（移動）
+  - IA_Run（走る）
+  - IA_Look（視点移動）
+  - IA_Fire（攻撃）
+  - IA_ReadyGun（武器を構える）
+  - IA_Toggle（FPS/TPS 切り替え）
+  - IA_SwitchAndEquipWeapons（武器切り替え）
+  - IA_PauseMenu（ポーズメニューを開く）
+
+- IMC_Map には以下の入力を設定
+  - IA_Enter（決定）
+  - IA_UpArrowKey（上移動）
+  - IA_DownArrowKey（下移動）
+
+## 17.プレイヤーと敵のアニメーション BP での更新処理を C++ に移行
+
+アニメーション BP の Event Blueprint Update Animation よりも UAnimInstance クラスを継承して  
+Native Update Animation を C++ コードでオーバーライドした方が付加的な処理が少なく、高速であるので移行した。
+
+その他のステートマシンなどの AnimGraph は継承したアニメーション BP で実装している。
+
+[GUNMANAnimInstance クラスのソースコード](../Source/GUNMAN/GUNMANAnimInstance.cpp)  
+[EnemyAnimInstance クラスのソースコード](../Source/GUNMAN/Enemy/EnemyAnimInstance.cpp)

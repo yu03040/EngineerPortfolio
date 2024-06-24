@@ -31,9 +31,22 @@
   - 受け取ったアクターの情報を更新
   - プレイヤーが視界に存在するか情報を更新
 
+## Enemy Anim Instance Class
+
+[Enemy Anim Instance](/GUNMAN/Source/GUNMAN/Enemy/EnemyAnimInstance.cpp) は敵のアニメーションを定義している。
+
+アニメーションが更新されるごとに処理するため、少しでも高速な C++で基底クラスとして構成する。
+
+- 接地の判定
+- 方向の設定
+- スピードの設定
+- 武器を構えているか設定
+
+これらの情報を基に、派生クラスをブループリントで作り、ステートマシンを設定する。
+
 ## Enemy Target Point Class
 
-[Enemy Target Point](GUNMAN/Source/GUNMAN/Enemy/EnemyTargetPoint.cpp) は敵を生成する場所と生成条件を定義している。  
+[Enemy Target Point](/GUNMAN/Source/GUNMAN/Enemy/EnemyTargetPoint.cpp) は敵を生成する場所と生成条件を定義している。  
 出現条件：Max Enemy Count（生成させる敵の最大値）を超えるまで出現させる
 
 - 例）`MaxEnemyCount = 5` なら 5 体、6 体目は出現しない
