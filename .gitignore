@@ -145,3 +145,4 @@ GUNMAN/.ignore
 GUNMAN/Content/Test/
 GUNMAN/.editorconfig
 GUNMAN/shadertoolsconfig.json
+GUNMAN/Content/Maps/_GENERATED/
