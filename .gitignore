@@ -41,6 +41,11 @@
 *.VC.db
 *.VC.opendb
 
+*.vsconfig
+*.vcxproj
+*.filters
+*.user
+
 # Precompiled Assets
 SourceArt/**/*.png
 SourceArt/**/*.tga
@@ -73,22 +78,6 @@ Plugins/*/Intermediate/*
 # Cache files for the editor to use
 DerivedDataCache/*
 
-GUNMAN/Content/FreeAssets/
-GUNMAN/Binaries/
-GUNMAN/DerivedDataCache/Boot.ddc
-GUNMAN/Intermediate/AssetRegistryCache/311563bb.bin
-GUNMAN/Intermediate/
-GUNMAN/Saved/
-GUNMAN/Content/AnimStarterPack/
-GUNMAN/Content/Blueprint/FirstPersonCPP/Blueprints/BP_firstpersonProjectProjectile.uasset
-GUNMAN/Content/Enemy/Animation/
-GUNMAN/Content/Enemy/Materials/M_UE4Man_Body_Black.uasset
-GUNMAN/Content/FirstPerson/
-GUNMAN/Content/Geometry/
-GUNMAN/Content/Mannequin/
-GUNMAN/Content/StarterContent/
-GUNMAN/Content/ThirdPerson/
-
 first-person/FirstPerson.png
 first-person/Binaries/
 first-person/Build/
@@ -100,10 +89,8 @@ first-person/Content/StarterContent/
 first-person/Intermediate/
 first-person/Saved/
 
-*.vcxproj
-*.filters
-*.user
 big-or-small/BigOrSmall/x64/
+big-or-small/BigOrSmall/BigOrSmall/x64/Debug/
 
 battery-collector/Binaries/
 battery-collector/Build/
@@ -134,11 +121,27 @@ EndlessRun/Content/EndlessRun/MS_FieldBGM.uasset
 EndlessRun/Content/EndlessRun/BGM/MS_FieldBGM.uasset
 EndlessRun/Content/EndlessRun/Blueprints/NewBlueprint.uasset
 EndlessRun/Platforms/HoloLens/
+EndlessRun/Binaries/
+EndlessRun/Content/EndlessRun/3DModel/SM_DoorWay_Large_Door_Left.uasset
+EndlessRun/Content/EndlessRun/Blueprints/Title/BP_Door.uasset
+EndlessRun/Content/EndlessRun/Test/
 
+GUNMAN/Content/FreeAssets/
+GUNMAN/Binaries/
+GUNMAN/DerivedDataCache/Boot.ddc
+GUNMAN/Intermediate/AssetRegistryCache/311563bb.bin
+GUNMAN/Intermediate/
+GUNMAN/Saved/
+GUNMAN/Content/AnimStarterPack/
+GUNMAN/Content/Blueprint/FirstPersonCPP/Blueprints/BP_firstpersonProjectProjectile.uasset
+GUNMAN/Content/Enemy/Animation/
+GUNMAN/Content/Enemy/Materials/M_UE4Man_Body_Black.uasset
+GUNMAN/Content/FirstPerson/
+GUNMAN/Content/Geometry/
+GUNMAN/Content/Mannequin/
+GUNMAN/Content/StarterContent/
+GUNMAN/Content/ThirdPerson/
 GUNMAN/Build/
-*.vsconfig
-
-big-or-small/BigOrSmall/BigOrSmall/x64/Debug/
 GUNMAN/.vscode/
 GUNMAN/GUNMAN.code-workspace
 GUNMAN/.ignore
