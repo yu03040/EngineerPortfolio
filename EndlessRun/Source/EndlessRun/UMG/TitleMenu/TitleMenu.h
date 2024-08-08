@@ -45,8 +45,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr <USoundBase> SoundObj;
 
-	bool bHasExecuted;
-
 protected:
 	virtual void NativeConstruct() override;
 

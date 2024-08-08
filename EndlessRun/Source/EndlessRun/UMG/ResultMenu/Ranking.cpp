@@ -24,14 +24,6 @@ void URanking::OnClickedBackToTitle_Button()
 	// クリック音を鳴らす
 	StartSound();
 
-	//1秒後にタイトルに戻る
-	float DelayTime = 1.0f;
-	FLatentActionInfo LatentActionInfo;
-	LatentActionInfo.CallbackTarget = this;
-	LatentActionInfo.ExecutionFunction = FName(TEXT(""));
-	LatentActionInfo.Linkage = 0;
-	UKismetSystemLibrary::Delay(this, DelayTime, LatentActionInfo);
-
 	FName LevelName = TEXT("/Game/EndlessRun/Maps/TitleMap.TitleMap");
 	UGameplayStatics::OpenLevel(this, LevelName);
 }
