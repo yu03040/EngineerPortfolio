@@ -27,41 +27,6 @@ void UCountDown::NativeConstruct()
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UCountDown::UpdateCountdown, 1.0f, true);
 }
 
-void UCountDown::CountDownEvent()
-{
-	// 3, 2, 1, GO まで繰り返す
-	//if (0 <= Index && Index < CountTexts.Num() - 1)
-	//{
-	//	// 不透明にする
-
-	//	// 1 秒後（Delay(0.5秒) + SetTimer(0.5秒)）に透明にする
-	//	float DelayTime = 1.0f;
-	//	//StartDelay(DelayTime, FName("SetTextTransparency"));
-
-	//	Index++;
-	//	StartDelay(DelayTime, FName("CountDownEvent"));
-	//}
-	//else if (Index == CountTexts.Num() - 1)
-	//{
-	//	TObjectPtr<ACharacter> Player = UGameplayStatics::GetPlayerCharacter(this, 0);
-	//	TObjectPtr<APlayerController> OwningPlayerController = GetOwningPlayer();
-
-	//	// 入力できるようになる
-	//	Player->EnableInput(OwningPlayerController);
-
-	//	// キャラクターの Tick を再開（走れるようになる）
-	//	bool bEnabled = true;
-	//	Player->SetActorTickEnabled(bEnabled);
-
-	//	TObjectPtr<ARunGameMode> GameMode = Cast<ARunGameMode>(UGameplayStatics::GetGameMode(this));
-	//	if (GameMode)
-	//	{
-	//		// ゲームモードの Tick を再開（走行距離を計算できるようになる）
-	//		GameMode->SetActorTickEnabled(bEnabled);
-	//	}
-	//}
-}
-
 void UCountDown::SetTextBlockOpacity(UTextBlock* TextBlock, float Opacity)
 {
 	if (TextBlock)
@@ -83,7 +48,7 @@ void UCountDown::UpdateCountdown()
 		}
 	}
 
-	if (CountDownTime == 0)
+	if (CountDownTime < 0) // CountDownTime == 0 だと 「GO!!!」と同時に消してしまう
 	{
 		GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 
@@ -103,18 +68,9 @@ void UCountDown::UpdateCountdown()
 			// ゲームモードの Tick を再開（走行距離を計算できるようになる）
 			GameMode->SetActorTickEnabled(bEnabled);
 		}
+
+		RemoveFromViewport();
 	}
 
 	CountDownTime--;
-}
-
-void UCountDown::StartDelay(float DelayTime, FName FuncName)
-{
-	FLatentActionInfo LatentInfo;
-	LatentInfo.Linkage = 0;
-	LatentInfo.UUID = FMath::Rand();
-	LatentInfo.ExecutionFunction = FuncName;
-	LatentInfo.CallbackTarget = this;
-
-	UKismetSystemLibrary::Delay(this, DelayTime, LatentInfo);
 }

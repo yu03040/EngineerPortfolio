@@ -66,14 +66,8 @@ protected:
 
 public:
 	UFUNCTION()
-	void CountDownEvent();
-
-	UFUNCTION()
 	void SetTextBlockOpacity(UTextBlock* TextBlock, float Opacity);
 
 	UFUNCTION()
 	void UpdateCountdown();
-
-	UFUNCTION()
-	void StartDelay(float DelayTime, FName FuncName);
 };
