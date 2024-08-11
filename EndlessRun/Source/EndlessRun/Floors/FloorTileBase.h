@@ -10,7 +10,7 @@
 #include "FloorTileBase.generated.h"
 
 UENUM(BlueprintType)
-enum class SpawnObj : uint8
+enum class ESpawnObj : uint8
 {
 	Blocker,
 	Coins,
@@ -83,4 +83,7 @@ public:
 	// コインを生成する関数
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Floor")
 	void SpawnCoins();
+
+	UFUNCTION()
+	void DestroyActor();
 };

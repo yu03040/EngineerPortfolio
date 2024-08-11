@@ -59,11 +59,11 @@ void AFloorTileBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AA
 		{
 			GameMode->AddFloorTile();
 
-			float DelayTime = 2.0f;
+			float DelayTime = 5.0f;
 
 			FLatentActionInfo LatentActionInfo;
 			LatentActionInfo.CallbackTarget = this;
-			LatentActionInfo.ExecutionFunction = FName(TEXT("Destroy"));
+			LatentActionInfo.ExecutionFunction = FName(TEXT("DestroyActor"));
 			LatentActionInfo.Linkage = 0;
 
 			// 通り過ぎた床は 2 秒後に消していく
@@ -84,6 +84,11 @@ FTransform AFloorTileBase::GetAttachPoint()
 	return AttachPoint->GetComponentTransform();
 }
 
+void AFloorTileBase::DestroyActor()
+{
+	Destroy();
+}
+
 void AFloorTileBase::SetSpawnPoint_Implementation()
 {
 	FTransform R = SpawnPointRight->GetRelativeTransform();
@@ -94,13 +99,13 @@ void AFloorTileBase::SetSpawnPoint_Implementation()
 	SpawnPoints.Add(L);
 
 	// コインや障害物をランダムに生成する
-	switch (static_cast<SpawnObj>(UKismetMathLibrary::RandomIntegerInRange(0, 1)))
+	switch (static_cast<ESpawnObj>(UKismetMathLibrary::RandomIntegerInRange(0, 1)))
 	{
-	case SpawnObj::Blocker:
+	case ESpawnObj::Blocker:
 		SpawnBlocker();
 		break;
 
-	case SpawnObj::Coins:
+	case ESpawnObj::Coins:
 		SpawnCoins();
 		break;
 	}
