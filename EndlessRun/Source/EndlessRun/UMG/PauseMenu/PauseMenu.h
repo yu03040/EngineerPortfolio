@@ -55,6 +55,11 @@ private:
 	TObjectPtr<UBorder> Border;
 
 protected:
+	// クリック音
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	TObjectPtr<USoundBase> ClickSound;
+
+protected:
 	virtual void NativeConstruct() override;
 
 public:
@@ -66,4 +71,13 @@ public:
 
 	UFUNCTION()
 	void OnButtonQuitGameClicked();
+
+	UFUNCTION()
+	void BackTitle();
+
+	UFUNCTION()
+	void Cancel();
+
+	UFUNCTION()
+	void EndGame();
 };

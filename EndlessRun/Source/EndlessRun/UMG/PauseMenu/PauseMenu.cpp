@@ -4,6 +4,7 @@
 #include "EndlessRun/UMG/PauseMenu/PauseMenu.h"
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "Blueprint/WidgetBlueprintLibrary.h"
 
 void UPauseMenu::NativeConstruct()
@@ -36,12 +37,53 @@ void UPauseMenu::NativeConstruct()
 
 void UPauseMenu::OnButtonBackToTitleClicked()
 {
-	// タイトルを開く
+	UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+
+	// ポーズ中のため Delay を使用
+	FLatentActionInfo LatentInfo;
+	LatentInfo.Linkage = 0;
+	LatentInfo.UUID = FMath::Rand();
+	LatentInfo.ExecutionFunction = FName("BackTitle");
+	LatentInfo.CallbackTarget = this;
+
+	UKismetSystemLibrary::Delay(GetWorld(), 0.5f, LatentInfo);
+}
+
+void UPauseMenu::OnButtonCancelClicked()
+{
+	UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+
+	// ポーズ中のため Delay を使用
+	FLatentActionInfo LatentInfo;
+	LatentInfo.Linkage = 0;
+	LatentInfo.UUID = FMath::Rand();
+	LatentInfo.ExecutionFunction = FName("Cancel");
+	LatentInfo.CallbackTarget = this;
+
+	UKismetSystemLibrary::Delay(GetWorld(), 0.5f, LatentInfo);
+}
+
+void UPauseMenu::OnButtonQuitGameClicked()
+{
+	UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+
+	// ポーズ中のため Delay を使用
+	FLatentActionInfo LatentInfo;
+	LatentInfo.Linkage = 0;
+	LatentInfo.UUID = FMath::Rand();
+	LatentInfo.ExecutionFunction = FName("EndGame");
+	LatentInfo.CallbackTarget = this;
+
+	UKismetSystemLibrary::Delay(GetWorld(), 0.5f, LatentInfo);
+}
+
+void UPauseMenu::BackTitle()
+{
 	FName LevelName = TEXT("TitleMap");
 	UGameplayStatics::OpenLevel(this, LevelName);
 }
 
-void UPauseMenu::OnButtonCancelClicked()
+void UPauseMenu::Cancel()
 {
 	// ゲームの入力を再開する
 	TObjectPtr<APlayerController> Controller = UGameplayStatics::GetPlayerController(this, 0);
@@ -57,7 +99,7 @@ void UPauseMenu::OnButtonCancelClicked()
 	Controller->bShowMouseCursor = false;
 }
 
-void UPauseMenu::OnButtonQuitGameClicked()
+void UPauseMenu::EndGame()
 {
 	// ゲームを終了する
 	UKismetSystemLibrary::QuitGame(this, NULL, EQuitPreference::Quit, false);
