@@ -42,9 +42,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Transient, meta = (BindWidgetAnim), meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UWidgetAnimation> WidgetAnimation_LogoFrameIn;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Audio", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr <USoundBase> SoundObj;
-
 protected:
 	virtual void NativeConstruct() override;
 
