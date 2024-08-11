@@ -101,8 +101,5 @@ public:
 	void OnClickedBackToTitle_Button();
 
 	UFUNCTION()
-	void SetUpRankingData(FRankingData CurrentRankingData, TArray<FRankingData>& RankingDataAll);
-
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent)
-	void StartSound();
+	void SetUpRankingData(FRankingData& CurrentRankingData, TArray<FRankingData>& RankingDataAll);
 };

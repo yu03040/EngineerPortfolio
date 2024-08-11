@@ -279,13 +279,18 @@ void ARunCharacter::Death()
 	DisableInput(PlayerController);
 
 	// 爆発エフェクトを発生させる
-	FTransform SpawnTransform(FRotator(0.0f, 0.0f, 0.0f), FVector(GetActorLocation()), FVector(1.0f, 1.0f, 1.0f));
-	bool bAutoDestroy = true;
-	bool bAutoActiveSystem = true;
-	UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Emitter, SpawnTransform, bAutoDestroy, EPSCPoolMethod::None, bAutoActiveSystem);
+	if (bIsEffect == false)
+	{
+		FTransform SpawnTransform(FRotator(0.0f, 0.0f, 0.0f), FVector(GetActorLocation()), FVector(1.0f, 1.0f, 1.0f));
+		bool bAutoDestroy = true;
+		bool bAutoActiveSystem = true;
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Emitter, SpawnTransform, bAutoDestroy, EPSCPoolMethod::None, bAutoActiveSystem);
 
-	// 爆発音を再生させる
-	UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
+		// 爆発音を再生させる
+		UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
+
+		bIsEffect = true;
+	}
 
 	// プレイヤーを非表示にする
 	GetMesh()->SetVisibility(false, false);

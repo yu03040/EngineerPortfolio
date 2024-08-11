@@ -21,15 +21,15 @@ void URanking::NativeConstruct()
 
 void URanking::OnClickedBackToTitle_Button()
 {
-	// クリック音を鳴らす
-	StartSound();
-
-	FName LevelName = TEXT("/Game/EndlessRun/Maps/TitleMap.TitleMap");
+	FName LevelName = TEXT("TitleMap");
 	UGameplayStatics::OpenLevel(this, LevelName);
 }
 
-void URanking::SetUpRankingData(FRankingData CurrentRankingData, TArray<FRankingData>& RankingDataAll)
+void URanking::SetUpRankingData(FRankingData& CurrentRankingData, TArray<FRankingData>& RankingDataAll)
 {
+	//CurrentRankingData = RankingData;
+	//AllRankingData = RankingDataAll;
+
 	// WidgetBlueprintのClassを取得する
 	FString Path = TEXT("/Game/EndlessRun/Blueprints/UMG/WBP_RankingItem_v2.WBP_RankingItem_v2_C");
 	TSubclassOf<UUserWidget> RankingItemWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
@@ -50,23 +50,25 @@ void URanking::SetUpRankingData(FRankingData CurrentRankingData, TArray<FRanking
 
 	}
 
-	for (FRankingData RankingData : RankingDataAll)
-	{
-		int index = 0;
+	// 最初に追加
+	RankingDataAll.Add(CurrentRankingData);
 
-		// 現在のランクと過去のランクを比較
-		if (CurrentRankingData.Score >= RankingData.Score)
+	// ランキングをソートする
+	RankingDataAll.StableSort([](const FRankingData& A, const FRankingData& B) {
+		if (A.Score == B.Score) // コインが同じだったら距離が大きい方で比較
 		{
-			RankingDataAll.Insert(CurrentRankingData, index);
-			break; // 挿入した時点で終了
+			return A.Distance > B.Distance;
 		}
-		index++;
+		return A.Score > B.Score;
+		});
+
+	// ベスト 5 まで表示
+	if (RankingDataAll.Num() > 5)
+	{
+		RankingDataAll.RemoveAt(5);
 	}
 
-	// ランキングに同じ値がなければ、配列の最下位に追加
-	RankingDataAll.AddUnique(CurrentRankingData);
-
-	// 他の 5 人分のデータを反映
+	// 他の人のデータを反映
 	for (int i = 0; i < RankingDataAll.Num(); i++)
 	{
 		if (RankingItemWidgetClass && PlayerController)
@@ -84,11 +86,7 @@ void URanking::SetUpRankingData(FRankingData CurrentRankingData, TArray<FRanking
 	TObjectPtr<ARunGameMode> GameMode = Cast<ARunGameMode>(UGameplayStatics::GetGameMode(this));
 	if (GameMode)
 	{
-		GameMode->SaveData(RankingDataAll);
+		GameMode->LoadRankingData = RankingDataAll;
+		GameMode->SaveGame();
 	}
-}
-
-void URanking::StartSound_Implementation()
-{
-
 }

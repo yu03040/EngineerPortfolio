@@ -11,6 +11,7 @@ struct FRankingData
 {
 	GENERATED_BODY()
 
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloorTile", meta = (AllowPrivateAccess = "true"))
 	int Score;
 
@@ -21,8 +22,4 @@ struct FRankingData
 	{
 		return Score == Other.Score && Distance == Other.Distance;
 	}
-
-public:
-	void SetScore(int NewScore) { Score = NewScore; }
-	void SetDistance(float NewDistance) { Distance = NewDistance; }
 };

@@ -27,14 +27,11 @@ class ENDLESSRUN_API UResultMenu : public UUserWidget
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget), meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UImage> Image;
 
-	// 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget), meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UScaleBox> Goal_ScaleBox;
-
 	// ランキングデータが表示される領域
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget), meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UScaleBox> Ranking_ScaleBox;
 
+public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranking", meta = (AllowPrivateAccess = "true"))
 	FRankingData RankingData;
 
@@ -50,4 +47,10 @@ public:
 
 	UFUNCTION()
 	void SetRankingDataAll(TArray<FRankingData> NewRankingDataAll) { RankingDataAll = NewRankingDataAll; }
+
+	UFUNCTION()
+	void SetScore(int NewScore) { RankingData.Score = NewScore; }
+
+	UFUNCTION()
+	void SetDistance(float NewDistance) { RankingData.Distance = NewDistance; }
 };

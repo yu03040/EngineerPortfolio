@@ -41,9 +41,6 @@ private:
 	TObjectPtr<UInputAction> TurnRightAction;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-	bool bIsDead;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FRotator DesiredRotation;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
@@ -57,9 +54,14 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USoundBase> ExplosionSound;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+public:
+	bool bIsDead;
+	bool bIsEffect;
 
 public:
 	// Sets default values for this character's properties

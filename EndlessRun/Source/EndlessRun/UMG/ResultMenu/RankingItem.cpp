@@ -7,49 +7,23 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
 
-bool URankingItem::Initialize()
+void URankingItem::SetUpRankingItem(FRankingData& RankingData, int Rank)
 {
-	bool Success = Super::Initialize();
-
-	if (!Success) return false;
-
-	TextBlock_Rank->TextDelegate.BindUFunction(this, "SetTextBlockRank");
-	TextBlock_Score->TextDelegate.BindUFunction(this, "SetTextBlockScore");
-	TextBlock_Time->TextDelegate.BindUFunction(this, "SetTextBlockTime");
-
-	return true;
-}
-
-void URankingItem::SetUpRankingItem(FRankingData RankingData, int Rank)
-{
-	CurrentRankingData = RankingData;
-	CurrentRank = Rank;
-
 	bIsValidRank = (Rank != -1) ? true : false; // ランクが正しいか？
+
+	TextBlock_Rank->SetText(RankSelect(bIsValidRank, FText(), FText::AsNumber(Rank)));
+
+	TextBlock_Score->SetText(FText::AsNumber(RankingData.Score));
+
+	FText Distance = FText::Format
+	(
+		FText::FromString(TEXT("{0} m")), 
+		FText::AsNumber(FMath::FloorToInt(RankingData.Distance))
+	);
+	TextBlock_Distance->SetText(Distance);
 }
 
-FText URankingItem::SetTextBlockRank()
+FText URankingItem::RankSelect(bool bCondition, FText Option_False, FText Option_True)
 {
-	if (bIsValidRank == true)
-	{
-		return UKismetTextLibrary::Conv_IntToText(CurrentRank);
-	}
-	else
-	{
-		return FText::FromString(TEXT(""));
-	}
-}
-
-FText URankingItem::SetTextBlockScore()
-{
-	return UKismetTextLibrary::Conv_IntToText(CurrentRankingData.Score);
-}
-
-FText URankingItem::SetTextBlockTime()
-{
-	// タイムを表示する
-	FString Distance = UKismetStringLibrary::Conv_IntToString(UKismetMathLibrary::FTrunc(CurrentRankingData.Distance));
-	FString Meter = TEXT("m");
-	FString DistanceToString = UKismetStringLibrary::Concat_StrStr(Distance, Meter);
-	return UKismetTextLibrary::Conv_StringToText(DistanceToString);
+	return bCondition ? Option_True : Option_False;
 }

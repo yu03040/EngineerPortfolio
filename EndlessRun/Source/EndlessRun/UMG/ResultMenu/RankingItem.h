@@ -53,7 +53,7 @@ private:
 	TObjectPtr<USizeBox> SizeBox_2;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget), meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UTextBlock> TextBlock_Time;
+	TObjectPtr<UTextBlock> TextBlock_Distance;
 
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget), meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpacer> Spacer_3;
@@ -62,22 +62,13 @@ private:
 	FRankingData CurrentRankingData;
 
 	bool bIsValidRank;
-	
-	int CurrentRank;
 
 protected:
-	bool Initialize() override;
 
 public:
 	UFUNCTION()
-	void SetUpRankingItem(FRankingData RankingData, int Rank);
+	void SetUpRankingItem(FRankingData& RankingData, int Rank);
 
 	UFUNCTION()
-	FText SetTextBlockRank();
-
-	UFUNCTION()
-	FText SetTextBlockScore();
-
-	UFUNCTION()
-	FText SetTextBlockTime();
+	FText RankSelect(bool bCondition, FText Option_False, FText Option_True);
 };

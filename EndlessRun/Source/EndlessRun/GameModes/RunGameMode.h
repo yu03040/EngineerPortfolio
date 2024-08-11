@@ -50,24 +50,9 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranking", meta = (AllowPrivateAccess = "true"))
 	FRankingData RankingData;
 
-private:
-
-	// 曲がった床を生成する関数
-	UFUNCTION(BlueprintCallable, Category = "FloorTile")
-	void AddFloorTileCurve();
-
-	/**
-	*  走った距離を計算する関数
-	*  @param DeltaSeconds フレーム間の合計時間
-	*/
-	UFUNCTION(BlueprintCallable, Category = "FloorTile")
-	void RunDistance(float DeltaSeconds);
-
-	// まっすぐな床の枚数を更新する関数
-	void UpdateStraightsFloor();
-
-	// まっすぐな床の枚数を初期化する関数
-	void InitStraightsFloor();
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranking", meta = (AllowPrivateAccess = "true"))
+	TArray<FRankingData> LoadRankingData;
 
 protected:
 	virtual void BeginPlay() override;
@@ -77,30 +62,38 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
-public:
 	// 直線の床を生成する関数
-	UFUNCTION(BlueprintCallable, Category = "FloorTile")
 	void AddFloorTile();
 
+	// 曲がった床を生成する関数
+	void AddFloorTileCurve();
+
 	// 直線の床を生成する関数
-	UFUNCTION(BlueprintCallable, Category = "FloorTile")
 	void AddCoins();
 
 	// 結果を表示する関数
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Floor")
 	void ShowResult();
 
-	// ランキングデータを読み込む関数
-	UFUNCTION(BlueprintCallable, Category = "Floor")
-	TArray<FRankingData> LoadData();
+	/**
+	*  走った距離を計算する関数
+	*  @param DeltaSeconds フレーム間の合計時間
+	*  @param Player プレイヤーの参照
+	*/
+	void RunDistance(float DeltaSeconds, TObjectPtr<class ARunCharacter>& Player);
 
-	// ランキングデータを保存する関数
-	UFUNCTION(BlueprintCallable, Category = "Floor")
-	void SaveData(TArray<FRankingData> NewRankingData);
+	// まっすぐな床の枚数を更新する関数
+	void UpdateStraightsFloor();
 
-	UFUNCTION()
-	int GetTotalCoins() { return TotalCoins; }
+	// まっすぐな床の枚数を初期化する関数
+	void InitStraightsFloor();
 
-	UFUNCTION()
-	float GetSumDistance() { return SumDistance; }
+	int GetTotalCoins() const { return TotalCoins; }
+
+	float GetSumDistance() const { return SumDistance; }
+
+	void CreateSaveFile();
+
+	void SaveGame();
+
+	void LoadGame();
 };

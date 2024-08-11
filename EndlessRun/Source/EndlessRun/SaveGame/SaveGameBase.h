@@ -15,11 +15,7 @@ class ENDLESSRUN_API USaveGameBase : public USaveGame
 {
 	GENERATED_BODY()
 
-private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveGame", meta = (AllowPrivateAccess = "true"))
-	TArray<FRankingData> RankingData;
-
 public:
-	UFUNCTION(BlueprintCallable, Category = "SaveGame")
-	TArray<FRankingData> GetRankingData() { return RankingData; }
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveGame")
+	TArray<FRankingData> RankingDataList;
 };

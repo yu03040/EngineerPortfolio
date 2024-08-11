@@ -14,6 +14,9 @@
 
 ARunGameMode::ARunGameMode()
 {
+	PrimaryActorTick.bStartWithTickEnabled = true;
+	PrimaryActorTick.bCanEverTick = true;
+
 	NextAttachPoint = UKismetMathLibrary::MakeTransform(
 		FVector(0.0f, 0.0f, 0.0f),
 		FRotator(0.0f, 0.0f, 0.0f),
@@ -23,13 +26,15 @@ ARunGameMode::ARunGameMode()
 	MoveSeconds = 0.0f;
 	SumDistance = 0.0f;
 	TotalCoins = 0;
-	SaveSlotName = TEXT("EndlessRun_1");
+	SaveSlotName = TEXT("slot_0");
 	SaveUserIndex = 0;
 }
 
 void ARunGameMode::BeginPlay()
 {
 	Super::BeginPlay();
+
+	LoadGame();
 
 	FString Path = TEXT("/Game/EndlessRun/Blueprints/UMG/WBP_RunScore_v2.WBP_RunScore_v2_C");
 	TSubclassOf<UUserWidget> WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
@@ -41,6 +46,14 @@ void ARunGameMode::BeginPlay()
 		RunScoreWidget->AddToViewport();
 	}
 
+	TObjectPtr<AActor> Floor = GetWorld()->SpawnActor<AActor>(FloorTiles[0], NextAttachPoint);
+	TObjectPtr<AFloorTileBase> FloorBase = Cast<AFloorTileBase>(Floor);
+	if (FloorBase)
+	{
+		NextAttachPoint = FloorBase->GetAttachPoint();
+		UpdateStraightsFloor();
+	}
+
 	for (int i = 0; i < 10; i++)
 	{
 		AddFloorTile();
@@ -50,7 +63,12 @@ void ARunGameMode::BeginPlay()
 void ARunGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	RunDistance(DeltaTime);
+
+	TObjectPtr<ARunCharacter> Player = Cast<ARunCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
+	if (Player->bIsDead == false)
+	{
+		RunDistance(DeltaTime, Player);
+	}
 }
 
 void ARunGameMode::AddFloorTile()
@@ -95,19 +113,17 @@ void ARunGameMode::AddFloorTileCurve()
 void ARunGameMode::AddCoins()
 {
 	TotalCoins += 1;
+	RankingData.Score = TotalCoins;
 }
 
-void ARunGameMode::RunDistance(float DeltaSeconds)
+void ARunGameMode::RunDistance(float DeltaSeconds, TObjectPtr<ARunCharacter>& Player)
 {
 	// 1 フレーム = 1/30[s] だから 秒に変換して足す
 	MoveSeconds += DeltaSeconds * 30.0f;
 
-	auto Player = Cast<ARunCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
-	if (Player)
-	{
-		// xy 方向の走った距離を求める
-		SumDistance = UKismetMathLibrary::VSizeXY(Player->GetActorForwardVector() * MoveSeconds);
-	}
+	// xy 方向の走った距離を求める
+	SumDistance = UKismetMathLibrary::VSizeXY(Player->GetActorForwardVector() * MoveSeconds);
+	RankingData.Distance = SumDistance;
 }
 
 void ARunGameMode::UpdateStraightsFloor()
@@ -120,13 +136,13 @@ void ARunGameMode::InitStraightsFloor()
 	CurrentStraights = 0;
 }
 
-void ARunGameMode::ShowResult_Implementation()
+void ARunGameMode::ShowResult()
 {
 	// マウスを表示する
 	UGameplayStatics::GetPlayerController(this, 0)->bShowMouseCursor = true;
 
 	SetActorTickEnabled(false);
-	TArray<FRankingData> Load = LoadData();
+	//TArray<FRankingData> Load = LoadData();
 
 	FString Path = TEXT("/Game/EndlessRun/Blueprints/UMG/WBP_Result_v2.WBP_Result_v2_C");
 	TSubclassOf<UUserWidget> WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
@@ -135,36 +151,51 @@ void ARunGameMode::ShowResult_Implementation()
 	if (WidgetClass && PlayerController)
 	{
 		TObjectPtr<UResultMenu> ResultMenuWidget = Cast<UResultMenu>(UWidgetBlueprintLibrary::Create(this, WidgetClass, PlayerController));
-		RankingData.Score = TotalCoins;
-		RankingData.Distance = SumDistance;
-		ResultMenuWidget->GetRankingData().SetScore(RankingData.Score);
-		ResultMenuWidget->GetRankingData().SetDistance(RankingData.Distance);
-		ResultMenuWidget->SetRankingDataAll(Load);
+		ResultMenuWidget->RankingData.Score = RankingData.Score;
+		ResultMenuWidget->RankingData.Distance = RankingData.Distance;
+		ResultMenuWidget->RankingDataAll = LoadRankingData;
 		ResultMenuWidget->AddToViewport();
 	}
 }
 
-TArray<FRankingData> ARunGameMode::LoadData()
+void ARunGameMode::CreateSaveFile()
 {
-	SaveGameRef = Cast<USaveGameBase>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, SaveUserIndex));
-	if (SaveGameRef)
-	{
-		return SaveGameRef->GetRankingData();
-	}
-	
-	return TArray<FRankingData>();
+	// Save Game オブジェクトを作成し、デフォルトのスロットに保存する
+	TObjectPtr<USaveGameBase> DataToSave = Cast<USaveGameBase>(UGameplayStatics::CreateSaveGameObject(USaveGameBase::StaticClass()));
+	UGameplayStatics::SaveGameToSlot(DataToSave, SaveSlotName, SaveUserIndex);
 }
 
-void ARunGameMode::SaveData(TArray<FRankingData> NewRankingData)
+void ARunGameMode::SaveGame()
 {
-	SaveGameRef = Cast<USaveGameBase>(UGameplayStatics::CreateSaveGameObject(USaveGameBase::StaticClass()));
-	if (SaveGameRef)
-	{
-		for (auto rank : NewRankingData)
-		{
-			SaveGameRef->GetRankingData().Add(rank);
-		}
+	// 保存するデータの初期化
+	TObjectPtr<USaveGameBase> DataToSave = Cast<USaveGameBase>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, SaveUserIndex));
 
-		UGameplayStatics::SaveGameToSlot(SaveGameRef, SaveSlotName, SaveUserIndex);
+	// セーブに使用する有効な Save Game オブジェクトがある場合
+	if (DataToSave != nullptr)
+	{
+		DataToSave->RankingDataList = LoadRankingData;
+		UGameplayStatics::SaveGameToSlot(DataToSave, SaveSlotName, SaveUserIndex);
+	}
+	else if (!UGameplayStatics::DoesSaveGameExist(SaveSlotName, SaveUserIndex))
+	{
+		// デフォルトの保存ファイルを作成する
+		CreateSaveFile();
+	}
+}
+
+void ARunGameMode::LoadGame()
+{
+	// ロードするデータを取得する
+	TObjectPtr<USaveGameBase> DataToLoad = Cast<USaveGameBase>(UGameplayStatics::LoadGameFromSlot(SaveSlotName, SaveUserIndex));
+
+	// ロードするデータがある場合
+	if (DataToLoad != nullptr)
+	{
+		LoadRankingData = DataToLoad->RankingDataList;
+	}
+	else if (!UGameplayStatics::DoesSaveGameExist(SaveSlotName, SaveUserIndex))
+	{
+		// デフォルトの保存ファイルを作成する
+		CreateSaveFile();
 	}
 }

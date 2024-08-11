@@ -66,17 +66,20 @@ void AItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 	TObjectPtr<ARunCharacter> Player = Cast<ARunCharacter>(OtherActor);
 	if (Player)
 	{
-		TObjectPtr<ARunGameMode> GameMode = Cast<ARunGameMode>(UGameplayStatics::GetGameMode(this));
-		if (GameMode)
+		if (Player->bIsDead == false)
 		{
-			// 取ったコインをカウントする
-			GameMode->AddCoins();
+			TObjectPtr<ARunGameMode> GameMode = Cast<ARunGameMode>(UGameplayStatics::GetGameMode(this));
+			if (GameMode)
+			{
+				// 取ったコインをカウントする
+				GameMode->AddCoins();
 
-			// コインの位置でサウンドを再生
-			UGameplayStatics::PlaySoundAtLocation(GetWorld(), ItemSound, GetActorLocation());
+				// コインの位置でサウンドを再生
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), ItemSound, GetActorLocation());
 
-			// 終わったらコインを消す
-			Destroy();
+				// 終わったらコインを消す
+				Destroy();
+			}
 		}
 	}
 }
