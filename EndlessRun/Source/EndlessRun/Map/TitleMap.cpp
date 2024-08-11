@@ -22,7 +22,6 @@ void ATitleMap::BeginPlay()
 	// WidgetClassとPlayerControllerが取得できたか判定する
 	if (WidgetClass && PlayerController)
 	{
-		// RankingItem を子として追加表示する
 		TitleWidget = CreateWidget<UTitleMenu>(PlayerController, WidgetClass);
 		if (TitleWidget)
 		{
