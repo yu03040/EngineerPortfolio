@@ -6,6 +6,8 @@
 #include "Components/Button.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
+#include "Sound/SoundBase.h"
+#include "TimerManager.h"
 
 void UTitleMenu::NativeConstruct()
 {
@@ -23,10 +25,24 @@ void UTitleMenu::NativeConstruct()
 
 void UTitleMenu::OnButtonStartClicked()
 {
-	OnGameStarted.Broadcast();
+	UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UTitleMenu::StartGame, 0.5f, false);
 }
 
 void UTitleMenu::OnButtonEndClicked()
+{
+	UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &UTitleMenu::EndGame, 0.5f, false);
+}
+
+void UTitleMenu::StartGame()
+{
+	OnGameStarted.Broadcast();
+}
+
+void UTitleMenu::EndGame()
 {
 	// ゲームを終了する
 	UKismetSystemLibrary::QuitGame(this, NULL, EQuitPreference::Quit, false);

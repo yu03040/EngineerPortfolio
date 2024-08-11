@@ -43,6 +43,17 @@ private:
 	TObjectPtr<UWidgetAnimation> WidgetAnimation_LogoFrameIn;
 
 protected:
+	// クリック音
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	TObjectPtr<USoundBase> ClickSound;
+
+public:
+	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStartedDelegate);
+
+	UPROPERTY(BlueprintAssignable)
+	FGameStartedDelegate OnGameStarted;
+
+protected:
 	virtual void NativeConstruct() override;
 
 public:
@@ -52,9 +63,7 @@ public:
 	UFUNCTION()
 	void OnButtonEndClicked();
 
-public:
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStartedDelegate);
+	void EndGame();
 
-	UPROPERTY(BlueprintAssignable)
-	FGameStartedDelegate OnGameStarted;
+	void StartGame();
 };
