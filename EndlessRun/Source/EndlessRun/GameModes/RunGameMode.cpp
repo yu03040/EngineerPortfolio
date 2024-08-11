@@ -138,11 +138,7 @@ void ARunGameMode::InitStraightsFloor()
 
 void ARunGameMode::ShowResult()
 {
-	// マウスを表示する
-	UGameplayStatics::GetPlayerController(this, 0)->bShowMouseCursor = true;
-
 	SetActorTickEnabled(false);
-	//TArray<FRankingData> Load = LoadData();
 
 	FString Path = TEXT("/Game/EndlessRun/Blueprints/UMG/WBP_Result_v2.WBP_Result_v2_C");
 	TSubclassOf<UUserWidget> WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();

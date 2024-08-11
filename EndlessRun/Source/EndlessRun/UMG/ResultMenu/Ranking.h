@@ -94,6 +94,11 @@ private:
 	TObjectPtr<UTextBlock> TextBlock_BackToTitle;
 
 protected:
+	// クリック音
+	UPROPERTY(EditAnyWhere, BlueprintReadWrite)
+	TObjectPtr<USoundBase> ClickSound;
+
+protected:
 	virtual void NativeConstruct() override;
 
 public:
@@ -102,4 +107,7 @@ public:
 
 	UFUNCTION()
 	void SetUpRankingData(FRankingData& CurrentRankingData, TArray<FRankingData>& RankingDataAll);
+
+	UFUNCTION()
+	void BackTitle();
 };

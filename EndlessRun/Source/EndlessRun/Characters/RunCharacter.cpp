@@ -274,10 +274,6 @@ void ARunCharacter::Death()
 	// 死んだらオンにする
 	bIsDead = true;
 
-	// 入力を止める
-	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-	DisableInput(PlayerController);
-
 	// 爆発エフェクトを発生させる
 	if (bIsEffect == false)
 	{

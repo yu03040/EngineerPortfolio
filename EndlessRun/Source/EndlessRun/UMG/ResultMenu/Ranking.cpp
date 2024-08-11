@@ -10,6 +10,7 @@
 #include "Blueprint/WidgetBlueprintLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Kismet/KismetSystemLibrary.h"
 
 void URanking::NativeConstruct()
 {
@@ -21,15 +22,20 @@ void URanking::NativeConstruct()
 
 void URanking::OnClickedBackToTitle_Button()
 {
-	FName LevelName = TEXT("TitleMap");
-	UGameplayStatics::OpenLevel(this, LevelName);
+	UGameplayStatics::PlaySound2D(GetWorld(), ClickSound);
+
+	// ポーズ中のため Delay を使用
+	FLatentActionInfo LatentInfo;
+	LatentInfo.Linkage = 0;
+	LatentInfo.UUID = FMath::Rand();
+	LatentInfo.ExecutionFunction = FName("BackTitle");
+	LatentInfo.CallbackTarget = this;
+
+	UKismetSystemLibrary::Delay(GetWorld(), 0.5f, LatentInfo);
 }
 
 void URanking::SetUpRankingData(FRankingData& CurrentRankingData, TArray<FRankingData>& RankingDataAll)
 {
-	//CurrentRankingData = RankingData;
-	//AllRankingData = RankingDataAll;
-
 	// WidgetBlueprintのClassを取得する
 	FString Path = TEXT("/Game/EndlessRun/Blueprints/UMG/WBP_RankingItem_v2.WBP_RankingItem_v2_C");
 	TSubclassOf<UUserWidget> RankingItemWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
@@ -89,4 +95,10 @@ void URanking::SetUpRankingData(FRankingData& CurrentRankingData, TArray<FRankin
 		GameMode->LoadRankingData = RankingDataAll;
 		GameMode->SaveGame();
 	}
+}
+
+void URanking::BackTitle()
+{
+	FName LevelName = TEXT("TitleMap");
+	UGameplayStatics::OpenLevel(this, LevelName);
 }
