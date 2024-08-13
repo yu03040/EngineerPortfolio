@@ -43,6 +43,7 @@ void UCountDown::UpdateCountdown()
 	{
 		if (CountTexts[i])
 		{
+			// CountDownTime によって不透明度を更新する
 			float Opacity = (i == CountDownTime) ? 1.0f : 0.0f;
 			SetTextBlockOpacity(CountTexts[i], Opacity);
 		}
@@ -59,16 +60,16 @@ void UCountDown::UpdateCountdown()
 		Player->EnableInput(OwningPlayerController);
 
 		// キャラクターの Tick を再開（走れるようになる）
-		bool bEnabled = true;
-		Player->SetActorTickEnabled(bEnabled);
+		Player->SetActorTickEnabled(true);
 
 		TObjectPtr<ARunGameMode> GameMode = Cast<ARunGameMode>(UGameplayStatics::GetGameMode(this));
 		if (GameMode)
 		{
 			// ゲームモードの Tick を再開（走行距離を計算できるようになる）
-			GameMode->SetActorTickEnabled(bEnabled);
+			GameMode->SetActorTickEnabled(true);
 		}
 
+		// ウィジェットを削除する
 		RemoveFromViewport();
 	}
 

@@ -16,6 +16,7 @@ class ENDLESSRUN_API USaveGameBase : public USaveGame
 	GENERATED_BODY()
 
 public:
+	// RankingData の配列
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveGame")
-	TArray<FRankingData> RankingDataList;
+	TArray<FRankingData> RankingDataArray;
 };

@@ -56,6 +56,7 @@ class ENDLESSRUN_API UCountDown : public UUserWidget
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget), meta = (AllowPrivateAccess = "true"))
 	TArray<TObjectPtr<UTextBlock>> CountTexts;
 
+	// タイマーを一意に識別するためのハンドル
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget), meta = (AllowPrivateAccess = "true"))
 	FTimerHandle TimerHandle;
 
@@ -68,6 +69,7 @@ public:
 	UFUNCTION()
 	void SetTextBlockOpacity(UTextBlock* TextBlock, float Opacity);
 
+	// カウントダウンを更新する関数
 	UFUNCTION()
 	void UpdateCountdown();
 };

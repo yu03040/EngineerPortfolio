@@ -40,61 +40,82 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> TurnRightAction;
 
+	// 曲がるときに欲しい角度
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FRotator DesiredRotation;
 
+	// 曲がれる場合は true, そうでない場合は false
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	bool bCanTurn;
 
+	// タイマーを一意に識別するためのハンドル
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
 	FTimerHandle TimerHandle;
 
+	// 爆発エフェクト
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UParticleSystem> Emitter;
 
+	// 爆発音
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = VFX, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USoundBase> ExplosionSound;
 
 protected:
-	// Called when the game starts or when spawned
+	// ゲーム開始時またはスポーン時にコールされる
 	virtual void BeginPlay() override;
 
 public:
+	// 死んだ場合は true, そうでない場合は false
 	bool bIsDead;
+
+	// エフェクトを発生した場合は true, そうでない場合は false
 	bool bIsEffect;
 
 public:
-	// Sets default values for this character's properties
+	// このキャラクターのプロパティのデフォルト値を設定する（コンストラクター）
 	ARunCharacter();
 	
-	// Called every frame
+	// フレームごとに呼び出される
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
+	// 入力に機能をバインドするために呼び出される
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	
+	/**
+	*  カウントダウンを表示する関数
+	*  @param PlayerController プレイヤーコントローラーの参照
+	*/
+	void DisplayCountDown(TObjectPtr<APlayerController>& PlayerController);
 
-public:
+	// ポーズする関数
 	UFUNCTION()
 	void PauseInput();
 
+	// ジャンプを開始する関数
 	UFUNCTION()
 	void StartJump();
 
+	// ジャンプを終了する関数
 	UFUNCTION()
 	void StopJump();
 
+	// 左右に移動する関数
 	UFUNCTION()
 	void MovementInput(const FInputActionValue& Value);
 
+	// 左に曲がる関数
 	UFUNCTION()
 	void TurnLeftMovement();
 
+	// 右に曲がる関数
 	UFUNCTION()
 	void TurnRightMovement();
 
+	// プレイヤーの向きを変更する関数
 	UFUNCTION()
 	void TurnCorner();
 
+	// プレイヤーが死んだとき呼ばれる関数
 	UFUNCTION(BlueprintCallable)
 	void Death();
 };

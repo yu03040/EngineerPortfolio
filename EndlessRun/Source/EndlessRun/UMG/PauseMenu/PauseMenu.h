@@ -63,21 +63,24 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
+	// Button_BackToTitle の OnClicked イベントに関連づける関数
 	UFUNCTION()
 	void OnButtonBackToTitleClicked();
 
+	// Button_Cancel の OnClicked イベントに関連づける関数
 	UFUNCTION()
 	void OnButtonCancelClicked();
 
+	// Button_QuitGame の OnClicked イベントに関連づける関数
 	UFUNCTION()
 	void OnButtonQuitGameClicked();
 
 	UFUNCTION()
-	void BackTitle();
+	void BackTitleAfterDelay();
 
 	UFUNCTION()
-	void Cancel();
+	void CancelAfterDelay();
 
 	UFUNCTION()
-	void EndGame();
+	void EndGameAfterDelay();
 };

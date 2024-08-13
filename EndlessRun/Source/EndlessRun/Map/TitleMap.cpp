@@ -22,13 +22,16 @@ void ATitleMap::BeginPlay()
 	// WidgetClassとPlayerControllerが取得できたか判定する
 	if (WidgetClass && PlayerController)
 	{
+		// タイトルメニュー用のウィジェットを作成する
 		TitleWidget = CreateWidget<UTitleMenu>(PlayerController, WidgetClass);
 		if (TitleWidget)
 		{
+			// タイトルメニューを画面に表示する
 			TitleWidget->AddToViewport();
+
+			// TitleWidget の OnGameStarted に「GameStarted」を関連づける
 			TitleWidget->OnGameStarted.AddDynamic(this, &ATitleMap::GameStarted);
 		}
-
 	}
 }
 
@@ -36,7 +39,9 @@ void ATitleMap::GameStarted()
 {
 	if (TitleWidget)
 	{
+		// ウィジェットを非表示にする
 		TitleWidget->RemoveFromParent();
+
 		// ゲームを開始する
 		FName LevelName = TEXT("RunGameMap");
 		UGameplayStatics::OpenLevel(this, LevelName);

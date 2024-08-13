@@ -11,10 +11,9 @@
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 
-// Sets default values
 AItem::AItem()
 {
-	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// 毎フレームTick()を呼び出すように設定
 	PrimaryActorTick.bCanEverTick = true;
 
 	// SceneComponent を作成する
@@ -25,11 +24,13 @@ AItem::AItem()
 	StaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
 	StaticMesh->SetRelativeRotation(FRotator(0.0f, 0.0f, -90.0f));
 	StaticMesh->SetupAttachment(RootComponent);
+
+	// StaticMesh の OnComponentBeginOverlap に「OnOverlapBegin」を関連づける
 	StaticMesh->OnComponentBeginOverlap.AddDynamic(this, &AItem::OnOverlapBegin);
 
 	// PointLightComponent を作成する
 	PointLight = CreateDefaultSubobject<UPointLightComponent>(TEXT("PointLightComponent"));
-	PointLight->Intensity = 1000.0f;
+	PointLight->Intensity = 40.0f;
 	PointLight->IntensityUnits = ELightUnits::Lumens;
 	PointLight->SetupAttachment(StaticMesh);
 
@@ -47,14 +48,12 @@ AItem::AItem()
 	}
 }
 
-// Called when the game starts or when spawned
 void AItem::BeginPlay()
 {
 	Super::BeginPlay();
 
 }
 
-// Called every frame
 void AItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

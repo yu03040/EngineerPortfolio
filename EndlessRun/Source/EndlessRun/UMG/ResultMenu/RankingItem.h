@@ -58,17 +58,22 @@ private:
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget), meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpacer> Spacer_3;
 
-	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget), meta = (AllowPrivateAccess = "true"))
-	FRankingData CurrentRankingData;
-
+	// ランクが正しい場合は true, そうでない場合は flase
 	bool bIsValidRank;
 
-protected:
-
 public:
-	UFUNCTION()
+	/**
+	* RankingItem を更新する関数
+	* @param RankingData RankingData の参照
+	* @param Rank 順位（Rank が -1 になるときは「YourScore」のRankingItem を更新する）
+	*/
 	void SetUpRankingItem(FRankingData& RankingData, int Rank);
 
-	UFUNCTION()
-	FText RankSelect(bool bCondition, FText Option_False, FText Option_True);
+	/**
+	* 条件に応じて異なる Text を選択して出力する関数
+	* @param bCondition 条件
+	* @param Option_True true の場合、この Text を選択する
+	* @param Option_False flase の場合、この Text を選択する
+	*/
+	FText RankSelect(bool bCondition, FText Option_True, FText Option_False);
 };

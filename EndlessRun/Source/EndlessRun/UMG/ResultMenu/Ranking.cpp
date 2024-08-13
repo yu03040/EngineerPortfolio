@@ -16,7 +16,7 @@ void URanking::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// BackToTitle ボタンが押されるときのイベント
+	// BackToTitle_Button の OnClicked に「OnClickedBackToTitle_Button」を関連づける
 	BackToTitle_Button->OnClicked.AddUniqueDynamic(this, &URanking::OnClickedBackToTitle_Button);
 }
 
@@ -34,39 +34,36 @@ void URanking::OnClickedBackToTitle_Button()
 	UKismetSystemLibrary::Delay(GetWorld(), 0.5f, LatentInfo);
 }
 
+void URanking::BackTitle()
+{
+	FName LevelName = TEXT("TitleMap");
+	UGameplayStatics::OpenLevel(this, LevelName);
+}
+
 void URanking::SetUpRankingData(FRankingData& CurrentRankingData, TArray<FRankingData>& RankingDataAll)
 {
-	// WidgetBlueprintのClassを取得する
+	// WidgetBlueprint の Class を取得する
 	FString Path = TEXT("/Game/EndlessRun/Blueprints/UMG/WBP_RankingItem_v2.WBP_RankingItem_v2_C");
 	TSubclassOf<UUserWidget> RankingItemWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
 
-	// PlayerControllerを取得する
+	// PlayerController を取得する
 	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
-	// WidgetClassとPlayerControllerが取得できたか判定する
-	if (RankingItemWidgetClass && PlayerController)
-	{
-		// RankingItem を子として追加表示する
-		TObjectPtr<URankingItem> RankingItemWidget = CreateWidget<URankingItem>(PlayerController, RankingItemWidgetClass);
-		if (RankingItemWidget)
-		{
-			RankingItemWidget->SetUpRankingItem(CurrentRankingData, -1);
-			YourScore_ScaleBox->AddChild(RankingItemWidget);
-		}
+	// 自分データを YourScore_ScaleBox に反映する
+	DisplayRankingItemInScaleBox(RankingItemWidgetClass, PlayerController, CurrentRankingData);
 
-	}
-
-	// 最初に追加
+	// 自分データをランキングに追加
 	RankingDataAll.Add(CurrentRankingData);
 
 	// ランキングをソートする
-	RankingDataAll.StableSort([](const FRankingData& A, const FRankingData& B) {
-		if (A.Score == B.Score) // コインが同じだったら距離が大きい方で比較
+	RankingDataAll.StableSort([](const FRankingData& A, const FRankingData& B){
+		// コインが同じだったら距離が大きい方で比較
+		if (A.Score == B.Score)
 		{
 			return A.Distance > B.Distance;
 		}
 		return A.Score > B.Score;
-		});
+	});
 
 	// ベスト 5 まで表示
 	if (RankingDataAll.Num() > 5)
@@ -74,7 +71,20 @@ void URanking::SetUpRankingData(FRankingData& CurrentRankingData, TArray<FRankin
 		RankingDataAll.RemoveAt(5);
 	}
 
-	// 他の人のデータを反映
+	// 他の人のデータを RankingList_VerticalBox に反映
+	DisplayRankingItemInVerticalBox(RankingDataAll, RankingItemWidgetClass, PlayerController);
+
+	TObjectPtr<ARunGameMode> GameMode = Cast<ARunGameMode>(UGameplayStatics::GetGameMode(this));
+	if (GameMode)
+	{
+		// ランキングデータを更新して、セーブする
+		GameMode->LoadRankingData = RankingDataAll;
+		GameMode->SaveGame();
+	}
+}
+
+void URanking::DisplayRankingItemInVerticalBox(TArray<FRankingData>& RankingDataAll, TSubclassOf<UUserWidget>& RankingItemWidgetClass, TObjectPtr<APlayerController>& PlayerController)
+{
 	for (int i = 0; i < RankingDataAll.Num(); i++)
 	{
 		if (RankingItemWidgetClass && PlayerController)
@@ -88,17 +98,22 @@ void URanking::SetUpRankingData(FRankingData& CurrentRankingData, TArray<FRankin
 			}
 		}
 	}
-
-	TObjectPtr<ARunGameMode> GameMode = Cast<ARunGameMode>(UGameplayStatics::GetGameMode(this));
-	if (GameMode)
-	{
-		GameMode->LoadRankingData = RankingDataAll;
-		GameMode->SaveGame();
-	}
 }
 
-void URanking::BackTitle()
+void URanking::DisplayRankingItemInScaleBox(TSubclassOf<UUserWidget>& RankingItemWidgetClass, TObjectPtr<APlayerController>& PlayerController, FRankingData& CurrentRankingData)
 {
-	FName LevelName = TEXT("TitleMap");
-	UGameplayStatics::OpenLevel(this, LevelName);
+	// WidgetClassとPlayerControllerが取得できたか判定する
+	if (RankingItemWidgetClass && PlayerController)
+	{
+		// RankingItem 用のウィジェットを作成する
+		TObjectPtr<URankingItem> RankingItemWidget = CreateWidget<URankingItem>(PlayerController, RankingItemWidgetClass);
+		if (RankingItemWidget)
+		{
+			RankingItemWidget->SetUpRankingItem(CurrentRankingData, -1);
+
+			// RankingItem を Ranking の子として表示する
+			YourScore_ScaleBox->AddChild(RankingItemWidget);
+		}
+
+	}
 }

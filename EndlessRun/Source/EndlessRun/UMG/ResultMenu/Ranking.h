@@ -102,12 +102,33 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
+	// BackToTitle_Button の OnClicked イベントに関連づける関数
 	UFUNCTION()
 	void OnClickedBackToTitle_Button();
-
-	UFUNCTION()
-	void SetUpRankingData(FRankingData& CurrentRankingData, TArray<FRankingData>& RankingDataAll);
-
+ 
 	UFUNCTION()
 	void BackTitle();
+
+	/**
+	* ランキングを更新する関数
+	* @param CurrentRankingData 現在の RankingData の参照
+	* @param RankingDataAll 過去の RankingData の配列の参照
+	*/
+	void SetUpRankingData(FRankingData& CurrentRankingData, TArray<FRankingData>& RankingDataAll);
+
+	/**
+	* ランキングを表示する関数
+	* @param RankingDataAll 過去の RankingData の配列の参照
+	* @param RankingItemWidgetClass RankingItem クラスの参照
+	* @param PlayerController プレイヤーコントローラーの参照
+	*/
+	void DisplayRankingItemInVerticalBox(TArray<FRankingData>& RankingDataAll, TSubclassOf<UUserWidget>& RankingItemWidgetClass, TObjectPtr<APlayerController>& PlayerController);
+
+	/**
+	* 自分のスコアを表示する関数
+	* @param RankingItemWidgetClass RankingItem クラスの参照
+	* @param PlayerController プレイヤーコントローラーの参照
+	* @param CurrentRankingData 現在の RankingData の参照
+	*/
+	void DisplayRankingItemInScaleBox(TSubclassOf<UUserWidget>& RankingItemWidgetClass, TObjectPtr<APlayerController>& PlayerController, FRankingData& CurrentRankingData);
 };

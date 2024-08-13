@@ -19,10 +19,9 @@
 #include "EnhancedInputSubsystems.h"
 #include "TimerManager.h"
 
-// Sets default values
 ARunCharacter::ARunCharacter()
 {
-	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// 毎フレームTick()を呼び出すように設定
 	PrimaryActorTick.bCanEverTick = true;
 
 	// collision capsule のサイズを設定する
@@ -43,9 +42,13 @@ ARunCharacter::ARunCharacter()
 	// カメラブームの作成
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character
+
+	// カメラからキャラクターの背中までの距離を設定
+	CameraBoom->TargetArmLength = 400.0f;
 	CameraBoom->SocketOffset = FVector(0.0f, 0.0f, 100.0f);
-	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+
+	// コントローラーに基づいてアームを回転させる
+	CameraBoom->bUsePawnControlRotation = true;
 	CameraBoom->SetRelativeLocation(FVector(0.0f, 0.0f, 8.5f));
 
 	// カメラコンポーネントの作成
@@ -105,7 +108,6 @@ ARunCharacter::ARunCharacter()
 	}
 }
 
-// Called when the game starts or when spawned
 void ARunCharacter::BeginPlay()
 {
 	Super::BeginPlay();
@@ -113,38 +115,19 @@ void ARunCharacter::BeginPlay()
 	// プレイヤーコントローラーを取得
 	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
-	// Enhanced Input サブシステムにマッピングコンテキストを追加
 	if (PlayerController)
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
+			// 入力アクションを使用するためにマッピングコンテキストを追加する
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
 
-	// カウントダウンタイマーのために Tick を停止
-	TObjectPtr<ARunGameMode> GameMode = Cast<ARunGameMode>(UGameplayStatics::GetGameMode(this));
-	TObjectPtr<ACharacter> Character = UGameplayStatics::GetPlayerCharacter(this, 0);
-	bool bEnabled = false;
-	GameMode->SetActorTickEnabled(bEnabled);
-	Character->SetActorTickEnabled(bEnabled);
-
-	// WidgetBlueprintのClassを取得する
-	FString Path = TEXT("/Game/EndlessRun/Blueprints/UMG/WBP_CountDown_v2.WBP_CountDown_v2_C");
-	TSubclassOf<UUserWidget> WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
-
-	// WidgetClassとPlayerControllerが取得できたか判定する
-	if (WidgetClass && PlayerController)
-	{
-		TObjectPtr<UCountDown> CountDownWidget = CreateWidget<UCountDown>(PlayerController, WidgetClass);
-		if (CountDownWidget)
-		{
-			CountDownWidget->AddToViewport();
-		}
-	}
+	// カウントダウンタイマーを表示する
+	DisplayCountDown(PlayerController);
 }
 
-// Called every frame
 void ARunCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -163,7 +146,6 @@ void ARunCharacter::Tick(float DeltaTime)
 	}
 }
 
-// Called to bind functionality to input
 void ARunCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
@@ -189,19 +171,21 @@ void ARunCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompon
 
 void ARunCharacter::PauseInput()
 {
-	// WidgetBlueprintのClassを取得する
+	// WidgetBlueprint の Class を取得する
 	FString Path = TEXT("/Game/EndlessRun/Blueprints/UMG/WBP_PauseMenu_v2.WBP_PauseMenu_v2_C");
 	TSubclassOf<UUserWidget> WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
 
-	// PlayerControllerを取得する
+	// PlayerController を取得する
 	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
-	// WidgetClassとPlayerControllerが取得できたか判定する
+	// WidgetClass と PlayerController が取得できたか判定する
 	if (WidgetClass && PlayerController)
 	{
+		// ポーズメニュー用のウィジェットを作成する
 		TObjectPtr<UPauseMenu> PauseMenuWidget = CreateWidget<UPauseMenu>(PlayerController, WidgetClass);
 		if (PauseMenuWidget)
 		{
+			// ポーズメニューを画面に表示する
 			PauseMenuWidget->AddToViewport();
 		}
 	}
@@ -256,14 +240,41 @@ void ARunCharacter::TurnRightMovement()
 	}
 }
 
+void ARunCharacter::DisplayCountDown(TObjectPtr<APlayerController>& PlayerController)
+{
+	// カウントダウンタイマーのために Tick を停止
+	TObjectPtr<ARunGameMode> GameMode = Cast<ARunGameMode>(UGameplayStatics::GetGameMode(this));
+	TObjectPtr<ACharacter> Character = UGameplayStatics::GetPlayerCharacter(this, 0);
+	GameMode->SetActorTickEnabled(false);
+	Character->SetActorTickEnabled(false);
+
+	// WidgetBlueprint の Class を取得する
+	FString Path = TEXT("/Game/EndlessRun/Blueprints/UMG/WBP_CountDown_v2.WBP_CountDown_v2_C");
+	TSubclassOf<UUserWidget> WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
+
+	// WidgetClassとPlayerControllerが取得できたか判定する
+	if (WidgetClass && PlayerController)
+	{
+		// カウントダウン用のウィジェットを作成する
+		TObjectPtr<UCountDown> CountDownWidget = CreateWidget<UCountDown>(PlayerController, WidgetClass);
+		if (CountDownWidget)
+		{
+			// カウントダウンを画面に表示する
+			CountDownWidget->AddToViewport();
+		}
+	}
+}
+
 void ARunCharacter::TurnCorner()
 {
-	// 希望の角度ではなかったら希望の角度までブレンドしていく
+	// 希望の角度ではなかったら
 	bool bUnwantedRotation = UKismetMathLibrary::NotEqual_RotatorRotator(DesiredRotation, GetControlRotation(), 1.0E-4F);
 	if (bUnwantedRotation == true)
 	{
 		TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 		float InterpSpeed = 10.0f;
+
+		// 希望の角度までブレンドしていく
 		FRotator BlendRotation = UKismetMathLibrary::RInterpTo(GetControlRotation(), DesiredRotation, UGameplayStatics::GetWorldDeltaSeconds(this), InterpSpeed);
 		PlayerController->SetControlRotation(BlendRotation);
 	}
@@ -271,18 +282,16 @@ void ARunCharacter::TurnCorner()
 
 void ARunCharacter::Death()
 {
-	// 死んだらオンにする
 	bIsDead = true;
 
-	// 爆発エフェクトを発生させる
 	if (bIsEffect == false)
 	{
 		FTransform SpawnTransform(FRotator(0.0f, 0.0f, 0.0f), FVector(GetActorLocation()), FVector(1.0f, 1.0f, 1.0f));
 		bool bAutoDestroy = true;
 		bool bAutoActiveSystem = true;
-		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Emitter, SpawnTransform, bAutoDestroy, EPSCPoolMethod::None, bAutoActiveSystem);
 
-		// 爆発音を再生させる
+		// 爆発エフェクトと爆発音を発生させる
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), Emitter, SpawnTransform, bAutoDestroy, EPSCPoolMethod::None, bAutoActiveSystem);
 		UGameplayStatics::PlaySoundAtLocation(this, ExplosionSound, GetActorLocation());
 
 		bIsEffect = true;
@@ -298,5 +307,4 @@ void ARunCharacter::Death()
 	{
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, GameMode, &ARunGameMode::ShowResult, DelayTime, false);
 	}
-
 }

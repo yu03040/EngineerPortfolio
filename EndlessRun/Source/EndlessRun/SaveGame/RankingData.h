@@ -12,14 +12,11 @@ struct FRankingData
 	GENERATED_BODY()
 
 public:
+	// 取ったコインの数
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloorTile", meta = (AllowPrivateAccess = "true"))
 	int Score;
 
+	// 走った距離
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloorTile", meta = (AllowPrivateAccess = "true"))
 	float Distance;
-
-	bool operator==(const FRankingData& Other) const
-	{
-		return Score == Other.Score && Distance == Other.Distance;
-	}
 };

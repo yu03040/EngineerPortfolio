@@ -25,13 +25,13 @@ void UPauseMenu::NativeConstruct()
 	// UI の操作を可能にする
 	UWidgetBlueprintLibrary::SetInputMode_GameAndUIEx(Controller, NULL, EMouseLockMode::DoNotLock, true, false);
 
-	// Button_BackToTitleのOnClickedに「OnButtonBackToTitleClicked」を関連づける
+	// Button_BackToTitle の OnClicked に「OnButtonBackToTitleClicked」を関連づける
 	Button_BackToTitle->OnClicked.AddUniqueDynamic(this, &UPauseMenu::OnButtonBackToTitleClicked);
 
-	// Button_CancelのOnClickedに「OnButtonCancelClicked」を関連づける
+	// Button_Cancel の OnClicked に「OnButtonCancelClicked」を関連づける
 	Button_Cancel->OnClicked.AddUniqueDynamic(this, &UPauseMenu::OnButtonCancelClicked);
 
-	// Button_QuitGameのOnClickedに「OnButtonQuitGameClicked」を関連づける
+	// Button_QuitGame の OnClicked に「OnButtonQuitGameClicked」を関連づける
 	Button_QuitGame->OnClicked.AddUniqueDynamic(this, &UPauseMenu::OnButtonQuitGameClicked);
 }
 
@@ -43,7 +43,7 @@ void UPauseMenu::OnButtonBackToTitleClicked()
 	FLatentActionInfo LatentInfo;
 	LatentInfo.Linkage = 0;
 	LatentInfo.UUID = FMath::Rand();
-	LatentInfo.ExecutionFunction = FName("BackTitle");
+	LatentInfo.ExecutionFunction = FName("BackTitleAfterDelay");
 	LatentInfo.CallbackTarget = this;
 
 	UKismetSystemLibrary::Delay(GetWorld(), 0.5f, LatentInfo);
@@ -57,7 +57,7 @@ void UPauseMenu::OnButtonCancelClicked()
 	FLatentActionInfo LatentInfo;
 	LatentInfo.Linkage = 0;
 	LatentInfo.UUID = FMath::Rand();
-	LatentInfo.ExecutionFunction = FName("Cancel");
+	LatentInfo.ExecutionFunction = FName("CancelAfterDelay");
 	LatentInfo.CallbackTarget = this;
 
 	UKismetSystemLibrary::Delay(GetWorld(), 0.5f, LatentInfo);
@@ -71,19 +71,19 @@ void UPauseMenu::OnButtonQuitGameClicked()
 	FLatentActionInfo LatentInfo;
 	LatentInfo.Linkage = 0;
 	LatentInfo.UUID = FMath::Rand();
-	LatentInfo.ExecutionFunction = FName("EndGame");
+	LatentInfo.ExecutionFunction = FName("EndGameAfterDelay");
 	LatentInfo.CallbackTarget = this;
 
 	UKismetSystemLibrary::Delay(GetWorld(), 0.5f, LatentInfo);
 }
 
-void UPauseMenu::BackTitle()
+void UPauseMenu::BackTitleAfterDelay()
 {
 	FName LevelName = TEXT("TitleMap");
 	UGameplayStatics::OpenLevel(this, LevelName);
 }
 
-void UPauseMenu::Cancel()
+void UPauseMenu::CancelAfterDelay()
 {
 	// ゲームの入力を再開する
 	TObjectPtr<APlayerController> Controller = UGameplayStatics::GetPlayerController(this, 0);
@@ -99,7 +99,7 @@ void UPauseMenu::Cancel()
 	Controller->bShowMouseCursor = false;
 }
 
-void UPauseMenu::EndGame()
+void UPauseMenu::EndGameAfterDelay()
 {
 	// ゲームを終了する
 	UKismetSystemLibrary::QuitGame(this, NULL, EQuitPreference::Quit, false);

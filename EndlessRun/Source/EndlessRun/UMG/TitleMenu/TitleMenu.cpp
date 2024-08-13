@@ -13,10 +13,10 @@ void UTitleMenu::NativeConstruct()
 {
 	Super::NativeConstruct();
 
-	// Button_StartのOnClickedに「OnButtonStartClicked」を関連づける
+	// Button_Start の OnClicked に「OnButtonStartClicked」を関連づける
 	Button_Start->OnClicked.AddUniqueDynamic(this, &UTitleMenu::OnButtonStartClicked);
 
-	// Button_EndのOnClickedに「OnButtonEndClicked」を関連づける
+	// Button_End の OnClicked に「OnButtonEndClicked」を関連づける
 	Button_End->OnClicked.AddUniqueDynamic(this, &UTitleMenu::OnButtonEndClicked);
 
 	// ロゴアニメーションの再生
@@ -39,6 +39,7 @@ void UTitleMenu::OnButtonEndClicked()
 
 void UTitleMenu::StartGame()
 {
+	// 呼び出し
 	OnGameStarted.Broadcast();
 }
 

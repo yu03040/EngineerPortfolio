@@ -32,9 +32,11 @@ class ENDLESSRUN_API UResultMenu : public UUserWidget
 	TObjectPtr<UScaleBox> Ranking_ScaleBox;
 
 public:
+	// 現在のランキング
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranking", meta = (AllowPrivateAccess = "true"))
 	FRankingData RankingData;
 
+	// 過去のランキングデータの配列
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranking", meta = (AllowPrivateAccess = "true"))
 	TArray<FRankingData> RankingDataAll;
 
@@ -42,15 +44,6 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
-	UFUNCTION()
-	FRankingData GetRankingData() { return RankingData; }
-
-	UFUNCTION()
-	void SetRankingDataAll(TArray<FRankingData> NewRankingDataAll) { RankingDataAll = NewRankingDataAll; }
-
-	UFUNCTION()
-	void SetScore(int NewScore) { RankingData.Score = NewScore; }
-
-	UFUNCTION()
-	void SetDistance(float NewDistance) { RankingData.Distance = NewDistance; }
+	// ランキングを表示する関数
+	void DisplayRanking();
 };

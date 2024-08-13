@@ -17,24 +17,31 @@ class ENDLESSRUN_API ARunGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 private:
+	// 次の床が発生する場所
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloorTile", meta = (AllowPrivateAccess = "true"))
 	FTransform NextAttachPoint;
 
+	// まっすぐな床の配列
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloorTile", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<AActor>> FloorTiles;
 
+	// 曲がった床の配列
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloorTile", meta = (AllowPrivateAccess = "true"))
 	TArray<TSubclassOf<AActor>> FloorCurves;
 
+	// まっすぐな床のカウンター
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloorTile", meta = (AllowPrivateAccess = "true"))
 	int CurrentStraights;
 
+	// プレイヤーが走った秒数
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloorTile", meta = (AllowPrivateAccess = "true"))
 	float MoveSeconds;
 
+	// プレイヤーが走った距離
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloorTile", meta = (AllowPrivateAccess = "true"))
 	float SumDistance;
 
+	// プレイヤーが取ったコインの数
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FloorTile", meta = (AllowPrivateAccess = "true"))
 	int TotalCoins;
 
@@ -44,9 +51,7 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveGame", meta = (AllowPrivateAccess = "true"))
 	int SaveUserIndex;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SaveGame", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USaveGameBase> SaveGameRef;
-
+	// ランキング
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranking", meta = (AllowPrivateAccess = "true"))
 	FRankingData RankingData;
 
@@ -55,20 +60,29 @@ public:
 	TArray<FRankingData> LoadRankingData;
 
 protected:
+	// ゲーム開始時またはスポーン時にコールされる
 	virtual void BeginPlay() override;
 
 public:
+	// このゲームモードのプロパティのデフォルト値を設定する（コンストラクター）
 	ARunGameMode();
 
+	// フレームごとに呼び出される
 	virtual void Tick(float DeltaTime) override;
 
-	// 直線の床を生成する関数
+	// 取ったコインと走った距離を表示する関数
+	void DisplayRunScore();
+
+	// まっすぐな床を生成する関数
 	void AddFloorTile();
+
+	// 何もスポーンしないまっすぐな床を生成する関数
+	void AddNothingSpawnFloorTile();
 
 	// 曲がった床を生成する関数
 	void AddFloorTileCurve();
 
-	// 直線の床を生成する関数
+	// 取ったコインをカウントする関数
 	void AddCoins();
 
 	// 結果を表示する関数

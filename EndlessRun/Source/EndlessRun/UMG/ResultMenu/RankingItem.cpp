@@ -11,19 +11,18 @@ void URankingItem::SetUpRankingItem(FRankingData& RankingData, int Rank)
 {
 	bIsValidRank = (Rank != -1) ? true : false; // ランクが正しいか？
 
-	TextBlock_Rank->SetText(RankSelect(bIsValidRank, FText(), FText::AsNumber(Rank)));
+	// ランクを更新
+	TextBlock_Rank->SetText(RankSelect(bIsValidRank, FText::AsNumber(Rank), FText()));
 
+	// スコアを更新
 	TextBlock_Score->SetText(FText::AsNumber(RankingData.Score));
 
-	FText Distance = FText::Format
-	(
-		FText::FromString(TEXT("{0} m")), 
-		FText::AsNumber(FMath::FloorToInt(RankingData.Distance))
-	);
+	// 距離を更新
+	FText Distance = FText::Format(FText::FromString(TEXT("{0} m")), FText::AsNumber(FMath::FloorToInt(RankingData.Distance)));
 	TextBlock_Distance->SetText(Distance);
 }
 
-FText URankingItem::RankSelect(bool bCondition, FText Option_False, FText Option_True)
+FText URankingItem::RankSelect(bool bCondition, FText Option_True, FText Option_False)
 {
 	return bCondition ? Option_True : Option_False;
 }

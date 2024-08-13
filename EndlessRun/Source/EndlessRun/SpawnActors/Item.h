@@ -27,21 +27,23 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<URotatingMovementComponent> RotatingMovement;
 
+	// アイテムに触れたときの効果音
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USoundBase> ItemSound;
 
 protected:
-	// Called when the game starts or when spawned
+	// ゲーム開始時またはスポーン時にコールされる
 	virtual void BeginPlay() override;
 
-public:	
-	// Sets default values for this actor's properties
+public:
+	// このアイテムのプロパティのデフォルト値を設定する（コンストラクター）
 	AItem();
 
-	// Called every frame
+	// フレームごとに呼び出される
 	virtual void Tick(float DeltaTime) override;
 
 public:
+	// StaticMesh のオーバーラップイベント
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 };

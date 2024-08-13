@@ -15,10 +15,11 @@ void URunScore::NativeConstruct()
 
 bool URunScore::Initialize()
 {
-	bool Success = Super::Initialize();
+	bool bSuccess = Super::Initialize();
 
-	if (!Success) return false;
+	if (!bSuccess) return false;
 
+	// TextBlock の値に関数を Bind する
 	TextBlock_CoinsCount->TextDelegate.BindUFunction(this, "SetTextBlockCoinsCount");
 	TextBlock_MileageMeter->TextDelegate.BindUFunction(this, "SetTextBlockMileageMeter");
 

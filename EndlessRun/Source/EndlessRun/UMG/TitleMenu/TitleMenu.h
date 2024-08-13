@@ -12,6 +12,8 @@ class UTextBlock;
 class UButton;
 class UWidgetAnimation;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStartedDelegate);
+
 /**
  * 
  */
@@ -48,8 +50,7 @@ protected:
 	TObjectPtr<USoundBase> ClickSound;
 
 public:
-	DECLARE_DYNAMIC_MULTICAST_DELEGATE(FGameStartedDelegate);
-
+	// ゲームを開始する呼び出し
 	UPROPERTY(BlueprintAssignable)
 	FGameStartedDelegate OnGameStarted;
 
@@ -57,13 +58,15 @@ protected:
 	virtual void NativeConstruct() override;
 
 public:
+	// Button_Start の OnClicked イベントに関連づける関数
 	UFUNCTION()
 	void OnButtonStartClicked();
 
+	// Button_End の OnClicked イベントに関連づける関数
 	UFUNCTION()
 	void OnButtonEndClicked();
 
-	void EndGame();
-
 	void StartGame();
+
+	void EndGame();
 };

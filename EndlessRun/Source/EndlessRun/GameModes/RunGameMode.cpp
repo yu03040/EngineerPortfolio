@@ -14,6 +14,7 @@
 
 ARunGameMode::ARunGameMode()
 {
+	// 毎フレームTick()を呼び出すように設定
 	PrimaryActorTick.bStartWithTickEnabled = true;
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -34,26 +35,16 @@ void ARunGameMode::BeginPlay()
 {
 	Super::BeginPlay();
 
+	// セーブデータをロードする、ない場合はセーブデータを作成する
 	LoadGame();
 
-	FString Path = TEXT("/Game/EndlessRun/Blueprints/UMG/WBP_RunScore_v2.WBP_RunScore_v2_C");
-	TSubclassOf<UUserWidget> WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
+	// ゲーム中の UI を表示する
+	DisplayRunScore();
 
-	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
-	if (WidgetClass && PlayerController)
-	{
-		TObjectPtr<URunScore> RunScoreWidget = Cast<URunScore>(UWidgetBlueprintLibrary::Create(this, WidgetClass, PlayerController));
-		RunScoreWidget->AddToViewport();
-	}
+	// 最初にコインと障害物がない床を一つ生成する
+	AddNothingSpawnFloorTile();
 
-	TObjectPtr<AActor> Floor = GetWorld()->SpawnActor<AActor>(FloorTiles[0], NextAttachPoint);
-	TObjectPtr<AFloorTileBase> FloorBase = Cast<AFloorTileBase>(Floor);
-	if (FloorBase)
-	{
-		NextAttachPoint = FloorBase->GetAttachPoint();
-		UpdateStraightsFloor();
-	}
-
+	// 最初プレイヤーが落ちないように 10 枚床を生成しておく
 	for (int i = 0; i < 10; i++)
 	{
 		AddFloorTile();
@@ -64,6 +55,7 @@ void ARunGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	// 走った距離を求める
 	TObjectPtr<ARunCharacter> Player = Cast<ARunCharacter>(UGameplayStatics::GetPlayerPawn(this, 0));
 	if (Player->bIsDead == false)
 	{
@@ -75,6 +67,7 @@ void ARunGameMode::AddFloorTile()
 {
 	if (CurrentStraights > 7)
 	{
+		// 7 枚ごとに曲がった床を追加
 		AddFloorTileCurve();
 	}
 	else
@@ -83,12 +76,13 @@ void ARunGameMode::AddFloorTile()
 		int Min = 0;
 		int Max = LastIndex;
 		int CurrentIndex = UKismetMathLibrary::RandomIntegerInRange(Min, Max);
-		TObjectPtr<AActor> Floor = GetWorld()->SpawnActor<AActor>(FloorTiles[CurrentIndex], NextAttachPoint);
 
-		TObjectPtr<AFloorTileBase> FloorBase = Cast<AFloorTileBase>(Floor);
-		if (FloorBase)
+		TObjectPtr<AActor> SpawnActor = GetWorld()->SpawnActor<AActor>(FloorTiles[CurrentIndex], NextAttachPoint);
+
+		TObjectPtr<AFloorTileBase> Floor = Cast<AFloorTileBase>(SpawnActor);
+		if (Floor)
 		{
-			NextAttachPoint = FloorBase->GetAttachPoint();
+			NextAttachPoint = Floor->GetAttachPoint();
 			UpdateStraightsFloor();
 		}
 	}
@@ -100,13 +94,27 @@ void ARunGameMode::AddFloorTileCurve()
 	int Min = 0;
 	int Max = LastIndex;
 	int CurrentIndex = UKismetMathLibrary::RandomIntegerInRange(Min, Max);
-	TObjectPtr<AActor> Floor = GetWorld()->SpawnActor<AActor>(FloorCurves[CurrentIndex], NextAttachPoint);
 
-	TObjectPtr<AFloorTileBase> FloorBase = Cast<AFloorTileBase>(Floor);
-	if (FloorBase)
+	TObjectPtr<AActor> SpawnActor = GetWorld()->SpawnActor<AActor>(FloorCurves[CurrentIndex], NextAttachPoint);
+
+	TObjectPtr<AFloorTileBase> Floor = Cast<AFloorTileBase>(SpawnActor);
+	if (Floor)
 	{
-		NextAttachPoint = FloorBase->GetAttachPoint();
+		NextAttachPoint = Floor->GetAttachPoint();
 		InitStraightsFloor();
+	}
+}
+
+void ARunGameMode::AddNothingSpawnFloorTile()
+{
+	int NotSpawningActorsFloorTileIndex = 0;
+	TObjectPtr<AActor> SpawnActor = GetWorld()->SpawnActor<AActor>(FloorTiles[NotSpawningActorsFloorTileIndex], NextAttachPoint);
+	
+	TObjectPtr<AFloorTileBase> Floor = Cast<AFloorTileBase>(SpawnActor);
+	if (Floor)
+	{
+		NextAttachPoint = Floor->GetAttachPoint();
+		UpdateStraightsFloor();
 	}
 }
 
@@ -138,19 +146,53 @@ void ARunGameMode::InitStraightsFloor()
 
 void ARunGameMode::ShowResult()
 {
+	// Tick を止める
 	SetActorTickEnabled(false);
 
+	// WidgetBlueprint の Class を取得する
 	FString Path = TEXT("/Game/EndlessRun/Blueprints/UMG/WBP_Result_v2.WBP_Result_v2_C");
 	TSubclassOf<UUserWidget> WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
 
+	// PlayerController を取得する
 	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	// WidgetClass と PlayerController が取得できたか判定する
 	if (WidgetClass && PlayerController)
 	{
+		// リザルトメニュー用のウィジェットを作成する
 		TObjectPtr<UResultMenu> ResultMenuWidget = Cast<UResultMenu>(UWidgetBlueprintLibrary::Create(this, WidgetClass, PlayerController));
-		ResultMenuWidget->RankingData.Score = RankingData.Score;
-		ResultMenuWidget->RankingData.Distance = RankingData.Distance;
-		ResultMenuWidget->RankingDataAll = LoadRankingData;
-		ResultMenuWidget->AddToViewport();
+		if (ResultMenuWidget)
+		{
+			// ランキングデータを更新
+			ResultMenuWidget->RankingData.Score = RankingData.Score;
+			ResultMenuWidget->RankingData.Distance = RankingData.Distance;
+			ResultMenuWidget->RankingDataAll = LoadRankingData;
+
+			// リザルトメニューを画面に表示する
+			ResultMenuWidget->AddToViewport();
+		}
+	}
+}
+
+void ARunGameMode::DisplayRunScore()
+{
+	// WidgetBlueprint の Class を取得する
+	FString Path = TEXT("/Game/EndlessRun/Blueprints/UMG/WBP_RunScore_v2.WBP_RunScore_v2_C");
+	TSubclassOf<UUserWidget> WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
+
+	// PlayerController を取得する
+	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
+
+	// WidgetClass と PlayerController が取得できたか判定する
+	if (WidgetClass && PlayerController)
+	{
+		// スコア用のウィジェットを作成する
+		TObjectPtr<URunScore> RunScoreWidget = Cast<URunScore>(UWidgetBlueprintLibrary::Create(this, WidgetClass, PlayerController));
+		if (RunScoreWidget)
+		{
+			// スコアを画面に表示する
+			RunScoreWidget->AddToViewport();
+		}
 	}
 }
 
@@ -169,7 +211,7 @@ void ARunGameMode::SaveGame()
 	// セーブに使用する有効な Save Game オブジェクトがある場合
 	if (DataToSave != nullptr)
 	{
-		DataToSave->RankingDataList = LoadRankingData;
+		DataToSave->RankingDataArray = LoadRankingData;
 		UGameplayStatics::SaveGameToSlot(DataToSave, SaveSlotName, SaveUserIndex);
 	}
 	else if (!UGameplayStatics::DoesSaveGameExist(SaveSlotName, SaveUserIndex))
@@ -187,7 +229,7 @@ void ARunGameMode::LoadGame()
 	// ロードするデータがある場合
 	if (DataToLoad != nullptr)
 	{
-		LoadRankingData = DataToLoad->RankingDataList;
+		LoadRankingData = DataToLoad->RankingDataArray;
 	}
 	else if (!UGameplayStatics::DoesSaveGameExist(SaveSlotName, SaveUserIndex))
 	{

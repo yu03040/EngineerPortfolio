@@ -49,5 +49,6 @@ protected:
 protected:
 	virtual void NativeConstruct() override;
 
+	// ウィジェットが初期化される際に一度だけ呼び出される関数
 	bool Initialize() override;
 };
