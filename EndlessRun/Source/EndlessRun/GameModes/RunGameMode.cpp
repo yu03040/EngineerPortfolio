@@ -166,7 +166,7 @@ void ARunGameMode::ShowResult()
 			// ランキングデータを更新
 			ResultMenuWidget->RankingData.Score = RankingData.Score;
 			ResultMenuWidget->RankingData.Distance = RankingData.Distance;
-			ResultMenuWidget->RankingDataAll = LoadRankingData;
+			ResultMenuWidget->RankingDataAll = RankingDataArray;
 
 			// リザルトメニューを画面に表示する
 			ResultMenuWidget->AddToViewport();
@@ -211,7 +211,7 @@ void ARunGameMode::SaveGame()
 	// セーブに使用する有効な Save Game オブジェクトがある場合
 	if (DataToSave != nullptr)
 	{
-		DataToSave->RankingDataArray = LoadRankingData;
+		DataToSave->RankingDataArray = RankingDataArray;
 		UGameplayStatics::SaveGameToSlot(DataToSave, SaveSlotName, SaveUserIndex);
 	}
 	else if (!UGameplayStatics::DoesSaveGameExist(SaveSlotName, SaveUserIndex))
@@ -229,7 +229,7 @@ void ARunGameMode::LoadGame()
 	// ロードするデータがある場合
 	if (DataToLoad != nullptr)
 	{
-		LoadRankingData = DataToLoad->RankingDataArray;
+		RankingDataArray = DataToLoad->RankingDataArray;
 	}
 	else if (!UGameplayStatics::DoesSaveGameExist(SaveSlotName, SaveUserIndex))
 	{

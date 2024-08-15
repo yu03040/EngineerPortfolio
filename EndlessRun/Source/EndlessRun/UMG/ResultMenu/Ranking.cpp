@@ -78,7 +78,7 @@ void URanking::SetUpRankingData(FRankingData& CurrentRankingData, TArray<FRankin
 	if (GameMode)
 	{
 		// ランキングデータを更新して、セーブする
-		GameMode->LoadRankingData = RankingDataAll;
+		GameMode->RankingDataArray = RankingDataAll;
 		GameMode->SaveGame();
 	}
 }
