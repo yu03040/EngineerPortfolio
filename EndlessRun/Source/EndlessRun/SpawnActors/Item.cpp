@@ -36,12 +36,11 @@ AItem::AItem()
 
 	// RotatingMovementComponent を作成する
 	RotatingMovement = CreateDefaultSubobject<URotatingMovementComponent>(TEXT("RotatingMovementComponent"));
-	AddInstanceComponent(RotatingMovement);
 	RotatingMovement->RotationRate = FRotator(0.0f, 180.0f, 0.0f);
-	RotatingMovement->RegisterComponent();
+	RotatingMovement->SetUpdatedComponent(RootComponent);
 
 	// サウンドのロード
-	static ConstructorHelpers::FObjectFinder<USoundBase> SoundFinder(TEXT("/Engine/VREditor/Sounds/UI/Click_on_Button.Click_on_Button"));
+	static ConstructorHelpers::FObjectFinder<USoundBase> SoundFinder(TEXT("/Game/FreeAssets/SoundEffects/8bit_acquisition_8.8bit_acquisition_8"));
 	if (SoundFinder.Succeeded())
 	{
 		ItemSound = SoundFinder.Object;
@@ -74,7 +73,7 @@ void AItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 				GameMode->AddCoins();
 
 				// コインの位置でサウンドを再生
-				UGameplayStatics::PlaySoundAtLocation(GetWorld(), ItemSound, GetActorLocation());
+				UGameplayStatics::PlaySoundAtLocation(GetWorld(), ItemSound, GetActorLocation(), 0.2f);
 
 				// 終わったらコインを消す
 				Destroy();
