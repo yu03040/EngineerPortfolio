@@ -57,7 +57,7 @@ private:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Ranking", meta = (AllowPrivateAccess = "true"))
-	TArray<FRankingData> LoadRankingData;
+	TArray<FRankingData> RankingDataArray;
 
 protected:
 	// ゲーム開始時またはスポーン時にコールされる
