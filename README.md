@@ -23,4 +23,5 @@
   | Lv.4 | 利用するだけでなくライブラリ構築等ができる |
 
 ## ゲームの説明
-[GUNMAN](GUNMAN/)
+- [GUNMAN](GUNMAN/)
+- [EndlessRun](EndlessRun/)
