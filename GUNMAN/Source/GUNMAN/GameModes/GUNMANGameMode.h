@@ -4,9 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
-#include "Enemy/AIEnemy.h"
-#include "GUNMANCharacter.h"
-#include "UMG/UITimeLimitWidget.h"
+#include "GUNMAN/Enemy/AIEnemy.h"
+#include "GUNMAN/GUNMANCharacter.h"
+#include "GUNMAN/UMG/UITimeLimitWidget.h"
 #include "GUNMANGameMode.generated.h"
 
 UCLASS(minimalapi)

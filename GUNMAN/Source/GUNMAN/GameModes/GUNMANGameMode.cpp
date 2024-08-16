@@ -1,12 +1,12 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GUNMANGameMode.h"
-#include "GUNMANCharacter.h"
-#include "GUNMANController.h"
+#include "GUNMAN/GUNMANCharacter.h"
+#include "GUNMAN/GUNMANController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "TimerManager.h"
-#include "UMG/UITimeLimitWidget.h"
+#include "GUNMAN/UMG/UITimeLimitWidget.h"
 #include "UObject/ConstructorHelpers.h"
 
 AGUNMANGameMode::AGUNMANGameMode() : Super()
