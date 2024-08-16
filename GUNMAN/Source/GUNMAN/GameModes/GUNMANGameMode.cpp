@@ -1,16 +1,20 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GUNMANGameMode.h"
-#include "GUNMANCharacter.h"
-#include "GUNMANController.h"
+#include "GUNMAN/GUNMANCharacter.h"
+#include "GUNMAN/GUNMANController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "TimerManager.h"
-#include "UMG/UITimeLimitWidget.h"
+#include "GUNMAN/UMG/UITimeLimitWidget.h"
 #include "UObject/ConstructorHelpers.h"
 
 AGUNMANGameMode::AGUNMANGameMode() : Super()
 {
+	// 毎フレームTick()を呼び出すように設定
+	PrimaryActorTick.bStartWithTickEnabled = true;
+	PrimaryActorTick.bCanEverTick = true;
+
 	// set default pawn class to our Blueprinted character
 	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/ThirdPersonCharacter"));
 	if (PlayerPawnBPClass.Class != NULL)
