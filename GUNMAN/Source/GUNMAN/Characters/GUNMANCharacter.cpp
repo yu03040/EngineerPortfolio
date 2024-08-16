@@ -131,6 +131,12 @@ AGUNMANCharacter::AGUNMANCharacter()
 		ReadyGunAction = ReadyGunActionFinder.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> AttachGunActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_SwitchAndEquipWeapons.IA_SwitchAndEquipWeapons"));
+	if (AttachGunActionFinder.Succeeded())
+	{
+		AttachGunAction = AttachGunActionFinder.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> RunActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Run.IA_Run"));
 	if (RunActionFinder.Succeeded())
 	{
@@ -159,6 +165,12 @@ AGUNMANCharacter::AGUNMANCharacter()
 	if (LookActionFinder.Succeeded())
 	{
 		LookAction = LookActionFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableFinder(TEXT("/Game/ArmedWeapon/DT_Weapon.DT_Weapon"));
+	if (DataTableFinder.Succeeded())
+	{
+		WeaponDataTable = DataTableFinder.Object;
 	}
 
 	// タイムライン初期化
@@ -254,6 +266,23 @@ void AGUNMANCharacter::BeginPlay()
 	}
 }
 
+void AGUNMANCharacter::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	// 銃を腕にアタッチする
+	FP_Gun->AttachToComponent(
+		Mesh1P, 
+		FAttachmentTransformRules(
+			EAttachmentRule::SnapToTarget, 
+			EAttachmentRule::SnapToTarget, 
+			EAttachmentRule::SnapToTarget, 
+			false
+		), 
+		FName(TEXT("GripPoint"))
+	);
+}
+
 void AGUNMANCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -289,6 +318,9 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 		// 武器を構えるバインド
 		EnhancedInputComponent->BindAction(ReadyGunAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartReadyGun);
 		EnhancedInputComponent->BindAction(ReadyGunAction, ETriggerEvent::Completed, this, &AGUNMANCharacter::StopReadyGun);
+
+		// 武器のつけ外しのバインド
+		EnhancedInputComponent->BindAction(AttachGunAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::AttachingAndRemovingGun);
 
 		// 走る操作へのバインド
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartTimeline);
@@ -668,6 +700,56 @@ void AGUNMANCharacter::StopReadyGun()
 	if (UIGunSightRef)
 	{
 		UIGunSightRef->RemoveFromParent();
+	}
+}
+
+void AGUNMANCharacter::AttachingAndRemovingGun()
+{
+	// 武器のインデックスをセット
+	WeaponNumber = WeaponNumberCounter;
+
+	// 武器を持っているか？
+	if (!HasWeapon)
+	{
+		// インデックスにあたる武器をセット
+		EquippedWeapon = WeaponMeshes[WeaponNumber];
+
+		// 武器を表示
+		EquippedWeapon->SetHiddenInGame(false, false);
+
+		// データテーブルにアクセス
+		FName RowName = EquippedWeapon->ComponentTags[0];
+		FWeaponStructure* Row = WeaponDataTable->FindRow<FWeaponStructure>(RowName, "");
+		if (Row)
+		{
+			// 発砲時の情報をセット
+			EquippedWeaponInformation.GunshotSound = Row->GunshotSound;
+			EquippedWeaponInformation.MuzzleFire = Row->MuzzleFire;
+			EquippedWeaponInformation.MuzzleFireSoketName = Row->MuzzleFireSoketName;
+			EquippedWeaponInformation.FiringMontage = Row->FiringMontage;
+			EquippedWeaponInformation.AmmunitionClass = Row->AmmunitionClass;
+			EquippedWeaponInformation.AmmunitionSocketName = Row->AmmunitionSocketName;
+
+			// 武器を装備してサウンドを再生する
+			EquipWeapon(true, Row->HasPistol, Row->EquipSocketName);
+			UGameplayStatics::PlaySound2D(this, Row->EquipmentNoise);
+		}
+
+		// カウント処理
+		CountWeapon(WeaponMeshes, WeaponNumber);
+	}
+	else
+	{
+		// 外す武器を選ぶ
+		FName RowName = RemoveWeapon(WeaponMeshes, WeaponNumber)->ComponentTags[0];
+
+		// データテーブルにアクセス
+		FWeaponStructure* Row = WeaponDataTable->FindRow<FWeaponStructure>(RowName, "");
+		if (Row)
+		{
+			// 武器を外す
+			EquipWeapon(false, false, Row->AttachSocketName);
+		}
 	}
 }
 
