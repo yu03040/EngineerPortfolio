@@ -1,8 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GUNMANGameMode.h"
-#include "GUNMAN/GUNMANCharacter.h"
-#include "GUNMAN/GUNMANController.h"
+#include "GUNMAN/Characters/GUNMANCharacter.h"
+#include "GUNMAN/Controllers/GUNMANController.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "TimerManager.h"

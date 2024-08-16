@@ -6,7 +6,7 @@
 #include "GameFramework/GameModeBase.h"
 #include "GUNMANGameModeBase.h"
 #include "GUNMAN/Enemy/AIEnemy.h"
-#include "GUNMAN/GUNMANCharacter.h"
+#include "GUNMAN/Characters/GUNMANCharacter.h"
 #include "GUNMAN/UMG/UITimeLimitWidget.h"
 #include "GUNMANGameMode.generated.h"
 

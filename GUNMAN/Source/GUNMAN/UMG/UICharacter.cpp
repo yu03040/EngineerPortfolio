@@ -4,7 +4,7 @@
 #include "UICharacter.h"
 #include "Kismet/GamePlayStatics.h"
 #include "Kismet/KismetTextLibrary.h"
-#include "GUNMAN/GUNMANCharacter.h"
+#include "GUNMAN/Characters/GUNMANCharacter.h"
 
 
 void UUICharacter::NativeConstruct()
