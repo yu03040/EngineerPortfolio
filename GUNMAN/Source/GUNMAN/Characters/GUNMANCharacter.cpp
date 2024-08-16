@@ -22,10 +22,10 @@
 #include "Kismet/KismetStringLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "DrawDebugHelpers.h"
-#include "firstpersonProjectProjectile.h"
-#include "ArmedWeapon/Weapon.h"
-#include "Enemy/AIEnemy.h"
-#include "LevelScript/BattleMapScript.h"
+#include "GUNMAN/SpawnActors/firstpersonProjectProjectile.h"
+#include "GUNMAN/ArmedWeapon/Weapon.h"
+#include "GUNMAN/Enemy/AIEnemy.h"
+#include "GUNMAN/LevelScript/BattleMapScript.h"
 
 
 //////////////////////////////////////////////////////////////////////////

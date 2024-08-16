@@ -3,14 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ArmedWeapon/WeaponStructure.h"
+#include "GUNMAN/ArmedWeapon/WeaponStructure.h"
 #include "Components/TimelineComponent.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
-#include "UMG/UICharacter.h"
-#include "UMG/UIGunSight.h"
-#include "ArmedWeapon/AnimationInterface.h"
-#include "ArmedWeapon/WeaponInterface.h"
+#include "GUNMAN/UMG/UICharacter.h"
+#include "GUNMAN/UMG/UIGunSight.h"
+#include "GUNMAN/ArmedWeapon/AnimationInterface.h"
+#include "GUNMAN/ArmedWeapon/WeaponInterface.h"
 #include "GUNMANCharacter.generated.h"
 
 

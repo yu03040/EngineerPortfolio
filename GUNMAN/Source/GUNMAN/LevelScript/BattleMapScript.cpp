@@ -4,7 +4,7 @@
 #include "BattleMapScript.h"
 #include "GUNMAN/UMG/UI_PaseMenu.h"
 #include "GUNMAN/UMG/UICharacter.h"
-#include "GUNMAN/GUNMANCharacter.h"
+#include "GUNMAN/Characters/GUNMANCharacter.h"
 #include "Kismet/GameplayStatics.h"
 #include "Components/Button.h"
 #include "EnhancedInputComponent.h"
