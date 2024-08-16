@@ -9,7 +9,7 @@
 #include "GameFramework/Character.h"
 #include "GUNMAN/UMG/UICharacter.h"
 #include "GUNMAN/UMG/UIGunSight.h"
-#include "GUNMAN/ArmedWeapon/AnimationInterface.h"
+#include "GUNMAN/Animations/AnimationInterface.h"
 #include "GUNMAN/ArmedWeapon/WeaponInterface.h"
 #include "GUNMANCharacter.generated.h"
 

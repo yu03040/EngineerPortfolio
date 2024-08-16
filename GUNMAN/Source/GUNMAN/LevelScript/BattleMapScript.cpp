@@ -20,25 +20,25 @@ ABattleMapScript::ABattleMapScript()
 	InvalidButtonIndex = 4;
 
 	// Enhanced Input のアセットをロード
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IMC_Map.IMC_Map"));
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/GUNMAN/Input/IMC_OperatingUI.IMC_OperatingUI"));
 	if (MappingContextFinder.Succeeded())
 	{
 		PauseMenuMappingContext = MappingContextFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> UpActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_UpArrowKey.IA_UpArrowKey"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> UpActionFinder(TEXT("/Game/GUNMAN/Input/IA_UpArrowKey.IA_UpArrowKey"));
 	if (UpActionFinder.Succeeded())
 	{
 		UpAction = UpActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> DownActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_DownArrowKey.IA_DownArrowKey"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> DownActionFinder(TEXT("/Game/GUNMAN/Input/IA_DownArrowKey.IA_DownArrowKey"));
 	if (DownActionFinder.Succeeded())
 	{
 		DownAction = DownActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> DecisionActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Enter.IA_Enter"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> DecisionActionFinder(TEXT("/Game/GUNMAN/Input/IA_Enter.IA_Enter"));
 	if (DecisionActionFinder.Succeeded())
 	{
 		DecisionAction = DecisionActionFinder.Object;
@@ -151,9 +151,9 @@ void ABattleMapScript::InitializeButtonPosition()
 	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
 	// ウィジェットブループリントのパスをセット
-	FString path = "/Game/UMG/WBP_PaseMenu.WBP_PaseMenu_C";
+	FString Path = "/Game/GUNMAN/Blueprint/UMG/WBP_PaseMenu.WBP_PaseMenu_C";
 	// アセットパスから UserWidgetClass を生成する
-	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*path)).LoadSynchronous();
+	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
 	if (IsValid(WidgetClass))
 	{
 		// ポーズメニューをを生成

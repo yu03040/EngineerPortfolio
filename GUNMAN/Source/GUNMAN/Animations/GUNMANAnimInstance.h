@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Animation/AnimInstance.h"
-#include "GUNMAN/ArmedWeapon/AnimationInterface.h"
+#include "GUNMAN/Animations/AnimationInterface.h"
 #include "GUNMANAnimInstance.generated.h"
 
 /**

@@ -101,73 +101,73 @@ AGUNMANCharacter::AGUNMANCharacter()
 	Weapon->SetupAttachment(GetMesh());
 
 	// Enhanced Input のアセットをロード
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IMC_Default.IMC_Default"));
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/GUNMAN/Input/IMC_Default.IMC_Default"));
 	if (MappingContextFinder.Succeeded())
 	{
 		DefaultMappingContext = MappingContextFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Jump.IA_Jump"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionFinder(TEXT("/Game/GUNMAN/Input/IA_Jump.IA_Jump"));
 	if (JumpActionFinder.Succeeded())
 	{
 		JumpAction = JumpActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> FireActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Fire.IA_Fire"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> FireActionFinder(TEXT("/Game/GUNMAN/Input/IA_Fire.IA_Fire"));
 	if (FireActionFinder.Succeeded())
 	{
 		FireAction = FireActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> ToggleActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Toggle.IA_Toggle"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> ToggleActionFinder(TEXT("/Game/GUNMAN/Input/IA_Toggle.IA_Toggle"));
 	if (ToggleActionFinder.Succeeded())
 	{
 		ToggleAction = ToggleActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> ReadyGunActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_ReadyGun.IA_ReadyGun"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> ReadyGunActionFinder(TEXT("/Game/GUNMAN/Input/IA_ReadyGun.IA_ReadyGun"));
 	if (ReadyGunActionFinder.Succeeded())
 	{
 		ReadyGunAction = ReadyGunActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> AttachGunActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_SwitchAndEquipWeapons.IA_SwitchAndEquipWeapons"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> AttachGunActionFinder(TEXT("/Game/GUNMAN/Input/IA_SwitchAndEquipWeapons.IA_SwitchAndEquipWeapons"));
 	if (AttachGunActionFinder.Succeeded())
 	{
 		AttachGunAction = AttachGunActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> RunActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Run.IA_Run"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> RunActionFinder(TEXT("/Game/GUNMAN/Input/IA_Run.IA_Run"));
 	if (RunActionFinder.Succeeded())
 	{
 		RunAction = RunActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> PauseMenuActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_PauseMenu.IA_PauseMenu"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> PauseMenuActionFinder(TEXT("/Game/GUNMAN/Input/IA_PauseMenu.IA_PauseMenu"));
 	if (PauseMenuActionFinder.Succeeded())
 	{
 		PauseMenuAction = PauseMenuActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> MoveForwardActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_MoveForward.IA_MoveForward"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> MoveForwardActionFinder(TEXT("/Game/GUNMAN/Input/IA_MoveForward.IA_MoveForward"));
 	if (MoveForwardActionFinder.Succeeded())
 	{
 		MoveForwardAction = MoveForwardActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> MoveRightActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_MoveRight.IA_MoveRight"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> MoveRightActionFinder(TEXT("/Game/GUNMAN/Input/IA_MoveRight.IA_MoveRight"));
 	if (MoveRightActionFinder.Succeeded())
 	{
 		MoveRightAction = MoveRightActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> LookActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Look.IA_Look"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> LookActionFinder(TEXT("/Game/GUNMAN/Input/IA_Look.IA_Look"));
 	if (LookActionFinder.Succeeded())
 	{
 		LookAction = LookActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableFinder(TEXT("/Game/ArmedWeapon/DT_Weapon.DT_Weapon"));
+	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableFinder(TEXT("/Game/GUNMAN/Blueprint/ArmedWeapon/DT_Weapon.DT_Weapon"));
 	if (DataTableFinder.Succeeded())
 	{
 		WeaponDataTable = DataTableFinder.Object;
@@ -181,7 +181,7 @@ AGUNMANCharacter::AGUNMANCharacter()
 	RunTimeline->SetTimelineLength(1.0f);
 
 	// カーブアセットの取得
-	const ConstructorHelpers::FObjectFinder<UCurveFloat> Find(TEXT("CurveFloat'/Game/Blueprint/ThirdPersonCPP/Blueprints/CB_Run.CB_Run'"));
+	const ConstructorHelpers::FObjectFinder<UCurveFloat> Find(TEXT("CurveFloat'/Game/GUNMAN/Blueprint/Characters/CB_Run.CB_Run'"));
 	if (Find.Succeeded())
 	{
 		RunCurve = Find.Object;
@@ -237,7 +237,7 @@ void AGUNMANCharacter::BeginPlay()
 	OnTakeAnyDamage.AddDynamic(this, &AGUNMANCharacter::HandleAnyDamage);
 
 	// WBP のパスをセット
-	CharacterWidgetPath = "/Game/UMG/WBP_UICharacter.WBP_UICharacter_C";
+	CharacterWidgetPath = "/Game/GUNMAN/Blueprint/UMG/WBP_UICharacter.WBP_UICharacter_C";
 
 	// パスからウィジェットを生成する
 	CharacterWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*CharacterWidgetPath)).LoadSynchronous();
@@ -254,7 +254,7 @@ void AGUNMANCharacter::BeginPlay()
 	}
 
 	// WBP のパスをセット
-	GunSightWidgetPath = "/Game/UMG/WBP_UIGunSight.WBP_UIGunSight_C";
+	GunSightWidgetPath = "/Game/GUNMAN/Blueprint/UMG/WBP_UIGunSight.WBP_UIGunSight_C";
 
 	// パスからウィジェットを生成する
 	GunSightWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*GunSightWidgetPath)).LoadSynchronous();
