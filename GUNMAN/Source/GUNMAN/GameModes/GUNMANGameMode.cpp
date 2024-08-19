@@ -16,7 +16,7 @@ AGUNMANGameMode::AGUNMANGameMode() : Super()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/GUNMAN/Blueprint/Characters/ThirdPersonCharacter.ThirdPersonCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/GUNMAN/Blueprint/Characters/ThirdPersonCharacter.ThirdPersonCharacter_C"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
