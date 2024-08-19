@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GUNMAN/ArmedWeapon/WeaponStructure.h"
 #include "Components/TimelineComponent.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "GUNMAN/ArmedWeapon/WeaponStructure.h"
 #include "GUNMAN/UMG/UICharacter.h"
 #include "GUNMAN/UMG/UIGunSight.h"
 #include "GUNMAN/Animations/AnimationInterface.h"
@@ -240,7 +241,7 @@ private:
 
 	/* プレイヤ―の速さの最大値 */
 	UPROPERTY()
-	float EndSpeed = 600.0f;
+	float EndSpeed = 1000.0f;
 
 	UPROPERTY(EditAnywhere, Category = "Data")
 	TObjectPtr<UDataTable> WeaponDataTable;
@@ -251,6 +252,9 @@ protected:
 
 	/** カーブ */
 	TObjectPtr<class UCurveFloat> RunCurve;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	TObjectPtr<UAIPerceptionStimuliSourceComponent> StimuliSourceComponent;
 
 public:
 	/* MappingContext */

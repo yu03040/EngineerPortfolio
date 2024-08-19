@@ -17,6 +17,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerInput.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Perception/AISenseConfig_Sight.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
@@ -99,6 +100,15 @@ AGUNMANCharacter::AGUNMANCharacter()
 	// 三人称視点の武器メッシュコンポーネントを作成
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetMesh());
+
+	// StimuliSourceComponent を作成
+	StimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceComponent"));
+	if (StimuliSourceComponent)
+	{
+		// 敵AI がプレイヤーを完治できるように視覚に登録する
+		StimuliSourceComponent->RegisterForSense(TSubclassOf<UAISense_Sight>());
+		StimuliSourceComponent->RegisterWithPerceptionSystem();
+	}
 
 	// Enhanced Input のアセットをロード
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/GUNMAN/Input/IMC_Default.IMC_Default"));
