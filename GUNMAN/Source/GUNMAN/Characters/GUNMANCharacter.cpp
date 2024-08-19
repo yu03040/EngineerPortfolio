@@ -17,6 +17,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/PlayerInput.h"
 #include "UObject/ConstructorHelpers.h"
+#include "Perception/AISenseConfig_Sight.h"
 #include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetStringLibrary.h"
@@ -100,65 +101,86 @@ AGUNMANCharacter::AGUNMANCharacter()
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
 	Weapon->SetupAttachment(GetMesh());
 
+	// StimuliSourceComponent を作成
+	StimuliSourceComponent = CreateDefaultSubobject<UAIPerceptionStimuliSourceComponent>(TEXT("StimuliSourceComponent"));
+	if (StimuliSourceComponent)
+	{
+		// 敵AI がプレイヤーを完治できるように視覚に登録する
+		StimuliSourceComponent->RegisterForSense(TSubclassOf<UAISense_Sight>());
+		StimuliSourceComponent->RegisterWithPerceptionSystem();
+	}
+
 	// Enhanced Input のアセットをロード
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IMC_Default.IMC_Default"));
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/GUNMAN/Input/IMC_Default.IMC_Default"));
 	if (MappingContextFinder.Succeeded())
 	{
 		DefaultMappingContext = MappingContextFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Jump.IA_Jump"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionFinder(TEXT("/Game/GUNMAN/Input/IA_Jump.IA_Jump"));
 	if (JumpActionFinder.Succeeded())
 	{
 		JumpAction = JumpActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> FireActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Fire.IA_Fire"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> FireActionFinder(TEXT("/Game/GUNMAN/Input/IA_Fire.IA_Fire"));
 	if (FireActionFinder.Succeeded())
 	{
 		FireAction = FireActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> ToggleActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Toggle.IA_Toggle"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> ToggleActionFinder(TEXT("/Game/GUNMAN/Input/IA_Toggle.IA_Toggle"));
 	if (ToggleActionFinder.Succeeded())
 	{
 		ToggleAction = ToggleActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> ReadyGunActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_ReadyGun.IA_ReadyGun"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> ReadyGunActionFinder(TEXT("/Game/GUNMAN/Input/IA_ReadyGun.IA_ReadyGun"));
 	if (ReadyGunActionFinder.Succeeded())
 	{
 		ReadyGunAction = ReadyGunActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> RunActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Run.IA_Run"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> AttachGunActionFinder(TEXT("/Game/GUNMAN/Input/IA_SwitchAndEquipWeapons.IA_SwitchAndEquipWeapons"));
+	if (AttachGunActionFinder.Succeeded())
+	{
+		AttachGunAction = AttachGunActionFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UInputAction> RunActionFinder(TEXT("/Game/GUNMAN/Input/IA_Run.IA_Run"));
 	if (RunActionFinder.Succeeded())
 	{
 		RunAction = RunActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> PauseMenuActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_PauseMenu.IA_PauseMenu"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> PauseMenuActionFinder(TEXT("/Game/GUNMAN/Input/IA_PauseMenu.IA_PauseMenu"));
 	if (PauseMenuActionFinder.Succeeded())
 	{
 		PauseMenuAction = PauseMenuActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> MoveForwardActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_MoveForward.IA_MoveForward"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> MoveForwardActionFinder(TEXT("/Game/GUNMAN/Input/IA_MoveForward.IA_MoveForward"));
 	if (MoveForwardActionFinder.Succeeded())
 	{
 		MoveForwardAction = MoveForwardActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> MoveRightActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_MoveRight.IA_MoveRight"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> MoveRightActionFinder(TEXT("/Game/GUNMAN/Input/IA_MoveRight.IA_MoveRight"));
 	if (MoveRightActionFinder.Succeeded())
 	{
 		MoveRightAction = MoveRightActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> LookActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Look.IA_Look"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> LookActionFinder(TEXT("/Game/GUNMAN/Input/IA_Look.IA_Look"));
 	if (LookActionFinder.Succeeded())
 	{
 		LookAction = LookActionFinder.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableFinder(TEXT("/Game/GUNMAN/Blueprint/ArmedWeapon/DT_Weapon.DT_Weapon"));
+	if (DataTableFinder.Succeeded())
+	{
+		WeaponDataTable = DataTableFinder.Object;
 	}
 
 	// タイムライン初期化
@@ -169,7 +191,7 @@ AGUNMANCharacter::AGUNMANCharacter()
 	RunTimeline->SetTimelineLength(1.0f);
 
 	// カーブアセットの取得
-	const ConstructorHelpers::FObjectFinder<UCurveFloat> Find(TEXT("CurveFloat'/Game/Blueprint/ThirdPersonCPP/Blueprints/CB_Run.CB_Run'"));
+	const ConstructorHelpers::FObjectFinder<UCurveFloat> Find(TEXT("CurveFloat'/Game/GUNMAN/Blueprint/Characters/CB_Run.CB_Run'"));
 	if (Find.Succeeded())
 	{
 		RunCurve = Find.Object;
@@ -225,7 +247,7 @@ void AGUNMANCharacter::BeginPlay()
 	OnTakeAnyDamage.AddDynamic(this, &AGUNMANCharacter::HandleAnyDamage);
 
 	// WBP のパスをセット
-	CharacterWidgetPath = "/Game/UMG/WBP_UICharacter.WBP_UICharacter_C";
+	CharacterWidgetPath = "/Game/GUNMAN/Blueprint/UMG/WBP_UICharacter.WBP_UICharacter_C";
 
 	// パスからウィジェットを生成する
 	CharacterWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*CharacterWidgetPath)).LoadSynchronous();
@@ -242,7 +264,7 @@ void AGUNMANCharacter::BeginPlay()
 	}
 
 	// WBP のパスをセット
-	GunSightWidgetPath = "/Game/UMG/WBP_UIGunSight.WBP_UIGunSight_C";
+	GunSightWidgetPath = "/Game/GUNMAN/Blueprint/UMG/WBP_UIGunSight.WBP_UIGunSight_C";
 
 	// パスからウィジェットを生成する
 	GunSightWidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*GunSightWidgetPath)).LoadSynchronous();
@@ -252,6 +274,23 @@ void AGUNMANCharacter::BeginPlay()
 	{
 		UIGunSightRef = Cast<UUIGunSight>(CreateWidget(PlayerController, GunSightWidgetClass));
 	}
+}
+
+void AGUNMANCharacter::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	// 銃を腕にアタッチする
+	FP_Gun->AttachToComponent(
+		Mesh1P, 
+		FAttachmentTransformRules(
+			EAttachmentRule::SnapToTarget, 
+			EAttachmentRule::SnapToTarget, 
+			EAttachmentRule::SnapToTarget, 
+			false
+		), 
+		FName(TEXT("GripPoint"))
+	);
 }
 
 void AGUNMANCharacter::Tick(float DeltaTime)
@@ -289,6 +328,9 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 		// 武器を構えるバインド
 		EnhancedInputComponent->BindAction(ReadyGunAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartReadyGun);
 		EnhancedInputComponent->BindAction(ReadyGunAction, ETriggerEvent::Completed, this, &AGUNMANCharacter::StopReadyGun);
+
+		// 武器のつけ外しのバインド
+		EnhancedInputComponent->BindAction(AttachGunAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::AttachingAndRemovingGun);
 
 		// 走る操作へのバインド
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartTimeline);
@@ -668,6 +710,56 @@ void AGUNMANCharacter::StopReadyGun()
 	if (UIGunSightRef)
 	{
 		UIGunSightRef->RemoveFromParent();
+	}
+}
+
+void AGUNMANCharacter::AttachingAndRemovingGun()
+{
+	// 武器のインデックスをセット
+	WeaponNumber = WeaponNumberCounter;
+
+	// 武器を持っているか？
+	if (!HasWeapon)
+	{
+		// インデックスにあたる武器をセット
+		EquippedWeapon = WeaponMeshes[WeaponNumber];
+
+		// 武器を表示
+		EquippedWeapon->SetHiddenInGame(false, false);
+
+		// データテーブルにアクセス
+		FName RowName = EquippedWeapon->ComponentTags[0];
+		FWeaponStructure* Row = WeaponDataTable->FindRow<FWeaponStructure>(RowName, "");
+		if (Row)
+		{
+			// 発砲時の情報をセット
+			EquippedWeaponInformation.GunshotSound = Row->GunshotSound;
+			EquippedWeaponInformation.MuzzleFire = Row->MuzzleFire;
+			EquippedWeaponInformation.MuzzleFireSoketName = Row->MuzzleFireSoketName;
+			EquippedWeaponInformation.FiringMontage = Row->FiringMontage;
+			EquippedWeaponInformation.AmmunitionClass = Row->AmmunitionClass;
+			EquippedWeaponInformation.AmmunitionSocketName = Row->AmmunitionSocketName;
+
+			// 武器を装備してサウンドを再生する
+			EquipWeapon(true, Row->HasPistol, Row->EquipSocketName);
+			UGameplayStatics::PlaySound2D(this, Row->EquipmentNoise);
+		}
+
+		// カウント処理
+		CountWeapon(WeaponMeshes, WeaponNumber);
+	}
+	else
+	{
+		// 外す武器を選ぶ
+		FName RowName = RemoveWeapon(WeaponMeshes, WeaponNumber)->ComponentTags[0];
+
+		// データテーブルにアクセス
+		FWeaponStructure* Row = WeaponDataTable->FindRow<FWeaponStructure>(RowName, "");
+		if (Row)
+		{
+			// 武器を外す
+			EquipWeapon(false, false, Row->AttachSocketName);
+		}
 	}
 }
 

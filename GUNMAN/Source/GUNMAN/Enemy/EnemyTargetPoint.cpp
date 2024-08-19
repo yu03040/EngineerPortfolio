@@ -70,7 +70,7 @@ void AEnemyTargetPoint::GenerateEnemyAI(UWorld* World, TSubclassOf<APawn> PawnCl
 			if (!AIController)
 			{
 				// AIコントローラがない場合は、新しく作成
-				FString path = "/Game/Enemy/BP_AIEnemyController.BP_AIEnemyController_C";
+				FString path = "/Game/GUNMAN/Blueprint/Enemy/BP_AIEnemyController.BP_AIEnemyController_C";
 				TSubclassOf<class AAIEnemyController> AIControllerClass = TSoftClassPtr<AAIEnemyController>(FSoftObjectPath(*path)).LoadSynchronous();
 				AIController = World->SpawnActor<AAIEnemyController>(AIControllerClass, Location, Rotation, SpawnParams);
 				if (AIController)

@@ -15,7 +15,7 @@ void AGameClearMode::BeginPlay()
 void AGameClearMode::DisplayGameClear()
 {
 	// WidgetBlueprint の Class を取得する
-	FString Path = TEXT("/Game/UMG/WBP_GameClear.WBP_GameClear_C");
+	FString Path = TEXT("/Game/GUNMAN/Blueprint/UMG/WBP_GameClear.WBP_GameClear_C");
 	TSubclassOf<UUserWidget> WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
 
 	// PlayerController を取得する

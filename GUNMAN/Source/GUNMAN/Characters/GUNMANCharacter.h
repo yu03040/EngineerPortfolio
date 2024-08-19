@@ -3,13 +3,14 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GUNMAN/ArmedWeapon/WeaponStructure.h"
 #include "Components/TimelineComponent.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
+#include "Perception/AIPerceptionStimuliSourceComponent.h"
+#include "GUNMAN/ArmedWeapon/WeaponStructure.h"
 #include "GUNMAN/UMG/UICharacter.h"
 #include "GUNMAN/UMG/UIGunSight.h"
-#include "GUNMAN/ArmedWeapon/AnimationInterface.h"
+#include "GUNMAN/Animations/AnimationInterface.h"
 #include "GUNMAN/ArmedWeapon/WeaponInterface.h"
 #include "GUNMANCharacter.generated.h"
 
@@ -210,6 +211,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ReadyGunAction;
 
+	/* Attach Gun Input */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> AttachGunAction;
+
 	/* Run Input */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> RunAction;
@@ -236,7 +241,25 @@ private:
 
 	/* プレイヤ―の速さの最大値 */
 	UPROPERTY()
-	float EndSpeed = 600.0f;
+	float EndSpeed = 1000.0f;
+
+	UPROPERTY(EditAnywhere, Category = "Data")
+	TObjectPtr<UDataTable> WeaponDataTable;
+
+protected:
+	/** タイムライン */
+	FTimeline* RunTimeline;
+
+	/** カーブ */
+	TObjectPtr<class UCurveFloat> RunCurve;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
+	TObjectPtr<UAIPerceptionStimuliSourceComponent> StimuliSourceComponent;
+
+public:
+	/* MappingContext */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
+	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 
 protected:
 	virtual void BeginPlay() override;
@@ -261,8 +284,8 @@ protected:
 
 	/* 銃を構える（開始） */
 	void StartReadyGun();
-	
-	/* 
+
+	/*
 	 * 銃を構える過程
 	 * @param bIsAiming 銃を構えているか？
 	 * @param ArmLength カメラのアームの長さ
@@ -275,6 +298,9 @@ protected:
 
 	/* 銃を構える（終了） */
 	void StopReadyGun();
+
+	/* 銃の付け外し */
+	void AttachingAndRemovingGun();
 
 	/* ポーズメニューを開く */
 	void PressedActionPoseMenu();
@@ -344,15 +370,11 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = ThirdPerson)
 	void EquipWeapon(bool bHasWeapon, bool bHasPistol, FName SoketName);
 
-protected:
-	/** タイムライン */
-	FTimeline* RunTimeline;
-
-	/** カーブ */
-	TObjectPtr<class UCurveFloat> RunCurve;
-
 public:
 	AGUNMANCharacter();
+
+	// Construction Script
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 	virtual void Tick(float DeltaTime) override;
 
@@ -383,9 +405,4 @@ public:
 	void SetOrientRotationToMovement(bool bOrientRotationToMovement);
 
 	void SetUseControllerRotationYaw(bool bYawRotation);
-
-public:
-	/* MappingContext */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
-	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 };

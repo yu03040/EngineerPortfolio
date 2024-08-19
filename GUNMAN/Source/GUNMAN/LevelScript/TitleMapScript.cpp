@@ -17,25 +17,25 @@ ATitleMapScript::ATitleMapScript()
 	InvalidButtonIndex = 4;
 
 	// Enhanced Input のアセットをロード
-	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IMC_Map.IMC_Map"));
+	static ConstructorHelpers::FObjectFinder<UInputMappingContext> MappingContextFinder(TEXT("/Game/GUNMAN/Input/IMC_OperatingUI.IMC_OperatingUI"));
 	if (MappingContextFinder.Succeeded())
 	{
 		DefaultMappingContext = MappingContextFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> EnterActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_Enter.IA_Enter"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> EnterActionFinder(TEXT("/Game/GUNMAN/Input/IA_Enter.IA_Enter"));
 	if (EnterActionFinder.Succeeded())
 	{
 		EnterAction = EnterActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> DownArrowKeyActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_DownArrowKey.IA_DownArrowKey"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> DownArrowKeyActionFinder(TEXT("/Game/GUNMAN/Input/IA_DownArrowKey.IA_DownArrowKey"));
 	if (DownArrowKeyActionFinder.Succeeded())
 	{
 		DownArrowKeyAction = DownArrowKeyActionFinder.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UInputAction> UpArrowKeyActionFinder(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/EnhancedInput/IA_UpArrowKey.IA_UpArrowKey"));
+	static ConstructorHelpers::FObjectFinder<UInputAction> UpArrowKeyActionFinder(TEXT("/Game/GUNMAN/Input/IA_UpArrowKey.IA_UpArrowKey"));
 	if (UpArrowKeyActionFinder.Succeeded())
 	{
 		UpArrowKeyAction = UpArrowKeyActionFinder.Object;
@@ -61,9 +61,9 @@ void ATitleMapScript::BeginPlay()
 	SetupInput(PlayerController->InputComponent);
 
 	// ウィジェットブループリントのパスをセット
-	FString path = "/Game/UMG/WBP_Title.WBP_Title_C";
+	FString Path = "/Game/GUNMAN/Blueprint/UMG/WBP_Title.WBP_Title_C";
 	// アセットパスから UserWidgetClass を生成する
-	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*path)).LoadSynchronous();
+	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
 	// タイトルのウィジェットを作成
 	if (IsValid(WidgetClass))
 	{

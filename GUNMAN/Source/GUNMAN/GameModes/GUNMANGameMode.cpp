@@ -16,7 +16,7 @@ AGUNMANGameMode::AGUNMANGameMode() : Super()
 	PrimaryActorTick.bCanEverTick = true;
 
 	// set default pawn class to our Blueprinted character
-	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/Blueprint/ThirdPersonCPP/Blueprints/ThirdPersonCharacter"));
+	static ConstructorHelpers::FClassFinder<APawn> PlayerPawnBPClass(TEXT("/Game/GUNMAN/Blueprint/Characters/ThirdPersonCharacter.ThirdPersonCharacter_C"));
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
@@ -61,7 +61,7 @@ void AGUNMANGameMode::BeginPlay()
 	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
 	// ウィジェットブループリントのパスをセット
-	FString path = "/Game/UMG/WBP_TimeLimit.WBP_TimeLimit_C";
+	FString path = "/Game/GUNMAN/Blueprint/UMG/WBP_TimeLimit.WBP_TimeLimit_C";
 	// アセットパスから UserWidgetClass を生成する
 	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*path)).LoadSynchronous();
 	// タイトルのウィジェットを作成
