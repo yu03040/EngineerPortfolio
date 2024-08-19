@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GUNMAN/ArmedWeapon/WeaponStructure.h"
 #include "Weapon.generated.h"
 
 UCLASS()
@@ -18,6 +19,9 @@ class GUNMAN_API AWeapon : public AActor
 	/** 武器のメッシュ */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Rifle, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent> WeaponMesh;
+
+	UPROPERTY(EditAnywhere, Category = "Data")
+	TObjectPtr<UDataTable> WeaponDataTable;
 public:
 	// Sets default values for this actor's properties
 	AWeapon();
