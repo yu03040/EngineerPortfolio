@@ -15,8 +15,6 @@ class GUNMAN_API UUIGameOver : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-	void NativeConstruct() override;
-
 	/** コンティニューボタン */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<class UButton> Continue_Button;
@@ -34,8 +32,6 @@ protected:
 	TObjectPtr<class UTextBlock> GameEnd_TextBlock;
 
 public:
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
 	/** ゲームを終了する関数 */
 	UFUNCTION()
 	void OnClickedContinue_Button();

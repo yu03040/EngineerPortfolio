@@ -15,9 +15,6 @@ class GUNMAN_API UUITimeLimitWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	// コンストラクタ
-	virtual void NativeConstruct() override;
-
 	bool Initialize() override;
 
 	float GetTime() const { return TimeLimitSeconds; }

@@ -34,8 +34,6 @@ protected:
 	TObjectPtr<class UWidgetAnimation> MoveKillCount;
 
 protected:
-	virtual void NativeConstruct() override;
-
 	bool Initialize() override;
 
 	// 倒した数を表示する関数

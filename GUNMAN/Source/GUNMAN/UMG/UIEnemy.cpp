@@ -1,14 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "UIEnemy.h"
 #include "Kismet/GamePlayStatics.h"
 #include "GUNMAN/Enemy/AIEnemy.h"
 #include "Components/ProgressBar.h"
-
-void UUIEnemy::NativeConstruct()
-{
-}
 
 bool UUIEnemy::Initialize()
 {
