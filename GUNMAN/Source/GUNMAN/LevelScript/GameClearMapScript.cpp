@@ -64,7 +64,7 @@ void AGameClearMapScript::BeginPlay()
 	FString Path = "/Game/GUNMAN/Blueprint/UMG/WBP_GameClear.WBP_GameClear_C";
 	// アセットパスから UserWidgetClass を生成する
 	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
-	// タイトルのウィジェットを作成
+	// ゲームクリア用のウィジェットを作成
 	if (IsValid(WidgetClass))
 	{
 		UI_GameClear = Cast<UUIGameClear>(CreateWidget(PlayerController, WidgetClass));

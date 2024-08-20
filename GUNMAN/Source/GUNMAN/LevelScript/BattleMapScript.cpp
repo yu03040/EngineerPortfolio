@@ -154,17 +154,18 @@ void ABattleMapScript::InitializeButtonPosition()
 	FString Path = "/Game/GUNMAN/Blueprint/UMG/WBP_PaseMenu.WBP_PaseMenu_C";
 	// アセットパスから UserWidgetClass を生成する
 	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
+
 	if (IsValid(WidgetClass))
 	{
-		// ポーズメニューをを生成
+		// ポーズメニュー用のウィジェットを生成
 		UI_PaseMenu = Cast<UUI_PaseMenu>(CreateWidget(PlayerController, WidgetClass));
-		// ポーズメニューがあったら
 		if (UI_PaseMenu)
 		{
 			// ビューポートに表示する
 			UI_PaseMenu->AddToViewport();
 			UGameplayStatics::SetGamePaused(GetWorld(), true);
 		}
+
 		//ゲームパッドで動かせるように
 		PlayerController->SetInputMode(FInputModeGameOnly());
 	}
