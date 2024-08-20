@@ -15,21 +15,21 @@
 
 ## 関数の説明
 
-### OnClickedBackToTitle_Button メソッド
+### OnClickedBackToTitle_Button 関数
 
-このメソッドは、「タイトルに戻る」ボタンがクリックされた際に呼び出されます。
+この関数は、「タイトルに戻る」ボタンがクリックされた際に呼び出されます。
 
 - `UGameplayStatics::OpenLevel` 関数を使用して、"TitleMap" という名前のレベル（タイトル画面）をロードします。この処理により、プレイヤーはポーズメニューからタイトル画面に戻ることができます。
 
-### OnClickedCancel_Button メソッド
+### OnClickedCancel_Button 関数
 
-このメソッドは、「ゲームに戻る」ボタンがクリックされた際に呼び出されます。
+この関数は、「ゲームに戻る」ボタンがクリックされた際に呼び出されます。
 
 - `RemoveFromParent` 関数を使用してポーズメニューを閉じ、ウィジェットを画面から削除します。
 - `UGameplayStatics::SetGamePaused` 関数を使って、ゲームのポーズ状態を解除します。`false` を引数として渡すことで、ゲームが再開されます。
 
-### OnClickedGameEnd_Button メソッド
+### OnClickedGameEnd_Button 関数
 
-このメソッドは、「ゲーム終了」ボタンがクリックされた際に呼び出されます。
+この関数は、「ゲーム終了」ボタンがクリックされた際に呼び出されます。
 
 - `UKismetSystemLibrary::QuitGame` 関数を使用してゲームを終了します。`EQuitPreference::Quit` を指定することで、プレイヤーがゲームを完全に終了できるようにしています。

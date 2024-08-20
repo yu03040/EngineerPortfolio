@@ -14,14 +14,14 @@
 
 ## 関数の説明
 
-### OnClickedContinue_Button メソッド
+### OnClickedContinue_Button 関数
 
-このメソッドは、「ゲームを続ける」ボタンがクリックされた際に呼び出されます。
+この関数は、「ゲームを続ける」ボタンがクリックされた際に呼び出されます。
 
 - `UGameplayStatics::OpenLevel` 関数を使用して、"TitleMap" という名前のレベル（タイトル画面）をロードし、ゲームを再開します。この処理により、プレイヤーはゲームのタイトル画面に戻ることができます。
 
-### OnClickedGameEnd_Button メソッド
+### OnClickedGameEnd_Button 関数
 
-このメソッドは、「ゲーム終了」ボタンがクリックされた際に呼び出されます。
+この関数は、「ゲーム終了」ボタンがクリックされた際に呼び出されます。
 
 - `UKismetSystemLibrary::QuitGame` 関数を使用してゲームを終了します。`EQuitPreference::Quit` を指定することで、プレイヤーがゲームを完全に終了できるようにしています。

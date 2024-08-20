@@ -16,26 +16,26 @@
 
 ## 関数の説明
 
-### OnClickedGameStart_Button メソッド
+### OnClickedGameStart_Button 関数
 
-このメソッドは、ゲーム開始ボタンがクリックされた際に呼び出されます。
+この関数は、ゲーム開始ボタンがクリックされた際に呼び出されます。
 
 - `UGameplayStatics::OpenLevel` 関数を使用して、"BattleMap" という名前のレベルをロードし、ゲームを開始します。
 
-### OnClickedGameEnd_Button メソッド
+### OnClickedGameEnd_Button 関数
 
-このメソッドは、ゲーム終了ボタンがクリックされた際に呼び出されます。
+この関数は、ゲーム終了ボタンがクリックされた際に呼び出されます。
 
 - `UKismetSystemLibrary::QuitGame` 関数を使用してゲームを終了します。`EQuitPreference::Quit` を指定することで、プレイヤーがゲームを完全に終了できるようにしています。
 
-### OnClickedGameStartExplaination_Button メソッド
+### OnClickedGameStartExplaination_Button 関数
 
-このメソッドは、?ボタン（ゲーム操作方法を説明するボタン）がクリックされた際に呼び出されます。
+この関数は、?ボタン（ゲーム操作方法を説明するボタン）がクリックされた際に呼び出されます。
 
 - `Explaination_CanvasPanel` の表示状態を `ESlateVisibility::SelfHitTestInvisible` に設定し、操作説明の画像を表示します。
 
-### OnClickedGameEndExplaination_Button メソッド
+### OnClickedGameEndExplaination_Button 関数
 
-このメソッドは、操作説明を閉じるボタンがクリックされた際に呼び出されます。
+この関数は、操作説明を閉じるボタンがクリックされた際に呼び出されます。
 
 - `Explaination_CanvasPanel` の表示状態を `ESlateVisibility::Hidden` に設定し、操作説明の画像を非表示にします。
