@@ -13,12 +13,4 @@ UCLASS()
 class GUNMAN_API AGameClearMode : public AGUNMANGameModeBase
 {
 	GENERATED_BODY()
-	
-protected:
-	virtual void BeginPlay() override;
-
-public:
-	// クリア画面を表示する関数
-	void DisplayGameClear();
-
 };

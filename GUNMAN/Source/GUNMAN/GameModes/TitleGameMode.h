@@ -4,13 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GUNMAN/GameModes/GUNMANGameModeBase.h"
-#include "GameOverMode.generated.h"
+#include "TitleGameMode.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class GUNMAN_API AGameOverMode : public AGUNMANGameModeBase
+class GUNMAN_API ATitleGameMode : public AGUNMANGameModeBase
 {
 	GENERATED_BODY()
+	
 };

@@ -15,18 +15,7 @@ class AGUNMANGameMode : public AGUNMANGameModeBase
 {
 	GENERATED_BODY()
 
-public:
-	AGUNMANGameMode();
-
-	virtual void Tick(float DeltaTime) override;
-
-protected:
-	virtual void BeginPlay() override;
-
-	void OpenGameClearMap();
-
 private:
-
 	/** ゲームクリアに必要な倒した数 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	int GameClearKillCount = 10;
@@ -39,15 +28,28 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	float GameClearWaitingTime = 2.0f;
 
-	/** UITimeLimitWidget の リファレンス */
+	/** UITimeLimitWidget の 参照 */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UUITimeLimitWidget> UITimeLimitRef;
-
-	/** GUNMANCharacter の リファレンス */
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Gameplay, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<AGUNMANCharacter> PlayerRef;
 
 	/* ブループリントのウィジェットクラス */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> WidgetClass;
+
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	AGUNMANGameMode();
+
+	virtual void Tick(float DeltaTime) override;
+
+	// 制限時間のウィジェットを表示する関数
+	void DisplayTimeLimit();
+
+	// GameClearMap を開く関数
+	void OpenGameClearMap();
+
+	// GameOverMap を開く関数
+	void OpenGameOverMap();
 };
