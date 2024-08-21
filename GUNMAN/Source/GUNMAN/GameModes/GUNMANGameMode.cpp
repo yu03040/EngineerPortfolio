@@ -25,6 +25,14 @@ AGUNMANGameMode::AGUNMANGameMode() : Super()
 	PlayerControllerClass = AGUNMANController::StaticClass();
 }
 
+void AGUNMANGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// 制限時間のウィジェットを表示する
+	DisplayTimeLimit();
+}
+
 void AGUNMANGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
@@ -35,43 +43,39 @@ void AGUNMANGameMode::Tick(float DeltaTime)
 	// 0 秒以下ならゲーム終了（ゲームオーバー）
 	if (UITimeLimitRef->GetTime() <= GameOverTime)
 	{
-		UGameplayStatics::OpenLevel(this, "GameOverMap");
+		OpenGameOverMap();
 	}
 
-	// 1敵を10体以上倒したらゲームクリア
-	if (PlayerRef->GetKillCount() >= GameClearKillCount)
+	TObjectPtr<AGUNMANCharacter> Player = Cast<AGUNMANCharacter>(UGameplayStatics::GetPlayerCharacter(this, 0));
+	if (Player)
 	{
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGUNMANGameMode::OpenGameClearMap, GameClearWaitingTime);
+		// 1敵を10体以上倒したらゲームクリア
+		if (Player->GetKillCount() >= GameClearKillCount)
+		{
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AGUNMANGameMode::OpenGameClearMap, GameClearWaitingTime);
+		}
 	}
 }
 
-void AGUNMANGameMode::BeginPlay()
+void AGUNMANGameMode::DisplayTimeLimit()
 {
-	Super::BeginPlay();
+	// WidgetBlueprint の Class を取得する
+	FString Path = "/Game/GUNMAN/Blueprint/UMG/WBP_TimeLimit.WBP_TimeLimit_C";
+	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
 
-	// プレイヤ―の情報をもらう
-	auto IsPlayer = IsValid(UGameplayStatics::GetPlayerCharacter(this->GetWorld(), 0));
-	if (IsPlayer == true)
-	{
-		PlayerRef = Cast<AGUNMANCharacter>(UGameplayStatics::GetPlayerCharacter(this->GetWorld(), 0));
-	}
-
-	// プレイヤーコントローラーを取得
+	// プレイヤーコントローラーを取得する
 	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
-	// ウィジェットブループリントのパスをセット
-	FString path = "/Game/GUNMAN/Blueprint/UMG/WBP_TimeLimit.WBP_TimeLimit_C";
-	// アセットパスから UserWidgetClass を生成する
-	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*path)).LoadSynchronous();
-	// タイトルのウィジェットを作成
-	if (IsValid(WidgetClass))
+	// WidgetClass と PlayerController が取得できたか判定する
+	if (WidgetClass && PlayerController)
 	{
-
+		// 制限時間用のウィジェットを作成
 		UITimeLimitRef = Cast<UUITimeLimitWidget>(CreateWidget(PlayerController, WidgetClass));
 
 		if (UITimeLimitRef)
 		{
+			// 制限時間を画面に表示する
 			UITimeLimitRef->AddToViewport();
 		}
 	}
@@ -80,4 +84,9 @@ void AGUNMANGameMode::BeginPlay()
 void AGUNMANGameMode::OpenGameClearMap()
 {
 	UGameplayStatics::OpenLevel(GetWorld(), FName(TEXT("GameClearMap")));
+}
+
+void AGUNMANGameMode::OpenGameOverMap()
+{
+	UGameplayStatics::OpenLevel(GetWorld(), FName(TEXT("GameOverMap")));
 }

@@ -1,14 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "UITimeLimitWidget.h"
 #include "Components/TextBlock.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/KismetTextLibrary.h"
-
-void UUITimeLimitWidget::NativeConstruct()
-{
-}
 
 bool UUITimeLimitWidget::Initialize()
 {

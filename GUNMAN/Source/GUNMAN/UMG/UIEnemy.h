@@ -15,8 +15,6 @@ class GUNMAN_API UUIEnemy : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	virtual void NativeConstruct() override;
-
 	bool Initialize() override;
 
 	/* 体力を表示する関数 */

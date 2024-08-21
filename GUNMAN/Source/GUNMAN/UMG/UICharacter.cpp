@@ -1,16 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "UICharacter.h"
 #include "Kismet/GamePlayStatics.h"
 #include "Kismet/KismetTextLibrary.h"
 #include "GUNMAN/Characters/GUNMANCharacter.h"
-
-
-void UUICharacter::NativeConstruct()
-{
-	
-}
 
 bool UUICharacter::Initialize()
 {
@@ -59,7 +52,7 @@ float UUICharacter::SetHealthProgressBar()
 	TObjectPtr<AGUNMANCharacter> PlayerRef = Cast<AGUNMANCharacter>(Player);
 	if (PlayerRef)
 	{
-		return PlayerRef->GetHealthPercent();
+		return PlayerRef->CalcHealthPercent();
 	}
 	else
 	{

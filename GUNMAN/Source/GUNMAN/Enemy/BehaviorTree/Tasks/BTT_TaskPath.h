@@ -15,9 +15,6 @@ class GUNMAN_API UBTT_TaskPath : public UBTTask_BlackboardBase
 {
 	GENERATED_BODY()
 
-public:
-	TObjectPtr<UBlueprint> MyBlueprint;
-
 private:
 	TArray<FVector> PathPoint;
 

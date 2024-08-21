@@ -15,8 +15,6 @@ class GUNMAN_API UUITitle : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
 	UFUNCTION(BlueprintPure, Category = "Button")
 	UButton* GetGameStart_Button() const { return GameStart_Button; }
 
@@ -46,8 +44,6 @@ public:
 	void OnClickedGameEndExplaination_Button();
 
 protected:
-	void NativeConstruct() override;
-
 	/** ゲーム開始ボタン */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<class UButton> GameStart_Button;

@@ -13,11 +13,4 @@ UCLASS()
 class GUNMAN_API AGameOverMode : public AGUNMANGameModeBase
 {
 	GENERATED_BODY()
-	
-protected:
-	virtual void BeginPlay() override;
-
-public:
-	// ゲームオーバー画面を表示する関数
-	void DisplayGameOver();
 };

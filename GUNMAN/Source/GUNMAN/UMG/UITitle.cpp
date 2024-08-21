@@ -1,6 +1,5 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
 #include "../UMG/UITitle.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
@@ -9,10 +8,6 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GamePlayStatics.h"
-
-void UUITitle::NativeConstruct()
-{
-}
 
 void UUITitle::OnClickedGameStart_Button()
 {
@@ -34,9 +29,4 @@ void UUITitle::OnClickedGameStartExplaination_Button()
 void UUITitle::OnClickedGameEndExplaination_Button()
 {
 	Explaination_CanvasPanel->SetVisibility(ESlateVisibility::Hidden);
-}
-
-void UUITitle::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
-{
-
 }

@@ -9,9 +9,6 @@
 // Sets default values
 AWeaponAmmunition::AWeaponAmmunition()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
 	// SceneComponent を作成する
 	DefaultSceneRoot = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 
@@ -30,26 +27,16 @@ void AWeaponAmmunition::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// プレイヤーをもらう
+	// プレイヤーにアクセス
 	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
-	// アクターにキャスト
-	AActor* MyActor = CastChecked<AActor>(Player);
 	if (Player)
 	{
 		// 飛ばす力
-		FVector Impulse = MyActor->GetActorRightVector() * UKismetMathLibrary::RandomFloatInRange(1.0f, 5.0f);
+		FVector Impulse = Player->GetActorRightVector() * UKismetMathLibrary::RandomFloatInRange(1.0f, 5.0f);
 		// 物理シュミレーションをオン
 		StaticMesh->SetSimulatePhysics(true);
-		// Impulse 分弾薬を飛ばす
+		// Impulse 分、弾薬を飛ばす
 		StaticMesh->AddImpulse(Impulse);
 	}
-	
-}
-
-// Called every frame
-void AWeaponAmmunition::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 

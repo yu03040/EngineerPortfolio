@@ -6,9 +6,10 @@
 #include "Components/TimelineComponent.h"
 #include "InputActionValue.h"
 #include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/SpringArmComponent.h"
 #include "Perception/AIPerceptionStimuliSourceComponent.h"
 #include "GUNMAN/ArmedWeapon/WeaponStructure.h"
-#include "GUNMAN/UMG/UICharacter.h"
 #include "GUNMAN/UMG/UIGunSight.h"
 #include "GUNMAN/Animations/AnimationInterface.h"
 #include "GUNMAN/ArmedWeapon/WeaponInterface.h"
@@ -56,8 +57,8 @@ private:
 	float FP_WeaponATK = 5.0f;
 
 	/* FirstPerson の武器がスポーンする銃弾 */
-	UPROPERTY(EditDefaultsOnly, Category = FirstPerson, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<class AfirstpersonProjectProjectile> ProjectileClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FirstPerson, meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<class AFirstPersonProjectile> ProjectileClass;
 
 	/* 銃口とキャラクターの位置のオフセット */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FirstPerson, meta = (AllowPrivateAccess = "true"))
@@ -113,11 +114,11 @@ private:
 
 	/* 装備した武器の情報 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = ThirdPerson, meta = (AllowPrivateAccess = "true"))
-	FWeaponStructure EquippedWeaponInformation;
+	FWeaponStructure EquippedWeaponInfo;
 
 	/* 武器を構えているか */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = ThirdPerson, meta = (AllowPrivateAccess = "true"))
-	bool IsAiming;
+	bool bIsAimingState;
 
 	/* 発射サウンドエフェクト */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FPAndTP, meta = (AllowPrivateAccess = "true"))
@@ -129,15 +130,15 @@ private:
 
 	/* 武器を持っているか？ */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = FPAndTP, meta = (AllowPrivateAccess = "true"))
-	bool HasWeapon;
+	bool bHasArms;
 
 	/* FirstPerson か？ */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FPAndTP, meta = (AllowPrivateAccess = "true"))
-	bool isFP = false;
+	bool bIsFP = false;
 
 	/* 攻撃できるか？ */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = FPAndTP, meta = (AllowPrivateAccess = "true"))
-	bool CanAttack = true;
+	bool bCanAttack = true;
 
 	/* 攻撃のタイマーハンドル */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = FPAndTP, meta = (AllowPrivateAccess = "true"))
@@ -167,97 +168,64 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = GamePlay, meta = (AllowPrivateAccess = "true"))
 	int KillCount = 0;
 
-	/* BattleMapScript の参照 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = GameMap, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class ABattleMapScript> BattleMapRef;
-
-	/* キャラクターUI の参照 */
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = UI, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UUICharacter> UICharacterRef;
-
-	/* キャラクターUI の WBP */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UUserWidget> CharacterWidgetClass;
-
-	/* キャラクターUIの WBP のパス */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (AllowPrivateAccess = "true"))
-	FString CharacterWidgetPath;
-
 	/* 照準の UI の参照 */
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = UI, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UUIGunSight> UIGunSightRef;
 
-	/* 照準の WBP */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UUserWidget> GunSightWidgetClass;
-
-	/* 照準の WBP のパス */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = UI, meta = (AllowPrivateAccess = "true"))
-	FString GunSightWidgetPath;
-
-	/* Jump Input */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> JumpAction;
 
-	/* Fire Input */
+	// 攻撃アクション
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> FireAction;
 
-	/* Toggle Input */
+	// FPS, TPS切り替えアクション
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ToggleAction;
 
-	/* Ready Gun Input */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ReadyGunAction;
 
-	/* Attach Gun Input */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> AttachGunAction;
 
-	/* Run Input */
+	// ダッシュアクション
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> RunAction;
 
-	/* Pause Menu Input */
+	// ポーズメニューアクション
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> PauseMenuAction;
 
-	/* Move Forward Input */
+	// 前後移動アクション
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> MoveForwardAction;
 
-	/* Move Right Input */
+	// 左右移動アクション
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> MoveRightAction;
 
-	/* Turn Input */
+	// 視点変更アクション
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> LookAction;
 
-	/* プレイヤ―の速さの最小値 */
-	UPROPERTY()
-	float StartSpeed = 300.0f;
-
-	/* プレイヤ―の速さの最大値 */
-	UPROPERTY()
-	float EndSpeed = 1000.0f;
-
+	// 武器の各種情報
 	UPROPERTY(EditAnywhere, Category = "Data")
 	TObjectPtr<UDataTable> WeaponDataTable;
 
 protected:
-	/** タイムライン */
+	// プレイヤーのスピード変化させるタイムライン
 	FTimeline* RunTimeline;
 
-	/** カーブ */
+	// プレイヤーのスピード変化させる CurveAsset
 	TObjectPtr<class UCurveFloat> RunCurve;
 
+	// AI に感知してもらために必要な刺激
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "AI")
 	TObjectPtr<UAIPerceptionStimuliSourceComponent> StimuliSourceComponent;
 
 public:
-	/* MappingContext */
+	// プレイヤーの入力を実行するために必要な各種情報
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input)
 	TObjectPtr<class UInputMappingContext> DefaultMappingContext;
 
@@ -266,23 +234,39 @@ protected:
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-	/* 攻撃開始 */
+	// 攻撃を開始する関数
 	void StartFire();
 
-	/* 攻撃（呼び出し） */
+	// TimerManager に呼ばれる関数
 	void FiringEvent();
 
-	/* 攻撃終了（ボタンを離すと呼ばれなくなる） */
+	// 攻撃を終了する関数
 	void StopFire();
 
-	void FireState_Implementation(bool CanATK) override;
+	/**
+	* 発砲の状態を管理する関数
+	* @param bCanATK 攻撃できるか？
+	*/
+	void FireState_Implementation(bool bCanATK) override;
 
+	/**
+	* 武器をアタッチする関数
+	* @param WeaponMesh 武器のメッシュ
+	* @param WeaponSoketName 武器をアタッチする場所の名前
+	*/
 	void AttachWeapon_Implementation(USkeletalMeshComponent* WeaponMesh, FName AttachSoketName) override;
 
-	/* TPS と FPS の視点を切り替える */
+	/* TPS と FPS を切り替える関数 */
 	void ToggleBetweenTPSAndFPS();
 
-	/* 銃を構える（開始） */
+	/**
+	* ThirdPerson と FirstPerson の設定を行う関数
+	* @param bIsTPActive ThirdPerson をアクティブにするか？
+	* @param bIsFPActive FirstPerson をアクティブにするか？
+	*/
+	void ToggleFlipflop(bool bIsTPActive, bool bIsFPActive);
+
+	/* 銃を構える関数 */
 	void StartReadyGun();
 
 	/*
@@ -296,53 +280,58 @@ protected:
 	 */
 	void GunPreparationProcess(bool bIsAiming, float ArmLength, bool bOrientRotationToMovement, bool bYawRotation, FVector CameraBoomLocation, FRotator CameraBoomRotation);
 
-	/* 銃を構える（終了） */
+	// 銃を構えることを止める関数
 	void StopReadyGun();
 
-	/* 銃の付け外し */
+	// 銃の付け外しする関数
 	void AttachingAndRemovingGun();
 
-	/* ポーズメニューを開く */
+	// ポーズメニューを開く関数
 	void PressedActionPoseMenu();
 
-	/* ジャンプ開始 */
+	// ジャンプを開始する関数
 	void StartJump();
 
-	/* ジャンプ停止 */
+	// ジャンプを停止する関数
 	void StopJump();
 
-	/* 前進/後進 */
+	// 前後に移動する関数
 	void MoveForward(const FInputActionValue& Value);
 
-	/* 右移動/左移動 */
+	// 左右に移動する関数
 	void MoveRight(const FInputActionValue& Value);
 
-	/* 視点移動 */
+	// 視点移動
 	void Look(const FInputActionValue& Value);
 
-protected:
-	/** 弾丸を発射する */
-	UFUNCTION(BlueprintCallable)
+	// 弾丸を発射する
 	void OnFire();
 
+	// 照準を表示する関数
+	void DisplayGunSight(TObjectPtr<APlayerController>& PlayerController);
+
+	// キャラクターの UI を表示する関数 
+	void DisplayCharacterUI(TObjectPtr<APlayerController>& PlayerController);
+
+	// OnTakeAnyDamage イベントに関連付ける関数
 	UFUNCTION()
 	void HandleAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 
-	/** タイムライン の スタート */
+	// タイムラインを開始する関数
 	UFUNCTION(BlueprintCallable, Category = Timeline)
 	void StartTimeline();
 
-	/** タイムライン の リバース */
+	// タイムラインを逆再生する関数
 	UFUNCTION(BlueprintCallable, Category = Timeline)
 	void ReverseTimeline();
 
-	/** タイムラインの進捗が変化した際の処理 */
+	// タイムラインでキャラクターのスピードを補間する関数
 	UFUNCTION()
-	void TimelineStep(float value);
+	void Timeline_LinearInterpCharacterSpeed(float Value);
 
 	/** 発砲時のアニメーションを出す関数 */
 	UFUNCTION(BlueprintCallable, Category = ThirdPerson)
-	void AnimationAtFiring();
+	void AnimationAtFiring(bool bIsFPActive);
 
 	/*
 	 * 武器を外す関数
@@ -373,36 +362,20 @@ protected:
 public:
 	AGUNMANCharacter();
 
+	// タイムラインを生成する関数
+	void CreateTimeline();
+
+	// EnhancedInput を読み込む関数
+	void LoadEnhancedInput();
+
 	// Construction Script
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	virtual void Tick(float DeltaTime) override;
 
-	/** CameraBoom の getter **/
-	FORCEINLINE TObjectPtr<class USpringArmComponent> GetCameraBoom() const { return CameraBoom; }
-	/** ThirdPersonCamera の getter **/
-	FORCEINLINE TObjectPtr<class UCameraComponent> GetThirdPersonCamera() const { return ThirdPersonCamera; }
-
-	/** Mesh1P の getter **/
-	TObjectPtr<USkeletalMeshComponent> GetMesh1P() const { return Mesh1P; }
-
-	/** FirstPersonCamera の getter **/
-	TObjectPtr<UCameraComponent> GetFirstPersonCamera() const { return FirstPersonCamera; }
-
+	// KillCount の Getter
 	int GetKillCount() const { return KillCount; }
 
-	float GetMaxHealth() const { return MaxHealth; }
-
-	float GetCurrentHealth() const { return CurrentHealth; }
-
-	float GetHealthPercent() const { return CurrentHealth / MaxHealth; }
-
-	/** MaxWalkSpeed の Setter */
-	void SetMaxWalkSpeed(float NewSpeed);
-
-	void SetTargetArmLength(float Length);
-
-	void SetOrientRotationToMovement(bool bOrientRotationToMovement);
-
-	void SetUseControllerRotationYaw(bool bYawRotation);
+	// 体力の割合を計算する関数
+	float CalcHealthPercent() const { return CurrentHealth / MaxHealth; }
 };

@@ -15,6 +15,7 @@ class GUNMAN_API ABattleMapScript : public ABaseMapScript
 {
 	GENERATED_BODY()
 
+private:
 	/* Up Input */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> UpAction;
@@ -27,17 +28,10 @@ class GUNMAN_API ABattleMapScript : public ABaseMapScript
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> DecisionAction;
 
-public:
-	ABattleMapScript();
-
-	/* ボタンの選択状態から非選択状態に遷移するときのボタンの色を変更する関数 */
-	virtual void ChangeButtonColor() override;
-
-	/* 選択されたボタンによって出力を変える関数 */
-	virtual void UpdateOutputButton() override;
-
-	/* ボタンの位置を初期化する関数 */
-	void InitializeButtonPosition();
+protected:
+	/* UI_PaseMenu の参照 */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UUI_PaseMenu> UI_PaseMenu;
 
 public:
 	/* MappingContext */
@@ -46,20 +40,24 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
 	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
-	/* ブループリントのプレイ中のウィジェット */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TSubclassOf<UUserWidget> HUD_WidgetClass;
+public:
+	ABattleMapScript();
 
-	/* UI_PaseMenu の Ref */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UUI_PaseMenu> UI_PaseMenu;
+	// ボタンの選択状態から非選択状態に遷移するときのボタンの色を変更する関数
+	virtual void ChangeButtonColor() override;
 
-	/* UICharacter の Ref */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UUICharacter> UI_Character;
+	// 選択されたボタンによって出力を変える関数
+	virtual void UpdateOutputButton() override;
 
-	/* WBP_UICharacter のパス */ 
-	FString PlayUIpath = "/Game/UMG/WBP_UICharacter.WBP_UICharacter_C";
+	// ボタンの位置を初期化する関数
+	void InitializeButtonPosition();
+
+	/**
+	* ポーズメニューを表示する関数
+	* @param PlayerController プレイヤーコントローラーの参照
+	*/
+	void DisplayPauseMenu(TObjectPtr<APlayerController>& PlayerController);
 };

@@ -15,8 +15,6 @@ class GUNMAN_API UUI_PaseMenu : public UUserWidget
 	GENERATED_BODY()
 
 protected:
-	void NativeConstruct() override;
-
 	/** ポーズメニューのテキスト */
 	UPROPERTY(EditAnyWhere, BlueprintReadWrite, meta = (BindWidget))
 	TObjectPtr<class UTextBlock> PoseMenu_TextBlock;
@@ -46,8 +44,6 @@ protected:
 	TObjectPtr<class UTextBlock> GameEnd_TextBlock;
 
 public:
-	virtual void NativeTick(const FGeometry& MyGeometry, float InDeltaTime) override;
-
 	UFUNCTION(BlueprintCallable, Category = "UI")
 	UButton* GetBackToTitle_Button() const { return BackToTitle_Button; }
 

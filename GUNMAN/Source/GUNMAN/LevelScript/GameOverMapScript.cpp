@@ -66,7 +66,7 @@ void AGameOverMapScript::BeginPlay()
 	FString Path = "/Game/GUNMAN/Blueprint/UMG/WBP_GameOver.WBP_GameOver_C";
 	// アセットパスから UserWidgetClass を生成する
 	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
-	// タイトルのウィジェットを作成
+	// ゲームオーバー用のウィジェットを作成
 	if (IsValid(WidgetClass))
 	{
 		UI_GameOver = Cast<UUIGameOver>(CreateWidget(PlayerController, WidgetClass));

@@ -23,3 +23,8 @@ void UAnimNotify_AdmitFiring::Notify(USkeletalMeshComponent* MeshComp, UAnimSequ
 		}
 	}
 }
+
+FString UAnimNotify_AdmitFiring::GetNotifyName_Implementation() const
+{
+	return FString(TEXT("AdmitFiring"));
+}

@@ -26,9 +26,6 @@ UBTT_TaskPath::UBTT_TaskPath()
 	{
 		something_object = found_something_object.Object;
 	}
-
-	MyBlueprint = Cast<UBlueprint>(StaticLoadObject(UBlueprint::StaticClass(), nullptr, TEXT("/Game/GUNMAN/Blueprint/Enemy/BP_PathPoint.BP_PathPoint_C")));
-
 }
 
 EBTNodeResult::Type UBTT_TaskPath::ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory)

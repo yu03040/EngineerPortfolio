@@ -20,10 +20,14 @@ class GUNMAN_API IWeaponInterface
 {
 	GENERATED_IINTERFACE_BODY()
 
-		// Add interface functions to this class. This is the class that will be inherited to implement this interface.
-public:
+	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 
-	//	武器を装備する関数
-	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "WeapInterface")
-		void AttachWeapon(USkeletalMeshComponent* WeaponMesh, FName AttachSoketName);
+public:
+	/**
+	* 武器をアタッチする関数
+	* @param WeaponMesh 武器のメッシュ
+	* @param WeaponSoketName 武器をアタッチする場所の名前
+	*/
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "WeaponInterface")
+	void AttachWeapon(USkeletalMeshComponent* WeaponMesh, FName AttachSoketName);
 };

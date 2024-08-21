@@ -3,9 +3,9 @@
 以下をチェックしてください。
 
 - [特に頑張ったところ](AppealPoint.md)
-- [前回の提出からブラッシュアップしたことのまとめ](BrushUp.md)
-- [プレイヤ―とゲームモード](MainSourceCode.md)
-- [敵](Enemy.md)
-- [装備する武器](ArmedWeapon.md)
-- [ユーザーインターフェース（UI）](UMG.md)
-- [マップ](LevelScript.md)
+- [プレイヤ―キャラクター](Character/README.md)
+- [敵](Enemy/README.md)
+- [ゲームモード](GameMode/README.md)
+- [マップ](LevelScript/README.md)
+- [UI](UMG/README.md)
+- [武器](Weapon/README.md)

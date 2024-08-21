@@ -64,7 +64,7 @@ void ATitleMapScript::BeginPlay()
 	FString Path = "/Game/GUNMAN/Blueprint/UMG/WBP_Title.WBP_Title_C";
 	// アセットパスから UserWidgetClass を生成する
 	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
-	// タイトルのウィジェットを作成
+	// タイトル用のウィジェットを作成
 	if (IsValid(WidgetClass))
 	{
 		UI_Title = Cast<UUITitle>(CreateWidget(PlayerController, WidgetClass));
