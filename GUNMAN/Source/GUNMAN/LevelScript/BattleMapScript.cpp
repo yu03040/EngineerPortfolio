@@ -15,7 +15,6 @@
 ABattleMapScript::ABattleMapScript()
 {
 	UI_PaseMenu = NULL;
-	UI_Character = NULL;
 	MaxButtonCounter = 3;
 	InvalidButtonIndex = 4;
 
@@ -147,33 +146,38 @@ void ABattleMapScript::UpdateOutputButton()
 
 void ABattleMapScript::InitializeButtonPosition()
 {
-	// プレイヤーコントローラーを取得
+	// PlayerController を取得
 	TObjectPtr<APlayerController> PlayerController = UGameplayStatics::GetPlayerController(this, 0);
 
-	// ウィジェットブループリントのパスをセット
-	FString Path = "/Game/GUNMAN/Blueprint/UMG/WBP_PaseMenu.WBP_PaseMenu_C";
-	// アセットパスから UserWidgetClass を生成する
-	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
+	//ゲームを止めて、UI をゲームパッドで動かす
+	UGameplayStatics::SetGamePaused(GetWorld(), true);
+	PlayerController->SetInputMode(FInputModeGameOnly());
 
-	if (IsValid(WidgetClass))
-	{
-		// ポーズメニュー用のウィジェットを生成
-		UI_PaseMenu = Cast<UUI_PaseMenu>(CreateWidget(PlayerController, WidgetClass));
-		if (UI_PaseMenu)
-		{
-			// ビューポートに表示する
-			UI_PaseMenu->AddToViewport();
-			UGameplayStatics::SetGamePaused(GetWorld(), true);
-		}
-
-		//ゲームパッドで動かせるように
-		PlayerController->SetInputMode(FInputModeGameOnly());
-	}
+	// ポーズメニューを表示する
+	DisplayPauseMenu(PlayerController);
 
 	// 最初 Back to Title を選択状態にする
 	TObjectPtr<UButton> BackToTitleButton = UI_PaseMenu->GetBackToTitle_Button();
 	if (BackToTitleButton)
 	{
 		BackToTitleButton->SetBackgroundColor(SelectedColor);
+	}
+}
+
+void ABattleMapScript::DisplayPauseMenu(TObjectPtr<APlayerController>& PlayerController)
+{
+	// WidgetBlueprint の Class を取得する
+	FString Path = "/Game/GUNMAN/Blueprint/UMG/WBP_PaseMenu.WBP_PaseMenu_C";
+	WidgetClass = TSoftClassPtr<UUserWidget>(FSoftObjectPath(*Path)).LoadSynchronous();
+
+	if (WidgetClass && PlayerController)
+	{
+		// ポーズメニュー用のウィジェットを生成
+		UI_PaseMenu = Cast<UUI_PaseMenu>(CreateWidget(PlayerController, WidgetClass));
+		if (UI_PaseMenu)
+		{
+			// ポーズメニューを画面に表示する
+			UI_PaseMenu->AddToViewport();
+		}
 	}
 }

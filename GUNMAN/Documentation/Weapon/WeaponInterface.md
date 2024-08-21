@@ -11,30 +11,8 @@
   - `AttachWeapon` 関数を定義しており、武器メッシュをキャラクターにアタッチする処理を行います。この関数の実装はインターフェースを継承したクラスに記述されます。
 
 
-## (2) このクラスのソースコードの説明
+## 関数の説明
 
-### `UWeaponInterface` クラス
-
-- **UINTERFACE マクロ**:
-  - `UINTERFACE(MinimalAPI, Blueprintable)` は、このインターフェースをブループリントでも利用可能にするための宣言です。
-  - `MinimalAPI` 修飾子により、エンジンの構築が最小限のAPI公開で行われます。
-  
-- **`UWeaponInterface` の役割**:
-  - `UWeaponInterface` は、`IWeaponInterface` のインターフェース定義を Unreal Engine に認識させるためのものです。このクラス自体に特別な処理はありません。
-
-### `IWeaponInterface` クラス
-
-- **IINTERFACE_BODY マクロ**:
-  - `GENERATED_IINTERFACE_BODY()` によって Unreal Engine 用にインターフェースとして認識され、オーバーライドが可能な状態になります。
-
-- **`AttachWeapon` 関数**:
-  - **関数の宣言**:
-    - `AttachWeapon` 関数は、`BlueprintCallable` と `BlueprintNativeEvent` に指定されているため、C++ で実装するだけでなく、ブループリントからも呼び出したり、実装をオーバーライドすることが可能です。
-  
-  - **関数のパラメータ**:
-    - `USkeletalMeshComponent* WeaponMesh`: キャラクターにアタッチする武器のスケルタルメッシュです。
-    - `FName AttachSoketName`: 武器をアタッチするキャラクターのソケット（骨の一部やスケルトン上のアタッチポイント）の名前です。
-
-### 全体の説明
-
-`WeaponInterface` クラスは、武器をキャラクターにアタッチするための標準的なインターフェースを提供します。このインターフェースを継承することで、各キャラクターや武器に固有のアタッチ処理を簡単に実装できます。また、ブループリントからも利用できるため、エディタでの作業も柔軟に行えます。
+### `AttachWeapon` 関数
+- 武器をキャラクターにアタッチするための標準的なインターフェースを提供します。
+- このインターフェースを継承することで、各キャラクターや武器に固有のアタッチ処理を簡単に実装できます。

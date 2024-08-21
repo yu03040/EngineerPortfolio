@@ -52,7 +52,7 @@ float UUICharacter::SetHealthProgressBar()
 	TObjectPtr<AGUNMANCharacter> PlayerRef = Cast<AGUNMANCharacter>(Player);
 	if (PlayerRef)
 	{
-		return PlayerRef->GetHealthPercent();
+		return PlayerRef->CalcHealthPercent();
 	}
 	else
 	{

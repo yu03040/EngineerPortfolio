@@ -23,3 +23,8 @@ void UAnimNotify_StopFiring::Notify(USkeletalMeshComponent* MeshComp, UAnimSeque
 		}
 	}
 }
+
+FString UAnimNotify_StopFiring::GetNotifyName_Implementation() const
+{
+	return FString(TEXT("StopFiring"));
+}
