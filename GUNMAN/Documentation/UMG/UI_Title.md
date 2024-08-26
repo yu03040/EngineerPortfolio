@@ -3,7 +3,7 @@
 ## 主な処理内容
 
 ![UI_Title](Images/UI_Title.png)  
-![UI_Title_Tutorial](Images/UI_Title_Tutorial.png)
+![UI_Title_Tutorial](Images/UI_Title_Tutorial_v2.png)
 ![Level_ClassDiagrams](Images/Level_ClassDiagrams.png)
 
 `UITitle` クラスは、ゲームのタイトルメニュー画面のUIウィジェットを担当するクラスです。このクラスは、次の3つのボタンを提供します。
