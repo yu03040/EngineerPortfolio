@@ -179,6 +179,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> FireAction;
 
+	// FPS用攻撃アクション
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> FPFireAction;
+
 	// FPS, TPS切り替えアクション
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Input, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ToggleAction;
@@ -243,6 +247,11 @@ protected:
 	// 攻撃を終了する関数
 	void StopFire();
 
+	void StartFPFire();
+
+	void StopFPFire();
+
+	void FPFiringEvent();
 	/**
 	* 発砲の状態を管理する関数
 	* @param bCanATK 攻撃できるか？
@@ -287,7 +296,7 @@ protected:
 	void AttachingAndRemovingGun();
 
 	// ポーズメニューを開く関数
-	void PressedActionPoseMenu();
+	void PressedActionPauseMenu();
 
 	// ジャンプを開始する関数
 	void StartJump();
@@ -306,6 +315,8 @@ protected:
 
 	// 弾丸を発射する
 	void OnFire();
+
+	void OnFPFire();
 
 	// 照準を表示する関数
 	void DisplayGunSight(TObjectPtr<APlayerController>& PlayerController);
@@ -330,8 +341,7 @@ protected:
 	void Timeline_LinearInterpCharacterSpeed(float Value);
 
 	/** 発砲時のアニメーションを出す関数 */
-	UFUNCTION(BlueprintCallable, Category = ThirdPerson)
-	void AnimationAtFiring(bool bIsFPActive);
+	void AnimationAtFiring();
 
 	/*
 	 * 武器を外す関数
@@ -339,16 +349,14 @@ protected:
 	 * @param number 現在装備している武器の index
 	 * @return 外す武器のメッシュを返す
 	 */
-	UFUNCTION(BlueprintCallable, BlueprintPure, Category = ThirdPerson)
-	USkeletalMeshComponent* RemoveWeapon(TArray<USkeletalMeshComponent*> Arms, int Number);
+	USkeletalMeshComponent* RemoveWeapon(TArray<TObjectPtr<USkeletalMeshComponent>> Arms, int Number);
 
 	/*
 	 * 装備した武器を数える関数
 	 * @param weapon 武器メッシュの配列
 	 * @param number 現在装備している武器の index
 	 */
-	UFUNCTION(BlueprintCallable, Category = ThirdPerson)
-	void CountWeapon(TArray<USkeletalMeshComponent*> Arms, int Number);
+	void CountWeapon(TArray<TObjectPtr<USkeletalMeshComponent>> Arms, int Number);
 
 	/*
 	 * 武器を装備する関数
@@ -356,7 +364,6 @@ protected:
 	 * @param HasPistol ピストルを装備しているか？
 	 * @param SoketName 武器をアタッチする場所の名前
 	 */
-	UFUNCTION(BlueprintCallable, Category = ThirdPerson)
 	void EquipWeapon(bool bHasWeapon, bool bHasPistol, FName SoketName);
 
 public:
