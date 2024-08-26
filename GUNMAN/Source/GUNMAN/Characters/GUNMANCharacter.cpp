@@ -187,6 +187,12 @@ void AGUNMANCharacter::LoadEnhancedInput()
 		FireAction = FireActionFinder.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> FPFireActionFinder(TEXT("/Game/GUNMAN/Input/IA_FPFire.IA_FPFire"));
+	if (FPFireActionFinder.Succeeded())
+	{
+		FPFireAction = FPFireActionFinder.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> ToggleActionFinder(TEXT("/Game/GUNMAN/Input/IA_Toggle.IA_Toggle"));
 	if (ToggleActionFinder.Succeeded())
 	{
@@ -256,6 +262,8 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 		// 攻撃のバインド
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartFire);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &AGUNMANCharacter::StopFire);
+		EnhancedInputComponent->BindAction(FPFireAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::StartFPFire);
+		EnhancedInputComponent->BindAction(FPFireAction, ETriggerEvent::Completed, this, &AGUNMANCharacter::StopFPFire);
 
 		// TPS/FPS 視点切り替えのバインド
 		EnhancedInputComponent->BindAction(ToggleAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::ToggleBetweenTPSAndFPS);
@@ -272,7 +280,7 @@ void AGUNMANCharacter::SetupPlayerInputComponent(class UInputComponent* PlayerIn
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AGUNMANCharacter::ReverseTimeline);
 
 		//// ポーズメニューのバインド
-		EnhancedInputComponent->BindAction(PauseMenuAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::PressedActionPoseMenu);
+		EnhancedInputComponent->BindAction(PauseMenuAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::PressedActionPauseMenu);
 
 		// 移動操作のバインド
 		EnhancedInputComponent->BindAction(MoveForwardAction, ETriggerEvent::Triggered, this, &AGUNMANCharacter::MoveForward);
@@ -297,21 +305,6 @@ void AGUNMANCharacter::StartFire()
 	);
 }
 
-void AGUNMANCharacter::FiringEvent()
-{
-	if ((bHasArms && bIsAimingState && bCanAttack) || bIsFP)
-	{
-		if (bIsFP == false)
-		{
-			OnFire();
-		}
-		else
-		{
-			OnFire();
-		}
-	}
-}
-
 void AGUNMANCharacter::StopFire()
 {
 	FTimerManager& FireTimerManager = GetWorldTimerManager();
@@ -325,22 +318,53 @@ void AGUNMANCharacter::StopFire()
 	}
 }
 
-void AGUNMANCharacter::FireState_Implementation(bool bCanATK)
+void AGUNMANCharacter::FiringEvent()
 {
-	bCanAttack = bCanATK;
+	if (bHasArms && bIsAimingState && bCanAttack && bIsFP == false)
+	{
+		OnFire();
+	}
 }
 
-void AGUNMANCharacter::AttachWeapon_Implementation(USkeletalMeshComponent* WeaponMesh, FName AttachSoketName)
+void AGUNMANCharacter::StartFPFire()
 {
-	// 武器をアタッチ
-	WeaponMeshes.Add(WeaponMesh);
-	WeaponMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), AttachSoketName);
+	// FiringInterval の間隔で連射する
+	FTimerManager& FireTimerManager = GetWorldTimerManager();
+	FireTimerManager.SetTimer
+	(
+		FireTimerHandle,
+		this,
+		&AGUNMANCharacter::FPFiringEvent,
+		FiringInterval,
+		true
+	);
+}
+
+void AGUNMANCharacter::StopFPFire()
+{
+	FTimerManager& FireTimerManager = GetWorldTimerManager();
+	if (FireTimerManager.IsTimerActive(FireTimerHandle))
+	{
+		// タイマーをクリア
+		FireTimerManager.ClearTimer(FireTimerHandle);
+
+		// タイマーハンドルを無効化
+		FireTimerHandle.Invalidate();
+	}
+}
+
+void AGUNMANCharacter::FPFiringEvent()
+{
+	if (bIsFP)
+	{
+		OnFPFire();
+	}
 }
 
 void AGUNMANCharacter::OnFire()
 {
 	// 発砲アニメーションを再生
-	AnimationAtFiring(bIsFP);
+	AnimationAtFiring();
 
 	FHitResult HitResult;
 	FVector StartLocation = ThirdPersonCamera->GetComponentLocation();
@@ -356,47 +380,81 @@ void AGUNMANCharacter::OnFire()
 	{
 		// hit したのが敵だったら
 		TObjectPtr<AAIEnemy> Enemy = Cast<AAIEnemy>(HitResult.GetActor());
-		if (Enemy && Enemy->GetCurrentHealth() > 0.0f)
+		if (Enemy)
 		{
-			if (bIsFP)
-			{
-				// 敵にダメージを与える
-				UGameplayStatics::ApplyDamage(Enemy, FP_WeaponATK, nullptr, nullptr, nullptr);
-			}
-			else
+			if (Enemy->GetCurrentHealth() > 0.0f)
 			{
 				// ヒットした場所の情報を使用
 				FVector HitLocation = HitResult.Location;
 				UGameplayStatics::SpawnEmitterAtLocation(this, WeaponEmitter, HitLocation, FRotator::ZeroRotator, true, EPSCPoolMethod::None, true);
 
-				if (WeaponNumber == 0) //ピストル
-				{
-					TP_WeaponATK = TP_PistolATK;
-				}
-				else if (WeaponNumber == 1) // ライフル
+				if (WeaponNumber == 0) // ライフル
 				{
 					TP_WeaponATK = TP_RifleATK;
 				}
-				else // ショットガン
+				else if (WeaponNumber == 1) // ショットガン
 				{
 					TP_WeaponATK = TP_ShotgunATK;
 				}
+				else //ピストル
+				{
+					TP_WeaponATK = TP_PistolATK;
+				}
 				// 敵に TP_WeaponATK だけダメージを与える
 				UGameplayStatics::ApplyDamage(Enemy, TP_WeaponATK, nullptr, nullptr, nullptr);
-			}
-
-			if (Enemy->GetCurrentHealth() <= 0.0f)
-			{
-				// 死んだらカウント
-				KillCount++;
+				
+				if (Enemy->GetCurrentHealth() <= 0.0f)
+				{
+					// 死んだらカウント
+					KillCount++;
+				}
 			}
 		}
 	}
 }
 
-void AGUNMANCharacter::AnimationAtFiring(bool bIsFPActive)
+void AGUNMANCharacter::OnFPFire()
 {
-	if (bIsFPActive)
+	// 発砲アニメーションを再生
+	AnimationAtFiring();
+
+	FHitResult HitResult;
+	FVector StartLocation = ThirdPersonCamera->GetComponentLocation();
+	FVector EndLocation = StartLocation + ThirdPersonCamera->GetForwardVector() * 10000.0f;
+
+	FCollisionQueryParams TraceParams(FName(TEXT("LineTraceByChannel")), true, this); // 衝突クエリに関するパラメータを設定するための構造体
+	TraceParams.bTraceComplex = false; // 詳細な衝突判定を行うか
+	TraceParams.AddIgnoredActor(this); // このアクターを無視する
+
+	// ライントレースを実行
+	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, TraceParams);
+	if (bHit)
+	{
+		// hit したのが敵だったら
+		TObjectPtr<AAIEnemy> Enemy = Cast<AAIEnemy>(HitResult.GetActor());
+		if (Enemy)
+		{
+			if (Enemy->GetCurrentHealth() > 0.0f)
+			{
+				if (bIsFP)
+				{
+					// 敵にダメージを与える
+					UGameplayStatics::ApplyDamage(Enemy, FP_WeaponATK, nullptr, nullptr, nullptr);
+				}
+
+				if (Enemy->GetCurrentHealth() <= 0.0f)
+				{
+					// 死んだらカウント
+					KillCount++;
+				}
+			}
+		}
+	}
+}
+
+void AGUNMANCharacter::AnimationAtFiring()
+{
+	if (bIsFP)
 	{
 		// 指定された場合、サウンドを再生
 		UGameplayStatics::PlaySound2D(this, FireSound);
@@ -431,6 +489,7 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 {
 	if (bIsFlipped)
 	{
+		UIGunSightRef->RemoveFromParent();
 		ToggleFlipflop(false, true);
 	}
 	else
@@ -475,7 +534,7 @@ void AGUNMANCharacter::ToggleFlipflop(bool bIsTPActive, bool bIsFPActive)
 
 void AGUNMANCharacter::StartReadyGun()
 {
-	if (bHasArms == true)
+	if (bHasArms == true && bIsFP == false)
 	{
 		GunPreparationProcess(true, 150.0f, false, true, FVector(0.0f, 98.0f, 102.0f), FRotator(0.0f, 32.0f, 41.0f));
 		if (UIGunSightRef)
@@ -483,6 +542,16 @@ void AGUNMANCharacter::StartReadyGun()
 			// 照準を画面に表示する
 			UIGunSightRef->AddToViewport();
 		}
+	}
+}
+
+void AGUNMANCharacter::StopReadyGun()
+{
+	GunPreparationProcess(false, 300.0f, true, false, FVector(0.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
+	if (UIGunSightRef)
+	{
+		// 照準を画面から取り除く
+		UIGunSightRef->RemoveFromParent();
 	}
 }
 
@@ -511,67 +580,94 @@ void AGUNMANCharacter::GunPreparationProcess(bool bIsAiming, float ArmLength, bo
 	CameraBoom->SetRelativeLocationAndRotation(CameraBoomLocation, CameraBoomRotation, false, false);
 }
 
-void AGUNMANCharacter::StopReadyGun()
-{
-	GunPreparationProcess(false, 300.0f, true, false, FVector(0.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
-	if (UIGunSightRef)
-	{
-		// 照準を画面から取り除く
-		UIGunSightRef->RemoveFromParent();
-	}
-}
-
 void AGUNMANCharacter::AttachingAndRemovingGun()
 {
-	// 武器のインデックスをセット
-	WeaponNumber = WeaponNumberCounter;
-
-	// 武器を持っているか？
-	if (!bHasArms)
+	if (bIsFP == false)
 	{
-		// インデックスにあたる武器をセット
-		EquippedWeapon = WeaponMeshes[WeaponNumber];
+		// 武器のインデックスをセット
+		WeaponNumber = WeaponNumberCounter;
 
-		// 武器を表示
-		EquippedWeapon->SetHiddenInGame(false, false);
-
-		// データテーブルにアクセス
-		FName RowName = EquippedWeapon->ComponentTags[0];
-		FWeaponStructure* Row = WeaponDataTable->FindRow<FWeaponStructure>(RowName, "");
-		if (Row)
+		// 武器を持っているか？
+		if (!bHasArms)
 		{
-			// 発砲時の情報をセット
-			EquippedWeaponInfo.GunshotSound = Row->GunshotSound;
-			EquippedWeaponInfo.MuzzleFire = Row->MuzzleFire;
-			EquippedWeaponInfo.MuzzleFireSoketName = Row->MuzzleFireSoketName;
-			EquippedWeaponInfo.FiringMontage = Row->FiringMontage;
-			EquippedWeaponInfo.AmmunitionClass = Row->AmmunitionClass;
-			EquippedWeaponInfo.AmmunitionSocketName = Row->AmmunitionSocketName;
+			// インデックスにあたる武器をセット
+			EquippedWeapon = WeaponMeshes[WeaponNumber];
 
-			// 武器を装備してサウンドを再生する
-			EquipWeapon(true, Row->HasPistol, Row->EquipSocketName);
-			UGameplayStatics::PlaySound2D(this, Row->EquipmentNoise);
+			// 武器を表示
+			EquippedWeapon->SetHiddenInGame(false, false);
+
+			// データテーブルにアクセス
+			FName RowName = EquippedWeapon->ComponentTags[0];
+			FWeaponStructure* Row = WeaponDataTable->FindRow<FWeaponStructure>(RowName, "");
+			if (Row)
+			{
+				// 発砲時の情報をセット
+				EquippedWeaponInfo.GunshotSound = Row->GunshotSound;
+				EquippedWeaponInfo.MuzzleFire = Row->MuzzleFire;
+				EquippedWeaponInfo.MuzzleFireSoketName = Row->MuzzleFireSoketName;
+				EquippedWeaponInfo.FiringMontage = Row->FiringMontage;
+				EquippedWeaponInfo.AmmunitionClass = Row->AmmunitionClass;
+				EquippedWeaponInfo.AmmunitionSocketName = Row->AmmunitionSocketName;
+
+				// 武器を装備してサウンドを再生する
+				EquipWeapon(true, Row->HasPistol, Row->EquipSocketName);
+				UGameplayStatics::PlaySound2D(this, Row->EquipmentNoise);
+			}
+
+			// カウント処理
+			CountWeapon(WeaponMeshes, WeaponNumber);
 		}
-
-		// カウント処理
-		CountWeapon(WeaponMeshes, WeaponNumber);
-	}
-	else
-	{
-		// 外す武器を選ぶ
-		FName RowName = RemoveWeapon(WeaponMeshes, WeaponNumber)->ComponentTags[0];
-
-		// データテーブルにアクセス
-		FWeaponStructure* Row = WeaponDataTable->FindRow<FWeaponStructure>(RowName, "");
-		if (Row)
+		else
 		{
-			// 武器を外す
-			EquipWeapon(false, false, Row->AttachSocketName);
+			// 外す武器を選ぶ
+			FName RowName = RemoveWeapon(WeaponMeshes, WeaponNumber)->ComponentTags[0];
+
+			// データテーブルにアクセス
+			FWeaponStructure* Row = WeaponDataTable->FindRow<FWeaponStructure>(RowName, "");
+			if (Row)
+			{
+				// 武器を外す
+				EquipWeapon(false, false, Row->AttachSocketName);
+			}
 		}
 	}
 }
 
-void AGUNMANCharacter::PressedActionPoseMenu()
+void AGUNMANCharacter::EquipWeapon(bool bHasWeapon, bool bHasPistol, FName SoketName)
+{
+	// ソケットに武器をアタッチする
+	EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), SoketName);
+
+	bHasArms = bHasWeapon;
+
+	IAnimationInterface* AnimInterface = Cast<IAnimationInterface>(TPMeshAnimInstance);
+	if (AnimInterface)
+	{
+		// ステートを更新
+		AnimInterface->Execute_EquippedState(TPMeshAnimInstance, bHasWeapon, bHasPistol);
+	}
+}
+
+void AGUNMANCharacter::CountWeapon(TArray<TObjectPtr<USkeletalMeshComponent>> Arms, int Number)
+{
+	// Arms のインデックスを超えていないか？
+	bool bHasNextWeaponNumber = (Number + 1 < Arms.Num()) ? true : false;
+
+	// Arms のインデックスを超えないようにする
+	WeaponNumberCounter = bHasNextWeaponNumber ? (Number + 1) : 0;
+}
+
+USkeletalMeshComponent* AGUNMANCharacter::RemoveWeapon(TArray<TObjectPtr<USkeletalMeshComponent>> Arms, int Number)
+{
+	// インデックスがマイナスか？
+	bool bPickAllWeaponNumber = (Number - 1 < 0) ? true : false;
+
+	// Arms のインデックスがマイナスになったときは元に戻す
+	int PickIndex = bPickAllWeaponNumber ? Arms.Num() - 1 : Number - 1;
+	return Arms[PickIndex];
+}
+
+void AGUNMANCharacter::PressedActionPauseMenu()
 {
 	// バトルマップにアクセス
 	TObjectPtr<ABattleMapScript> BattleMapRef = Cast<ABattleMapScript>(GetWorld()->GetLevelScriptActor());
@@ -641,6 +737,48 @@ void AGUNMANCharacter::StopJump()
 	}
 }
 
+void AGUNMANCharacter::MoveForward(const FInputActionValue& Value)
+{
+	if ((Controller != nullptr) && (Value.Get<float>() != 0.0f))
+	{
+		// どちらが前方向か調べる
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// 前方向ベクトルの取得
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
+		// その方向に移動する
+		AddMovementInput(Direction, Value.Get<float>());
+	}
+}
+
+void AGUNMANCharacter::MoveRight(const FInputActionValue& Value)
+{
+	if ((Controller != nullptr) && (Value.Get<float>() != 0.0f))
+	{
+		// どちらが右方向か調べる
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
+
+		// 右方向ベクトルの取得 
+		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
+		// その方向に移動する
+		AddMovementInput(Direction, Value.Get<float>());
+	}
+}
+
+void AGUNMANCharacter::Look(const FInputActionValue& Value)
+{
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
+	{
+		// コントローラにヨーとピッチの入力を追加
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
 void AGUNMANCharacter::HandleAnyDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser)
 {
 	// ダメージ分、体力を減らす
@@ -697,40 +835,6 @@ void AGUNMANCharacter::ReverseTimeline()
 	}
 }
 
-USkeletalMeshComponent* AGUNMANCharacter::RemoveWeapon(TArray<USkeletalMeshComponent*> Arms, int Number)
-{
-	// インデックスがマイナスか？
-	bool bPickAllWeaponNumber = (Number - 1 < 0) ? true : false;
-
-	// Arms のインデックスがマイナスになったときは元に戻す
-	int PickIndex = bPickAllWeaponNumber ? Arms.Num() - 1 : Number - 1;
-	return Arms[PickIndex];
-}
-
-void AGUNMANCharacter::CountWeapon(TArray<USkeletalMeshComponent*> Arms, int Number)
-{
-	// Arms のインデックスを超えていないか？
-	bool bHasNextWeaponNumber = (Number + 1 < Arms.Num()) ? true : false;
-
-	// Arms のインデックスを超えないようにする
-	WeaponNumberCounter = bHasNextWeaponNumber ? (Number + 1) : 0;
-}
-
-void AGUNMANCharacter::EquipWeapon(bool bHasWeapon, bool bHasPistol, FName SoketName)
-{
-	// ソケットに武器をアタッチする
-	EquippedWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::SnapToTarget, true), SoketName);
-
-	bHasArms = bHasWeapon;
-
-	IAnimationInterface* AnimInterface = Cast<IAnimationInterface>(TPMeshAnimInstance);
-	if (AnimInterface)
-	{
-		// ステートを更新
-		AnimInterface->Execute_EquippedState(TPMeshAnimInstance, bHasWeapon, bHasPistol);
-	}
-}
-
 void AGUNMANCharacter::DisplayGunSight(TObjectPtr<APlayerController>& PlayerController)
 {
 	// WidgetBlueprint の Class を取得する
@@ -765,44 +869,14 @@ void AGUNMANCharacter::DisplayCharacterUI(TObjectPtr<APlayerController>& PlayerC
 	}
 }
 
-void AGUNMANCharacter::MoveForward(const FInputActionValue& Value)
+void AGUNMANCharacter::FireState_Implementation(bool bCanATK)
 {
-	if ((Controller != nullptr) && (Value.Get<float>() != 0.0f))
-	{
-		// どちらが前方向か調べる
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// 前方向ベクトルの取得
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-		// その方向に移動する
-		AddMovementInput(Direction, Value.Get<float>());
-	}
+	bCanAttack = bCanATK;
 }
 
-void AGUNMANCharacter::MoveRight(const FInputActionValue& Value)
+void AGUNMANCharacter::AttachWeapon_Implementation(USkeletalMeshComponent* WeaponMesh, FName AttachSoketName)
 {
-	if ((Controller != nullptr) && (Value.Get<float>() != 0.0f))
-	{
-		// どちらが右方向か調べる
-		const FRotator Rotation = Controller->GetControlRotation();
-		const FRotator YawRotation(0, Rotation.Yaw, 0);
-
-		// 右方向ベクトルの取得 
-		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-		// その方向に移動する
-		AddMovementInput(Direction, Value.Get<float>());
-	}
-}
-
-void AGUNMANCharacter::Look(const FInputActionValue& Value)
-{
-	FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-	if (Controller != nullptr)
-	{
-		// コントローラにヨーとピッチの入力を追加
-		AddControllerYawInput(LookAxisVector.X);
-		AddControllerPitchInput(LookAxisVector.Y);
-	}
+	// 武器をアタッチ
+	WeaponMeshes.Add(WeaponMesh);
+	WeaponMesh->AttachToComponent(GetMesh(), FAttachmentTransformRules(EAttachmentRule::KeepRelative, true), AttachSoketName);
 }

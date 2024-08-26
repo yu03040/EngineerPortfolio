@@ -84,19 +84,20 @@ Platform: Windows
 
 ## 操作説明
 
-| 操作 | コントローラー | キーボード・マウス |
-| :--- | :------------: | -----------------: |
-| ジャンプ |  B ボタン  |    スペースバー    |
-|   移動   | 左スティック | W, A, S, D |
-| カメラ移動 | 右スティック | 右、左、マウスを動かす |
-| 銃を撃つ | 右トリガー + Rボタン | マウス右ボタン + マウス左ボタン |
-| 走る | Y ボタン | Tab, 右 Shift |
-| FPS/TPS 切り替え | 左トリガー | T |
-| 武器切り替え | 方向パッドの上 | マウスホイールを引く |
-| ポーズメニュー | STARTボタン | P |
-| 決定操作 | A ボタン | Enter | 
+|       操作       |          コントローラー          |
+| :--------------: | :------------------------------: |
+|     ジャンプ     |             B ボタン             |
+|        移動      |           左スティック           |
+|     カメラ移動   |           右スティック           |
+|  銃を撃つ（TPS） | 右トリガーを押しながら R ボタン  |
+|  銃を撃つ（FPS） |             L ボタン             |
+|     ダッシュ     |             Y ボタン             |
+| FPS/TPS 切り替え |            左トリガー            |
+|   武器切り替え   |             X ボタン             |
+|  ポーズメニュー  |           START ボタン           |
+|     決定操作     |             A ボタン             |
 
-![GameControllerInstructions.png](Documentation/Images/GameControllerInstructions.png)
+![TitleMap_Tutorial_v2](Documentation/Images/TitleMap_Tutorial_v2.png)
 
 ## 詳細情報
 [Documentation](Documentation/) をチェックしてください。
