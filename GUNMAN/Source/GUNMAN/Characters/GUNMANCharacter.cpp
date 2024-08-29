@@ -128,6 +128,10 @@ void AGUNMANCharacter::BeginPlay()
 	// ThirdPerson のアニメーションインスタンスをセット
 	TPMeshAnimInstance = GetMesh()->GetAnimInstance();
 
+	// 視点を制限（ThirdPerson）
+	UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMax = 10.0f;
+	UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMin = -30.0f;
+
 	// 最初は ThirdPerson にする
 	ToggleFlipflop(true, false);
 
@@ -490,6 +494,11 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 	if (bIsFlipped)
 	{
 		UIGunSightRef->RemoveFromParent();
+
+		// 視点を制限
+		UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMax = 10.0f;
+		UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMin = -50.0f;
+
 		ToggleFlipflop(false, true);
 	}
 	else
@@ -498,7 +507,11 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 		{
 			UIGunSightRef->AddToViewport();
 		}
-		
+
+		// 視点を制限
+		UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMax = 10.0f;
+		UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMin = -30.0f;
+
 		ToggleFlipflop(true, false);
 	}
 	bIsFlipped = !bIsFlipped;
