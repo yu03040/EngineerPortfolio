@@ -494,6 +494,11 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 	}
 	else
 	{
+		if (bHasArms && bIsAimingState)
+		{
+			UIGunSightRef->AddToViewport();
+		}
+		
 		ToggleFlipflop(true, false);
 	}
 	bIsFlipped = !bIsFlipped;
