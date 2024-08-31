@@ -217,6 +217,12 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Data")
 	TObjectPtr<UDataTable> WeaponDataTable;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CameraBoom, meta = (AllowPrivateAccess = "true"))
+	FVector CameraBoomSocketOffset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = CameraBoom, meta = (AllowPrivateAccess = "true"))
+	FVector CameraBoomTargetOffset;
+
 protected:
 	// プレイヤーのスピード変化させるタイムライン
 	FTimeline* RunTimeline;
@@ -281,13 +287,10 @@ protected:
 	/*
 	 * 銃を構える過程
 	 * @param bIsAiming 銃を構えているか？
-	 * @param ArmLength カメラのアームの長さ
 	 * @param bOrientRotationToMovement キャラクターの移動方向に応じて自動的にキャラクターの向きを調整するか？
 	 * @param bYawRotation キャラクターがコントローラーの回転（Yaw）に従って回転するか？
-	 * @param CameraBoomLocation カメラブームの新しい位置
-	 * @param CameraBoomRotation カメラブームの新しい角度
 	 */
-	void GunPreparationProcess(bool bIsAiming, float ArmLength, bool bOrientRotationToMovement, bool bYawRotation, FVector CameraBoomLocation, FRotator CameraBoomRotation);
+	void GunPreparationProcess(bool bIsAiming, bool bOrientRotationToMovement, bool bYawRotation);
 
 	// 銃を構えることを止める関数
 	void StopReadyGun();
@@ -340,7 +343,7 @@ protected:
 	UFUNCTION()
 	void Timeline_LinearInterpCharacterSpeed(float Value);
 
-	/** 発砲時のアニメーションを出す関数 */
+	// 発砲時のアニメーションを出す関数
 	void AnimationAtFiring();
 
 	/*
@@ -379,6 +382,12 @@ public:
 	virtual void OnConstruction(const FTransform& Transform) override;
 
 	virtual void Tick(float DeltaTime) override;
+
+	/*
+	* ThirdPersonCamera の基準位置を変更する関数
+	* @param DeltaTime フレーム間の合計時間
+	*/
+	void ChangeCameraOffset(float& DeltaTime);
 
 	// KillCount の Getter
 	int GetKillCount() const { return KillCount; }
