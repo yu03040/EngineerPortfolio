@@ -51,8 +51,8 @@ void UGUNMANAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 		double PitchAngleDegree = BreakRotator.Pitch;
 		double YawAngleDegree = BreakRotator.Yaw;
-		double MinAngleDegree = -50.0;
-		double MaxAngleDegree = 50.0;
+		double MinAngleDegree = -90.0;
+		double MaxAngleDegree = 90.0;
 		AimPitch = UKismetMathLibrary::ClampAngle(PitchAngleDegree, MinAngleDegree, MaxAngleDegree);
 		AimYaw = UKismetMathLibrary::ClampAngle(YawAngleDegree, MinAngleDegree, MaxAngleDegree);
 	}
