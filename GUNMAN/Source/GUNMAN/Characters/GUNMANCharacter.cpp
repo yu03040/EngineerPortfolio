@@ -55,6 +55,8 @@ AGUNMANCharacter::AGUNMANCharacter()
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 300.0f;
 	CameraBoom->bUsePawnControlRotation = true;
+	CameraBoom->ProbeSize = 10.0f;
+	CameraBoom->ProbeChannel = ECollisionChannel::ECC_Camera;
 
 	// ThirdPersonCameraComponent の作成
 	ThirdPersonCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("ThirdPersonCamera"));
@@ -128,10 +130,6 @@ void AGUNMANCharacter::BeginPlay()
 	// ThirdPerson のアニメーションインスタンスをセット
 	TPMeshAnimInstance = GetMesh()->GetAnimInstance();
 
-	// 視点を制限（ThirdPerson）
-	UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMax = 10.0f;
-	UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMin = -30.0f;
-
 	// 最初は ThirdPerson にする
 	ToggleFlipflop(true, false);
 
@@ -168,6 +166,39 @@ void AGUNMANCharacter::Tick(float DeltaTime)
 	if (RunTimeline != nullptr && RunTimeline->IsPlaying())
 	{
 		RunTimeline->TickTimeline(DeltaTime);
+	}
+
+	ChangeCameraOffset(DeltaTime);
+}
+
+void AGUNMANCharacter::ChangeCameraOffset(float& DeltaTime)
+{
+	if (bIsFP == false)
+	{
+		FHitResult HitResult;
+		FVector Start = GetActorLocation() + FVector(0.0f, 0.0f, 40.0f);
+		FVector End = Start - 80 * GetActorForwardVector();
+		UKismetSystemLibrary::LineTraceSingle(GetWorld(), Start, End, UEngineTypes::ConvertToTraceType(ECC_Visibility), false, TArray<TObjectPtr<AActor>>{this}, EDrawDebugTrace::ForDuration, HitResult, true, FColor::Green, FColor::Red, 5.0f);
+		if (HitResult.bBlockingHit)
+		{
+			// カメラが壁に当たっている（目的の値まで線形補間）
+			CameraBoom->TargetArmLength = FMath::Lerp(CameraBoom->TargetArmLength, 100.0f, DeltaTime);
+			CameraBoom->SocketOffset = FMath::Lerp(CameraBoom->SocketOffset, FVector(0.0f, 0.0f, 60.0f), DeltaTime);
+			CameraBoom->TargetOffset = FMath::Lerp(CameraBoom->TargetOffset, FVector(0.0f, 0.0f, 100.0f), DeltaTime);
+		}
+		else if (bIsAimingState)
+		{
+			// 銃を構えているとき（目的の値まで線形補間）
+			CameraBoom->TargetArmLength = FMath::Lerp(CameraBoom->TargetArmLength, 300.0f, DeltaTime);
+			CameraBoom->SocketOffset = FMath::Lerp(CameraBoom->SocketOffset, CameraBoomSocketOffset, DeltaTime);
+			CameraBoom->TargetOffset = FMath::Lerp(CameraBoom->TargetOffset, FVector(0.0f, 0.0f, 0.0f), DeltaTime);
+		}
+		else
+		{
+			CameraBoom->TargetArmLength = FMath::Lerp(CameraBoom->TargetArmLength, 300.0f, DeltaTime);
+			CameraBoom->TargetOffset = FMath::Lerp(CameraBoom->SocketOffset, FVector(0.0f, 0.0f, 0.0f), DeltaTime);
+			CameraBoom->TargetOffset = FMath::Lerp(CameraBoom->TargetOffset, FVector(0.0f, 0.0f, 0.0f), DeltaTime);
+		}
 	}
 }
 
@@ -374,12 +405,12 @@ void AGUNMANCharacter::OnFire()
 	FVector StartLocation = ThirdPersonCamera->GetComponentLocation();
 	FVector EndLocation = StartLocation + ThirdPersonCamera->GetForwardVector() * 10000.0f;
 
-	FCollisionQueryParams TraceParams(FName(TEXT("LineTraceByChannel")), true, this); // 衝突クエリに関するパラメータを設定するための構造体
-	TraceParams.bTraceComplex = false; // 詳細な衝突判定を行うか
+	FCollisionQueryParams TraceParams; // 衝突クエリに関するパラメータを設定するための構造体
 	TraceParams.AddIgnoredActor(this); // このアクターを無視する
 
 	// ライントレースを実行
 	bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, StartLocation, EndLocation, ECC_Visibility, TraceParams);
+	//DrawDebugLine(GetWorld(), StartLocation, EndLocation, FColor::Red, false, 5.0f);
 	if (bHit)
 	{
 		// hit したのが敵だったら
@@ -406,7 +437,7 @@ void AGUNMANCharacter::OnFire()
 				}
 				// 敵に TP_WeaponATK だけダメージを与える
 				UGameplayStatics::ApplyDamage(Enemy, TP_WeaponATK, nullptr, nullptr, nullptr);
-				
+
 				if (Enemy->GetCurrentHealth() <= 0.0f)
 				{
 					// 死んだらカウント
@@ -494,11 +525,6 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 	if (bIsFlipped)
 	{
 		UIGunSightRef->RemoveFromParent();
-
-		// 視点を制限
-		UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMax = 10.0f;
-		UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMin = -50.0f;
-
 		ToggleFlipflop(false, true);
 	}
 	else
@@ -507,10 +533,6 @@ void AGUNMANCharacter::ToggleBetweenTPSAndFPS()
 		{
 			UIGunSightRef->AddToViewport();
 		}
-
-		// 視点を制限
-		UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMax = 10.0f;
-		UGameplayStatics::GetPlayerCameraManager(this, 0)->ViewPitchMin = -30.0f;
 
 		ToggleFlipflop(true, false);
 	}
@@ -554,7 +576,8 @@ void AGUNMANCharacter::StartReadyGun()
 {
 	if (bHasArms == true && bIsFP == false)
 	{
-		GunPreparationProcess(true, 150.0f, false, true, FVector(0.0f, 98.0f, 102.0f), FRotator(0.0f, 32.0f, 41.0f));
+		CameraBoom->SocketOffset = CameraBoomSocketOffset;
+		GunPreparationProcess(true, false, true);
 		if (UIGunSightRef)
 		{
 			// 照準を画面に表示する
@@ -565,15 +588,19 @@ void AGUNMANCharacter::StartReadyGun()
 
 void AGUNMANCharacter::StopReadyGun()
 {
-	GunPreparationProcess(false, 300.0f, true, false, FVector(0.0f, 0.0f, 0.0f), FRotator(0.0f, 0.0f, 0.0f));
-	if (UIGunSightRef)
+	if (bHasArms == true && bIsFP == false)
 	{
-		// 照準を画面から取り除く
-		UIGunSightRef->RemoveFromParent();
+		CameraBoom->SocketOffset = FVector(0.0f, 0.0f, 0.0f);
+		GunPreparationProcess(false, true, false);
+		if (UIGunSightRef)
+		{
+			// 照準を画面から取り除く
+			UIGunSightRef->RemoveFromParent();
+		}
 	}
 }
 
-void AGUNMANCharacter::GunPreparationProcess(bool bIsAiming, float ArmLength, bool bOrientRotationToMovement, bool bYawRotation, FVector CameraBoomLocation, FRotator CameraBoomRotation)
+void AGUNMANCharacter::GunPreparationProcess(bool bIsAiming, bool bOrientRotationToMovement, bool bYawRotation)
 {
 	// エイムのフラグを設定
 	bIsAimingState = bIsAiming;
@@ -585,17 +612,11 @@ void AGUNMANCharacter::GunPreparationProcess(bool bIsAiming, float ArmLength, bo
 		AnimInterface->Execute_AimingState(TPMeshAnimInstance, bIsAimingState);
 	}
 
-	// カメラアームの長さを設定
-	CameraBoom->TargetArmLength = ArmLength;
-
 	// カメラの向きの設定
 	GetCharacterMovement()->bOrientRotationToMovement = bOrientRotationToMovement;
 
 	// 歩く向きの設定
 	bUseControllerRotationYaw = bYawRotation;
-
-	// カメラブームの位置と角度を設定
-	CameraBoom->SetRelativeLocationAndRotation(CameraBoomLocation, CameraBoomRotation, false, false);
 }
 
 void AGUNMANCharacter::AttachingAndRemovingGun()
